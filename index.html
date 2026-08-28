@@ -187,6 +187,60 @@
     font-weight:700;
   }
 
+  .moderador-panel .control-global {
+    margin:10px 0 8px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+
+  .moderador-panel .control-global-head {
+    margin:0 0 8px;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#dce8ff;
+    font-weight:700;
+  }
+
+  .moderador-panel .control-global-editor {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:8px 0;
+  }
+
+  .moderador-panel .control-global-editor input {
+    flex:1 1 120px;
+    min-width:0;
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    background:rgba(255,255,255,0.08);
+    color:#edf4ff;
+    font:inherit;
+  }
+
+  .moderador-panel .control-global-json {
+    width:100%;
+    min-height:120px;
+    resize:vertical;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(10,14,24,0.65);
+    color:#eaf3ff;
+    padding:8px 10px;
+    font:10px/1.5 "DM Mono", ui-monospace, monospace;
+    margin:8px 0;
+  }
+
+  .moderador-panel .control-global-link {
+    display:inline-block;
+    margin-top:4px;
+    color:#9ad5ff;
+    font-size:10px;
+    text-decoration:underline;
+  }
+
   .moderador-panel .acciones {
     display:flex;
     flex-wrap:wrap;
@@ -221,6 +275,10 @@
     display:flex; flex-direction:column; justify-content:center;
     padding:clamp(28px,6vw,80px);
     gap:clamp(24px,4vh,44px);
+  }
+
+  .bloque-meta {
+    display:contents;
   }
 
   .top-meta {
@@ -1061,30 +1119,48 @@
     justify-content:center;
   }
 
-  .top5-keyboard {
-    width:min(100%, 320px);
-    margin:0 auto;
+  .top5-shell.top5-compact .top5-row {
+    padding:3px 6px;
+  }
+
+  .top5-shell.top5-compact .top5-input,
+  .top5-shell.top5-compact .top5-num,
+  .top5-shell.top5-compact .top5-check {
+    font-size:11px;
+  }
+
+  .top5-input-row {
     display:flex;
-    flex-direction:column;
-    gap:clamp(3px, 0.6vh, 5px);
+    align-items:stretch;
+    gap:8px;
+    width:100%;
   }
 
-  .top5-keyboard .wordle-key {
-    height:clamp(26px, 2.6vh, 30px);
-    min-width:clamp(17px, 1.8vw, 24px);
-    font-size:clamp(9px, 0.85vw, 10px);
-    padding:0 6px;
+  .top5-guess {
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04);
+    border-radius:12px;
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    min-height:36px;
+    padding:8px 10px;
+    outline:none;
+    transition:border-color .12s ease, background .12s ease, transform .12s ease;
   }
 
-  .top5-keyboard .wordle-key.wide {
-    min-width:clamp(38px, 4vw, 46px);
+  .top5-guess:focus {
+    border-color:rgba(255, 204, 106, 0.7);
+    background:rgba(255,255,255,0.05);
   }
 
   @media (max-width: 480px) {
-    .top5-keyboard {
-      width:min(100%, 260px);
-    }
-
     .top5-category {
       font-size:13px;
     }
@@ -2371,9 +2447,32 @@
     }
 
     main {
-      padding: 96px 18px 28px;
+      padding: 270px 18px 28px;
       gap: 10px;
       justify-content: flex-start;
+    }
+
+    .bloque-meta {
+      position: fixed;
+      top: calc(14px + env(safe-area-inset-top));
+      left: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      z-index: 6;
+      max-width: 62vw;
+    }
+
+    .bloque-meta .top-meta {
+      margin-top: 0;
+      white-space: normal;
+    }
+
+    .bloque-meta .weather-badge,
+    .bloque-meta .franja,
+    .bloque-meta .fecha-hoy {
+      white-space: normal;
     }
 
     .top-meta {
@@ -2416,8 +2515,12 @@
     .firma { font-size: 10px; }
 
     .astro {
-      width:min(54vmin, 220px);
-      top: 21%;
+      left: auto;
+      right: 12%;
+      width: 104px;
+      height: 104px;
+      top: 120px;
+      transform: none;
       opacity: 0.9;
     }
 
@@ -2629,6 +2732,19 @@
     </div>
     <div id="moderador-meta" class="meta"></div>
     <div id="moderador-override" class="override" hidden></div>
+
+    <div class="control-global">
+      <div class="control-global-head">Control global</div>
+      <div id="control-global-estado" class="meta"></div>
+      <div id="control-global-warning" class="override" hidden></div>
+      <div class="control-global-editor">
+        <input id="control-global-input" type="date" aria-label="Fecha forzada">
+        <button id="control-global-generar" type="button">Generar JSON</button>
+      </div>
+      <textarea id="control-global-json" class="control-global-json" readonly hidden></textarea>
+      <a id="control-global-link" class="control-global-link" href="#" target="_blank" rel="noreferrer noopener">Abrir control.json</a>
+    </div>
+
     <ul id="moderador-warnings" class="meta" hidden></ul>
     <div class="acciones">
       <button id="moderador-regenerar" type="button">Regenerar juegos de hoy</button>
@@ -2749,14 +2865,16 @@
   <div id="persist-status" class="persist-status" aria-live="polite">No puedo guardar tu progreso en este navegador</div>
 
   <main>
-    <div class="top-meta">
-      <p class="franja" id="franja">—</p>
-      <p class="fecha-hoy" id="fecha-hoy">Fecha</p>
-    </div>
+    <div class="bloque-meta">
+      <div class="top-meta">
+        <p class="franja" id="franja">—</p>
+        <p class="fecha-hoy" id="fecha-hoy">Fecha</p>
+      </div>
 
-    <div class="weather-badge" id="weather-badge" aria-live="polite">
-      <span class="weather-dot" aria-hidden="true"></span>
-      <span id="weather-texto">Cargando clima…</span>
+      <div class="weather-badge" id="weather-badge" aria-live="polite">
+        <span class="weather-dot" aria-hidden="true"></span>
+        <span id="weather-texto">Cargando clima…</span>
+      </div>
     </div>
 
     <h1 class="saludo">
@@ -2787,6 +2905,12 @@
   const animacionDia = document.getElementById('animacion-dia');
   const panelModerador = document.getElementById('moderador-panel');
   const listaModerador = document.getElementById('moderador-lista');
+  const controlGlobalEstado = document.getElementById('control-global-estado');
+  const controlGlobalWarning = document.getElementById('control-global-warning');
+  const controlGlobalInput = document.getElementById('control-global-input');
+  const controlGlobalGenerar = document.getElementById('control-global-generar');
+  const controlGlobalJson = document.getElementById('control-global-json');
+  const controlGlobalLink = document.getElementById('control-global-link');
   const DISPOSITIVOS_KEY = 'granDiaDispositivos';
   const GLOBAL_SYNC_KEY = 'granDiaGlobalSync';
   const GLOBAL_SYNC_CHANNEL = 'gran-dia-sync';
@@ -2871,6 +2995,13 @@
   const HORA_CORTE = 10;
   const OFFSET_ARG = -3;
   const VERSION_JUEGOS = 1;
+  const URL_REPO_CONTROL = 'https://github.com/tuusuario/tu-repo/blob/main/control.json';
+  // control.json es el origen de verdad compartido para todos los dispositivos.
+  // El panel solo ayuda a redactar el texto; no escribe el archivo.
+
+  let DIA_FORZADO = null;
+  let ultimaVerificacionControl = 0;
+  const CONTROL_MIN_INTERVAL_MS = 2 * 60 * 1000;
 
   const CALENDARIO = {
     '2026-08-28': {
@@ -2925,10 +3056,46 @@
     return utcMs - fecha.getTime();
   }
 
+  // FORZAR UN DÍA EN TODOS LOS DISPOSITIVOS
+  // 1. Editar control.json (se puede desde github.com, también en el celular).
+  // 2. Poner "diaForzado": "2026-09-05" y commitear.
+  // 3. Vercel publica en ~1 min. Los dispositivos lo toman al recargar o al volver
+  //    a la pestaña.
+  // 4. Para volver al automático, poner null.
+  async function cargarControl() {
+    const ahora = Date.now();
+    if (ahora - ultimaVerificacionControl < CONTROL_MIN_INTERVAL_MS) {
+      return;
+    }
+    ultimaVerificacionControl = ahora;
+
+    try {
+      const res = await fetch('control.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) {
+        DIA_FORZADO = null;
+        return;
+      }
+
+      const data = await res.json();
+      const nuevo = data && typeof data.diaForzado === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(data.diaForzado)
+        ? data.diaForzado
+        : null;
+      const cambio = DIA_FORZADO !== nuevo;
+      DIA_FORZADO = nuevo;
+
+      if (cambio && typeof comprobarCambioDeDia === 'function' && typeof diaVisible !== 'undefined') {
+        comprobarCambioDeDia();
+      }
+    } catch (e) {
+      DIA_FORZADO = null;
+    }
+  }
+
   function diaLogico() {
     const params = new URLSearchParams(window.location.search);
     const override = params.get('dia');
     if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
+    if (DIA_FORZADO && /^\d{4}-\d{2}-\d{2}$/.test(DIA_FORZADO)) return DIA_FORZADO;
 
     const ahora = new Date();
     const offset = offsetBuenosAiresMs(ahora);
@@ -2942,7 +3109,8 @@
   function diaLogicoOverrideActivo() {
     const params = new URLSearchParams(window.location.search);
     const override = params.get('dia');
-    return Boolean(override && /^\d{4}-\d{2}-\d{2}$/.test(override));
+    if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return true;
+    return Boolean(DIA_FORZADO && /^\d{4}-\d{2}-\d{2}$/.test(DIA_FORZADO));
   }
 
   function fechaExisteEnCalendario(fecha) {
@@ -3463,6 +3631,40 @@
 
     if (meta) {
       meta.innerHTML = `Día lógico: <strong>${diaActual}</strong><br>Entrada del calendario: <strong>${fechaHoy ? 'Sí' : 'No'}</strong><br>Versión: <strong>v${VERSION_JUEGOS}</strong> · Corte: <strong>${HORA_CORTE}:00 (hora AR)</strong><br>Próximo cambio en <strong>${proximoCambio.texto}</strong><br>Juego del día: <strong>${juegoHoy.nombre}</strong><br>Contenido cargado hasta el <strong>${ultimoCargado}</strong>, faltan <strong>${faltan}</strong> días. ${alertaFaltan}<br><a href="${linkMañana}" target="_blank" rel="noreferrer noopener">Previsualizar mañana</a>`;
+    }
+
+    if (controlGlobalEstado) {
+      const estadoControl = DIA_FORZADO ? DIA_FORZADO : 'automático';
+      controlGlobalEstado.innerHTML = `Día forzado: <strong>${estadoControl}</strong>`;
+    }
+
+    if (controlGlobalWarning) {
+      const activo = Boolean(DIA_FORZADO && /^\d{4}-\d{2}-\d{2}$/.test(DIA_FORZADO));
+      controlGlobalWarning.hidden = !activo;
+      controlGlobalWarning.textContent = activo ? `Día forzado activo: ${DIA_FORZADO}` : 'Sin día forzado activo';
+    }
+
+    if (controlGlobalInput) {
+      controlGlobalInput.value = DIA_FORZADO || '';
+    }
+
+    if (controlGlobalLink) {
+      controlGlobalLink.href = URL_REPO_CONTROL || '#';
+      controlGlobalLink.textContent = 'Abrir control.json';
+    }
+
+    if (controlGlobalGenerar) {
+      controlGlobalGenerar.onclick = () => {
+        const fecha = (controlGlobalInput && controlGlobalInput.value) || '';
+        const payload = {
+          diaForzado: fecha || null,
+          nota: 'Poné una fecha YYYY-MM-DD para forzar ese día en todos los dispositivos. null = automático.'
+        };
+        if (controlGlobalJson) {
+          controlGlobalJson.value = JSON.stringify(payload, null, 2);
+          controlGlobalJson.hidden = false;
+        }
+      };
     }
 
     if (warnings.length) {
@@ -4460,133 +4662,68 @@
 
     let inputValue = '';
 
-    const currentDisplay = document.createElement('div');
-    currentDisplay.className = 'top5-guess';
-    currentDisplay.textContent = '—';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'top5-guess';
+    input.placeholder = 'Escribí tu respuesta';
+    input.autocomplete = 'off';
+    input.autocorrect = 'off';
+    input.autocapitalize = 'characters';
+    input.spellcheck = false;
+    input.enterKeyHint = 'done';
+    input.inputMode = 'text';
 
-    function actualizarDisplay() {
-      currentDisplay.textContent = normalizarTexto(inputValue) || '—';
-    }
-
-    const keyboard = document.createElement('div');
-    keyboard.className = 'wordle-keyboard top5-keyboard';
-    const filas = [
-      'QWERTYUIOP',
-      'ASDFGHJKL'
-    ];
-
-    const compactarEnter = window.innerWidth <= 393;
-
-    filas.forEach((letters, index) => {
-      const row = document.createElement('div');
-      row.className = 'wordle-key-row';
-
-      [...letters].forEach((letter) => {
-        const key = document.createElement('button');
-        key.type = 'button';
-        key.className = 'wordle-key';
-        key.textContent = letter;
-        key.addEventListener('click', () => {
-          if (terminado) return;
-          inputValue = (inputValue + letter).slice(0, 40);
-          actualizarDisplay();
-          if (status) {
-            const valor = normalizarTexto(inputValue);
-            if (!valor) {
-              status.textContent = 'Completá la respuesta antes de validar';
-            } else {
-              status.textContent = 'Respuesta actual: ' + valor;
-            }
-          }
-        });
-        row.appendChild(key);
-      });
-
-      if (compactarEnter && index === 0) {
-        const enterKey = document.createElement('button');
-        enterKey.type = 'button';
-        enterKey.className = 'wordle-key wide';
-        enterKey.textContent = 'ENTER';
-        enterKey.addEventListener('click', () => validarRespuesta());
-        row.appendChild(enterKey);
+    const syncInput = () => {
+      const valor = normalizarTexto(inputValue);
+      input.value = valor || '';
+      if (status) {
+        status.textContent = valor ? 'Respuesta actual: ' + valor : 'Completá la respuesta antes de validar';
       }
+    };
 
-      keyboard.appendChild(row);
-    });
-
-    const tercerFila = document.createElement('div');
-    tercerFila.className = 'wordle-key-row';
-
-    const deleteKey = document.createElement('button');
-    deleteKey.type = 'button';
-    deleteKey.className = 'wordle-key wide';
-    deleteKey.textContent = '⌫';
-    deleteKey.addEventListener('click', () => {
+    input.addEventListener('input', () => {
       if (terminado) return;
-      inputValue = inputValue.slice(0, -1);
-      actualizarDisplay();
-    });
-    tercerFila.appendChild(deleteKey);
-
-    [...'ZXCVBNM'].forEach((letter) => {
-      const key = document.createElement('button');
-      key.type = 'button';
-      key.className = 'wordle-key';
-      key.textContent = letter;
-      key.addEventListener('click', () => {
-        if (terminado) return;
-        inputValue = (inputValue + letter).slice(0, 40);
-        actualizarDisplay();
-      });
-      tercerFila.appendChild(key);
+      inputValue = input.value.slice(0, 40);
+      syncInput();
     });
 
-    const spaceKey = document.createElement('button');
-    spaceKey.type = 'button';
-    spaceKey.className = 'wordle-key wide';
-    spaceKey.style.minWidth = '70px';
-    spaceKey.textContent = '␣';
-    spaceKey.addEventListener('click', () => {
-      if (terminado) return;
-      inputValue = (inputValue + ' ').slice(0, 40);
-      actualizarDisplay();
-    });
-    tercerFila.appendChild(spaceKey);
-
-    if (!compactarEnter) {
-      const enterKey = document.createElement('button');
-      enterKey.type = 'button';
-      enterKey.className = 'wordle-key wide';
-      enterKey.textContent = 'ENTER';
-      enterKey.addEventListener('click', () => validarRespuesta());
-      tercerFila.appendChild(enterKey);
-    }
-
-    keyboard.appendChild(tercerFila);
-
-    const onKeyDown = (event) => {
+    input.addEventListener('keydown', (event) => {
       if (terminado) return;
       if (event.key === 'Enter') {
         event.preventDefault();
         validarRespuesta();
-        return;
       }
-      if (event.key === 'Backspace') {
-        event.preventDefault();
-        inputValue = inputValue.slice(0, -1);
-        actualizarDisplay();
-        return;
-      }
-      if (/^[a-zA-Z0-9 ]$/.test(event.key)) {
-        inputValue = (inputValue + event.key).slice(0, 40);
-        actualizarDisplay();
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
+    });
+
+    input.addEventListener('focus', () => {
+      setTimeout(() => {
+        input.scrollIntoView({ block: 'nearest' });
+      }, 300);
+    });
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'top5-check';
+    button.textContent = 'Enviar';
+    button.addEventListener('click', () => validarRespuesta());
+
+    const inputRow = document.createElement('div');
+    inputRow.className = 'top5-input-row';
+    inputRow.appendChild(input);
+    inputRow.appendChild(button);
 
     shell.appendChild(list);
-    shell.appendChild(currentDisplay);
-    shell.appendChild(keyboard);
+    shell.appendChild(inputRow);
+
+    const handleVisualViewportResize = () => {
+      if (!window.visualViewport) return;
+      shell.classList.toggle('top5-compact', window.visualViewport.height < 500);
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewportResize);
+      handleVisualViewportResize();
+    }
 
     function renderRanking() {
       rankingCells.forEach(({ row, value }, index) => {
@@ -4611,7 +4748,7 @@
       });
       renderRanking();
       inputValue = '';
-      actualizarDisplay();
+      syncInput();
       if (status) {
         status.textContent = `Perdiste. La respuesta correcta era: ${categoriaActual.respuestas.join(', ')}`;
       }
@@ -4630,7 +4767,7 @@
       if (posicion === -1) {
         vidas -= 1;
         inputValue = '';
-        actualizarDisplay();
+        syncInput();
         if (status) {
           status.textContent = vidas > 0 ? `Te equivocaste, te quedan ${vidas} vidas` : 'Perdiste';
         }
@@ -4647,14 +4784,14 @@
       if (posicionadas[posicion]) {
         if (status) status.textContent = 'Esa respuesta ya está en el ranking';
         inputValue = '';
-        actualizarDisplay();
+        syncInput();
         return;
       }
 
       posicionadas[posicion] = categoriaActual.respuestas[posicion];
       posicionesAdivinadas.add(posicion);
       inputValue = '';
-      actualizarDisplay();
+      syncInput();
       renderRanking();
 
       if (status) status.textContent = 'Respuesta correcta';
@@ -4669,10 +4806,13 @@
 
     renderLives();
     renderRanking();
+    syncInput();
     contenedor.appendChild(shell);
 
     return function desmontar() {
-      document.removeEventListener('keydown', onKeyDown);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
+      }
       contenedor.innerHTML = '';
     };
   }
@@ -6131,10 +6271,14 @@
       return;
     }
 
+    if (Date.now() - ultimaVerificacionControl >= CONTROL_MIN_INTERVAL_MS) {
+      cargarControl();
+    }
     comprobarCambioDeDia();
   });
 
   window.addEventListener('pageshow', function () {
+    cargarControl();
     comprobarCambioDeDia();
   });
 
@@ -6155,6 +6299,7 @@
     const corteProximo = ahoraArg.getTime() >= corteHoy ? Date.UTC(ahoraArg.getUTCFullYear(), ahoraArg.getUTCMonth(), ahoraArg.getUTCDate() + 1, HORA_CORTE, 0, 0) : corteHoy;
     const espera = Math.max(1000, Math.min(corteProximo - ahora + 1000, 2147483000));
     proximoCambioTimer = setTimeout(() => {
+      cargarControl();
       comprobarCambioDeDia();
       programarProximoCambio();
     }, espera);
@@ -6220,6 +6365,7 @@
     }
   })();
 
+  cargarControl();
   registrarIngresoDispositivo();
   escucharCambiosGlobales();
   activarPanelModerador();
