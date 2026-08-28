@@ -364,6 +364,7 @@
     color:#fff;
     text-decoration:none;
     font-family:"DM Mono",ui-monospace,monospace;
+    white-space:nowrap;
     box-shadow:0 12px 26px rgba(0,0,0,0.14);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
@@ -616,6 +617,10 @@
     text-transform:uppercase;
     pointer-events:none;
     box-shadow:0 10px 22px rgba(0,0,0,0.14);
+  }
+
+  .game-refresh-status.hidden {
+    display:none;
   }
 
   .game-refresh-timer {
@@ -1010,15 +1015,15 @@
   }
 
   .wordle-key {
-    min-width:clamp(22px, 2.6vw, 30px);
-    height:clamp(26px, 3vh, 32px);
-    padding:0 clamp(6px, 1.2vw, 8px);
+    min-width:clamp(18px, 1.9vw, 26px);
+    height:clamp(28px, 2.8vh, 34px);
+    padding:0 clamp(5px, 0.9vw, 8px);
     border:none;
     border-radius:8px;
     background:rgba(255,255,255,0.1);
     color:#f5f1ff;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(9px, 1vw, 11px);
+    font-size:clamp(9px, 0.9vw, 11px);
     font-weight:700;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -1031,7 +1036,7 @@
   }
 
   .wordle-key.wide {
-    min-width:54px;
+    min-width:clamp(42px, 4.4vw, 52px);
   }
 
   .wordle-key.correct { background:#2baf6c; }
@@ -1045,21 +1050,69 @@
   }
 
   .top5-shell {
-    width:min(100%, 360px);
+    width:min(100%, 300px);
     margin:0 auto;
     display:flex;
     flex-direction:column;
-    gap:clamp(8px, 1.3vh, 12px);
+    gap:clamp(6px, 1vh, 10px);
     align-items:stretch;
+    flex:1 1 auto;
     min-height:0;
+    justify-content:center;
+  }
+
+  .top5-keyboard {
+    width:min(100%, 320px);
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(3px, 0.6vh, 5px);
+  }
+
+  .top5-keyboard .wordle-key {
+    height:clamp(26px, 2.6vh, 30px);
+    min-width:clamp(17px, 1.8vw, 24px);
+    font-size:clamp(9px, 0.85vw, 10px);
+    padding:0 6px;
+  }
+
+  .top5-keyboard .wordle-key.wide {
+    min-width:clamp(38px, 4vw, 46px);
+  }
+
+  @media (max-width: 480px) {
+    .top5-keyboard {
+      width:min(100%, 260px);
+    }
+
+    .top5-category {
+      font-size:13px;
+    }
+
+    .top5-row {
+      padding:5px 8px;
+    }
+
+    .top5-num {
+      width:22px;
+      height:22px;
+      font-size:10px;
+      border-radius:7px;
+    }
+
+    .top5-guess {
+      min-height:36px;
+      padding:8px 10px;
+      font-size:12px;
+    }
   }
 
   .top5-header {
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
-    gap:8px;
-    padding:10px 12px;
+    gap:6px;
+    padding:8px 10px;
     border-radius:16px;
     background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
     border:1px solid rgba(255,255,255,0.12);
@@ -1069,25 +1122,29 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    min-width:78px;
-    padding:6px 8px;
+    min-width:60px;
+    padding:4px 7px;
     border-radius:999px;
     background:rgba(255, 214, 124, 0.12);
     border:1px solid rgba(255, 214, 124, 0.4);
     color:#ffddb2;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:9px;
+    font-size:8px;
     letter-spacing:.12em;
     text-transform:uppercase;
   }
 
   .top5-category {
     margin:0;
-    font-size:clamp(15px, 2vw, 20px);
-    line-height:1.2;
+    font-size:clamp(13px, 1.6vw, 16px);
+    line-height:1.15;
     letter-spacing:-.04em;
     font-weight:700;
     color:#f5f1ff;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
   }
 
   .top5-lives {
@@ -1099,8 +1156,8 @@
   }
 
   .top5-life {
-    width:14px;
-    height:14px;
+    width:11px;
+    height:11px;
     border-radius:50%;
     background:rgba(255,255,255,0.12);
     border:1px solid rgba(255,255,255,0.3);
@@ -1117,15 +1174,15 @@
   .top5-list {
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:clamp(5px, 0.9vh, 8px);
   }
 
   .top5-row {
     display:grid;
-    grid-template-columns:28px 1fr auto;
+    grid-template-columns:22px 1fr;
     gap:8px;
     align-items:center;
-    padding:8px 10px;
+    padding:5px 8px;
     border-radius:12px;
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.08);
@@ -1145,14 +1202,14 @@
   .top5-num {
     display:grid;
     place-items:center;
-    width:28px;
-    height:28px;
-    border-radius:9px;
+    width:22px;
+    height:22px;
+    border-radius:7px;
     background:rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.1);
     font-family:"DM Mono",ui-monospace,monospace;
     color:#f4e9ff;
-    font-size:11px;
+    font-size:10px;
     font-weight:700;
   }
 
@@ -1162,11 +1219,32 @@
     background:rgba(255,255,255,0.03);
     border-radius:10px;
     color:#f5f1ff;
-    padding:8px 10px;
+    padding:6px 8px;
     font:inherit;
-    font-size:13px;
+    font-size:12px;
     outline:none;
     transition:border-color .12s ease, background .12s ease, transform .12s ease;
+  }
+
+  .top5-guess {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:36px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
 
   .top5-input:focus {
@@ -1188,6 +1266,7 @@
     border:none;
     border-radius:10px;
     padding:10px 12px;
+    min-width:72px;
     background:linear-gradient(180deg, rgba(255, 208, 105, 0.96), rgba(244, 153, 88, 0.94));
     color:#1f1a2d;
     font-weight:800;
@@ -2292,18 +2371,16 @@
     }
 
     main {
-      padding: 150px 18px 36px;
-      gap: 12px;
+      padding: 96px 18px 28px;
+      gap: 10px;
       justify-content: flex-start;
     }
 
     .top-meta {
-      order: 2;
       margin-top: 8px;
     }
 
     .weather-badge {
-      order: 3;
       margin-bottom: 2px;
       font-size: 10px;
       padding: 7px 10px;
@@ -2311,18 +2388,16 @@
     }
 
     .saludo {
-      order: 1;
-      margin-top: 96px;
+      margin-top: 0;
       max-width: 11ch;
-      font-size: 42px;
-      line-height: .96;
-      letter-spacing: -.04em;
+      font-size: clamp(42px, 13vw, 62px);
+      line-height: .82;
+      letter-spacing: -.05em;
     }
 
     .dia-mensaje,
     .firma,
     .pie {
-      order: 4;
       letter-spacing: .06em;
     }
 
@@ -2332,7 +2407,12 @@
       letter-spacing: .06em;
     }
 
-    .dia-mensaje { font-size: 11px; }
+    .dia-mensaje {
+      font-size: clamp(34px, 11vw, 52px);
+      line-height: .84;
+      max-width: 11ch;
+      letter-spacing: -.05em;
+    }
     .firma { font-size: 10px; }
 
     .astro {
@@ -2377,7 +2457,6 @@
       border-radius:18px;
       overflow:hidden;
       gap:12px;
-      -webkit-overflow-scrolling:touch;
     }
 
     .game-header {
@@ -2482,8 +2561,8 @@
     .game-words {
       flex:1 1 auto;
       min-height:0;
-      overflow-y:auto;
-      padding:10px;
+      overflow:visible;
+      padding:8px 10px;
     }
 
     .game-words ul {
@@ -2491,14 +2570,24 @@
     }
 
     .game-words li {
-      padding:5px 8px;
-      font-size:11px;
+      padding:4px 7px;
+      font-size:10px;
       letter-spacing:.02em;
     }
 
     .premios-grid {
       grid-template-columns: 1fr;
       gap:12px;
+      max-height:none;
+      overflow:visible;
+    }
+
+    .premio-card {
+      padding:12px;
+    }
+
+    .premio-card h3 {
+      font-size:18px;
     }
 
     .premio-button {
@@ -2582,15 +2671,14 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14.7 7l5 .7-3.6 3.6.9 5.2-4.9-2.6-4.9 2.6.9-5.2L4.3 7.7l5-.7L12 2.5Zm0 4.8 1.3 2.6 2.9.4-2.1 2 0 3-2.1-1.1-2.1 1.1 0-3-2.1-2 2.9-.4L12 7.3Z"/></svg>
       <span id="medal-count">0</span>
     </button>
-    <a id="game-badge" class="game-badge" href="#" aria-label="Juegos">juegos</a>
+    <a id="game-badge" class="game-badge" href="#" aria-label="Juegos del día">juegos del día</a>
   </div>
 
   <div id="game-modal" class="game-modal" aria-hidden="true">
     <div class="game-panel" role="dialog" aria-modal="true" aria-labelledby="game-title">
-      <div id="game-toast" class="game-toast" aria-live="polite"></div>
       <div class="game-header">
         <div>
-          <div id="game-kicker" class="game-kicker">juegos</div>
+          <div id="game-kicker" class="game-kicker">juegos del día</div>
           <h2 id="game-title">Elegí tu juego</h2>
         </div>
         <button id="game-close" class="game-close" type="button" aria-label="Cerrar juego">×</button>
@@ -3835,26 +3923,6 @@
     return diaLogico();
   }
 
-  function mostrarToastGame(mensaje) {
-    const toast = document.getElementById('game-toast');
-    if (!toast) return;
-    toast.textContent = mensaje;
-    toast.classList.remove('visible');
-    void toast.offsetWidth;
-    toast.classList.add('visible');
-    window.clearTimeout(toast._timer);
-    toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 1800);
-  }
-
-  function mostrarToastVersion(mensaje) {
-    mostrarToastGame(mensaje);
-    const toast = document.getElementById('game-toast');
-    if (toast) {
-      window.clearTimeout(toast._timer);
-      toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 2000);
-    }
-  }
-
   function mostrarMedallaOverlay() {
     const overlay = document.getElementById('medalla-overlay');
     const total = Number((leerEstado().medallas) || 0);
@@ -4390,26 +4458,135 @@
       return { row, value };
     });
 
-    const inputWrap = document.createElement('div');
-    inputWrap.className = 'top5-row';
-    inputWrap.style.gridTemplateColumns = '1fr auto';
-    inputWrap.style.marginTop = '8px';
+    let inputValue = '';
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'top5-input';
-    input.placeholder = 'Ingresá una respuesta';
-    input.autocomplete = 'off';
-    input.spellcheck = false;
-    input.maxLength = 40;
+    const currentDisplay = document.createElement('div');
+    currentDisplay.className = 'top5-guess';
+    currentDisplay.textContent = '—';
 
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'top5-check';
-    button.textContent = 'ENTER';
+    function actualizarDisplay() {
+      currentDisplay.textContent = normalizarTexto(inputValue) || '—';
+    }
 
-    inputWrap.appendChild(input);
-    inputWrap.appendChild(button);
+    const keyboard = document.createElement('div');
+    keyboard.className = 'wordle-keyboard top5-keyboard';
+    const filas = [
+      'QWERTYUIOP',
+      'ASDFGHJKL'
+    ];
+
+    const compactarEnter = window.innerWidth <= 393;
+
+    filas.forEach((letters, index) => {
+      const row = document.createElement('div');
+      row.className = 'wordle-key-row';
+
+      [...letters].forEach((letter) => {
+        const key = document.createElement('button');
+        key.type = 'button';
+        key.className = 'wordle-key';
+        key.textContent = letter;
+        key.addEventListener('click', () => {
+          if (terminado) return;
+          inputValue = (inputValue + letter).slice(0, 40);
+          actualizarDisplay();
+          if (status) {
+            const valor = normalizarTexto(inputValue);
+            if (!valor) {
+              status.textContent = 'Completá la respuesta antes de validar';
+            } else {
+              status.textContent = 'Respuesta actual: ' + valor;
+            }
+          }
+        });
+        row.appendChild(key);
+      });
+
+      if (compactarEnter && index === 0) {
+        const enterKey = document.createElement('button');
+        enterKey.type = 'button';
+        enterKey.className = 'wordle-key wide';
+        enterKey.textContent = 'ENTER';
+        enterKey.addEventListener('click', () => validarRespuesta());
+        row.appendChild(enterKey);
+      }
+
+      keyboard.appendChild(row);
+    });
+
+    const tercerFila = document.createElement('div');
+    tercerFila.className = 'wordle-key-row';
+
+    const deleteKey = document.createElement('button');
+    deleteKey.type = 'button';
+    deleteKey.className = 'wordle-key wide';
+    deleteKey.textContent = '⌫';
+    deleteKey.addEventListener('click', () => {
+      if (terminado) return;
+      inputValue = inputValue.slice(0, -1);
+      actualizarDisplay();
+    });
+    tercerFila.appendChild(deleteKey);
+
+    [...'ZXCVBNM'].forEach((letter) => {
+      const key = document.createElement('button');
+      key.type = 'button';
+      key.className = 'wordle-key';
+      key.textContent = letter;
+      key.addEventListener('click', () => {
+        if (terminado) return;
+        inputValue = (inputValue + letter).slice(0, 40);
+        actualizarDisplay();
+      });
+      tercerFila.appendChild(key);
+    });
+
+    const spaceKey = document.createElement('button');
+    spaceKey.type = 'button';
+    spaceKey.className = 'wordle-key wide';
+    spaceKey.style.minWidth = '70px';
+    spaceKey.textContent = '␣';
+    spaceKey.addEventListener('click', () => {
+      if (terminado) return;
+      inputValue = (inputValue + ' ').slice(0, 40);
+      actualizarDisplay();
+    });
+    tercerFila.appendChild(spaceKey);
+
+    if (!compactarEnter) {
+      const enterKey = document.createElement('button');
+      enterKey.type = 'button';
+      enterKey.className = 'wordle-key wide';
+      enterKey.textContent = 'ENTER';
+      enterKey.addEventListener('click', () => validarRespuesta());
+      tercerFila.appendChild(enterKey);
+    }
+
+    keyboard.appendChild(tercerFila);
+
+    const onKeyDown = (event) => {
+      if (terminado) return;
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        validarRespuesta();
+        return;
+      }
+      if (event.key === 'Backspace') {
+        event.preventDefault();
+        inputValue = inputValue.slice(0, -1);
+        actualizarDisplay();
+        return;
+      }
+      if (/^[a-zA-Z0-9 ]$/.test(event.key)) {
+        inputValue = (inputValue + event.key).slice(0, 40);
+        actualizarDisplay();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+
+    shell.appendChild(list);
+    shell.appendChild(currentDisplay);
+    shell.appendChild(keyboard);
 
     function renderRanking() {
       rankingCells.forEach(({ row, value }, index) => {
@@ -4433,9 +4610,8 @@
         }
       });
       renderRanking();
-      input.value = '';
-      button.disabled = true;
-      input.disabled = true;
+      inputValue = '';
+      actualizarDisplay();
       if (status) {
         status.textContent = `Perdiste. La respuesta correcta era: ${categoriaActual.respuestas.join(', ')}`;
       }
@@ -4444,17 +4620,17 @@
     function validarRespuesta() {
       if (terminado) return;
 
-      const valor = normalizarTexto(input.value);
+      const valor = normalizarTexto(inputValue);
       if (!valor) {
         if (status) status.textContent = 'Completá la respuesta antes de validar';
-        input.focus();
         return;
       }
 
       const posicion = respuestasCorrectas.indexOf(valor);
       if (posicion === -1) {
         vidas -= 1;
-        input.value = '';
+        inputValue = '';
+        actualizarDisplay();
         if (status) {
           status.textContent = vidas > 0 ? `Te equivocaste, te quedan ${vidas} vidas` : 'Perdiste';
         }
@@ -4470,13 +4646,15 @@
 
       if (posicionadas[posicion]) {
         if (status) status.textContent = 'Esa respuesta ya está en el ranking';
-        input.value = '';
+        inputValue = '';
+        actualizarDisplay();
         return;
       }
 
       posicionadas[posicion] = categoriaActual.respuestas[posicion];
       posicionesAdivinadas.add(posicion);
-      input.value = '';
+      inputValue = '';
+      actualizarDisplay();
       renderRanking();
 
       if (status) status.textContent = 'Respuesta correcta';
@@ -4484,28 +4662,17 @@
       const completo = posicionadas.every(Boolean);
       if (completo) {
         terminado = true;
-        button.disabled = true;
-        input.disabled = true;
         if (status) status.textContent = '¡Ganaste!';
         if (typeof onGanar === 'function') onGanar();
       }
     }
 
-    button.addEventListener('click', validarRespuesta);
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        validarRespuesta();
-      }
-    });
-
     renderLives();
     renderRanking();
-    shell.appendChild(list);
-    shell.appendChild(inputWrap);
     contenedor.appendChild(shell);
 
     return function desmontar() {
+      document.removeEventListener('keydown', onKeyDown);
       contenedor.innerHTML = '';
     };
   }
@@ -5648,6 +5815,12 @@
     timer.textContent = formatearCuentaRegresiva(obtenerTiempoHastaProximaActualizacion());
   }
 
+  function toggleRefreshStatusMenu(visible) {
+    const status = document.getElementById('game-refresh-status');
+    if (!status) return;
+    status.classList.toggle('hidden', !visible);
+  }
+
   function actualizarCartelBloqueo() {
     const menu = document.getElementById('game-menu');
     if (!menu || !menu.dataset.bloqueado) return;
@@ -5749,6 +5922,7 @@
     }
 
     if (menu) menu.classList.add('hidden');
+    toggleRefreshStatusMenu(false);
     if (stage) {
       stage.classList.remove('hidden');
       stage.innerHTML = '';
@@ -5811,12 +5985,13 @@
 
     renderMenuJuegos();
     if (menu) menu.classList.remove('hidden');
+    toggleRefreshStatusMenu(true);
     if (stage) {
       stage.classList.add('hidden');
       stage.innerHTML = '';
     }
     if (title) title.textContent = 'Elegí tu juego';
-    if (kicker) kicker.textContent = 'juegos';
+    if (kicker) kicker.textContent = 'juegos del día';
     if (status) status.textContent = `Seleccioná uno de los ${Object.keys(JUEGOS).length} juegos de hoy`;
 
     if (modal) {
@@ -5839,6 +6014,7 @@
       window.clearInterval(menu._countdownId);
       menu._countdownId = null;
     }
+    toggleRefreshStatusMenu(true);
     if (stage) {
       stage.innerHTML = '';
       stage.classList.add('hidden');
@@ -5956,60 +6132,11 @@
     }
 
     comprobarCambioDeDia();
-    if (Date.now() - ultimoChequeoVersion >= 2 * 60 * 1000) {
-      comprobarVersionPages();
-    }
   });
 
   window.addEventListener('pageshow', function () {
     comprobarCambioDeDia();
-    if (Date.now() - ultimoChequeoVersion >= 2 * 60 * 1000) {
-      comprobarVersionPages();
-    }
   });
-
-  let ultimoChequeoVersion = 0;
-
-  async function comprobarVersionPages() {
-    try {
-      const ahora = Date.now();
-      if (ahora - ultimoChequeoVersion < 2 * 60 * 1000) return;
-      ultimoChequeoVersion = ahora;
-
-      const url = `${window.location.pathname}?v=${Date.now()}`;
-      const respuesta = await fetch(url, { cache: 'no-store' });
-      if (!respuesta.ok) return;
-      const html = await respuesta.text();
-
-      const matchVersion = html.match(/VERSION_JUEGOS\s*=\s*(\d+)/);
-      const versionRemota = matchVersion ? Number(matchVersion[1]) : null;
-      const matchCalendario = html.match(/const\s+CALENDARIO\s*=\s*\{[\s\S]*?\n\s*\};/m);
-      const calendarioRemoto = matchCalendario ? matchCalendario[0] : '';
-      const hashCalendarioLocal = hashString('const CALENDARIO = ' + JSON.stringify(CALENDARIO) + ';');
-      const hashCalendarioRemoto = calendarioRemoto ? hashString(calendarioRemoto) : null;
-      const cambioCalendario = hashCalendarioRemoto !== null && hashCalendarioRemoto !== hashCalendarioLocal;
-
-      if ((versionRemota !== null && versionRemota !== VERSION_JUEGOS) || cambioCalendario) {
-        const toast = document.getElementById('game-toast');
-        if (toast) {
-          toast.innerHTML = 'Hay una actualización disponible <button type="button" id="toast-actualizar" style="margin-left:8px; padding:4px 8px; border-radius:6px; border:none; background:#fff; color:#1d2435; font-weight:700; cursor:pointer;">Actualizar</button>';
-          toast.classList.remove('visible');
-          void toast.offsetWidth;
-          toast.classList.add('visible');
-          const boton = document.getElementById('toast-actualizar');
-          if (boton) {
-            boton.addEventListener('click', () => {
-              window.location.reload(true);
-            }, { once: true });
-          }
-          window.clearTimeout(toast._timer);
-          toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 12000);
-        }
-      }
-    } catch (error) {
-      // Sin conexión o restricciones del navegador: no romper la experiencia.
-    }
-  }
 
   let diaVisible = diaLogico();
   let bloqueoVisible = juegosBloqueadosPorHoy();
@@ -6072,7 +6199,6 @@
           versionVista: VERSION_JUEGOS
         };
         await Almacen.guardar(nuevoEstado);
-        mostrarToastVersion('Juegos actualizados');
       }
 
       if (saldo === 0 && total === 0 && (!estadoNormalizado.historial || !estadoNormalizado.historial.length) && (!estadoNormalizado.canjes || !estadoNormalizado.canjes.length) && (!perdidos || !perdidos.length)) {
@@ -6105,10 +6231,8 @@
   setInterval(comprobarCambioDeDia, 60000);
   setInterval(actualizarRefreshStatus, 1000);
   setInterval(cargarClima, 600000);
-  setInterval(comprobarVersionPages, 10 * 60 * 1000);
   actualizarRefreshStatus();
   programarProximoCambio();
-  comprobarVersionPages();
 })();
 </script>
 </body>
