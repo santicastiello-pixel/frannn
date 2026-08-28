@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>Que tengas un gran día</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -158,6 +159,54 @@
     color:#edf4ff;
     font-size:11px;
     line-height:1.6;
+  }
+
+  .moderador-panel .meta {
+    margin:8px 0 10px;
+    padding:8px 10px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    color:#dfe9ff;
+    font-size:10px;
+    line-height:1.6;
+    letter-spacing:.03em;
+  }
+
+  .moderador-panel .override {
+    margin:0 0 10px;
+    padding:6px 8px;
+    border-radius:8px;
+    background:rgba(255, 95, 95, 0.12);
+    border:1px solid rgba(255, 95, 95, 0.42);
+    color:#ffd2d2;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+
+  .moderador-panel .acciones {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:8px;
+  }
+
+  .moderador-panel button {
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    font:inherit;
+    cursor:pointer;
+    background:#edf4ff;
+    color:#121a2d;
+    font-weight:600;
+  }
+
+  .moderador-panel button.danger {
+    background:#ff7f7f;
+    color:#210f12;
   }
 
   .moderador-panel li + li {
@@ -1873,8 +1922,8 @@
     }
 
     main {
-      padding: 120px 18px 36px;
-      gap: 16px;
+      padding: 150px 18px 36px;
+      gap: 12px;
       justify-content: flex-start;
     }
 
@@ -1893,7 +1942,7 @@
 
     .saludo {
       order: 1;
-      margin-top: 12px;
+      margin-top: 96px;
       max-width: 11ch;
       font-size: 42px;
       line-height: .96;
@@ -1918,7 +1967,7 @@
 
     .astro {
       width:min(54vmin, 220px);
-      top: 23%;
+      top: 21%;
       opacity: 0.9;
     }
 
@@ -2003,7 +2052,7 @@
     }
 
     .wordle-board {
-      width:min(100%, calc((88dvh - 260px) * 0.833));
+      width:min(100%, calc((88dvh - 260px) * var(--wordle-ratio, 0.833)));
       margin:0 auto;
       gap:5px;
       flex-shrink:0;
@@ -2122,6 +2171,13 @@
     <div class="estado">
       <span>Actividad</span>
       <span class="led" aria-hidden="true"></span>
+    </div>
+    <div id="moderador-meta" class="meta"></div>
+    <div id="moderador-override" class="override" hidden></div>
+    <ul id="moderador-warnings" class="meta" hidden></ul>
+    <div class="acciones">
+      <button id="moderador-regenerar" type="button">Regenerar juegos de hoy</button>
+      <button id="moderador-reset" class="danger" type="button">Reset total</button>
     </div>
     <ul id="moderador-lista"></ul>
   </aside>
@@ -2277,12 +2333,199 @@
   const rainLayer = document.getElementById('rain-layer');
   const coffeeWrap = document.getElementById('coffee-wrap');
   const cielo = document.querySelector('.cielo');
+
+  let audioContext = null;
+
+  function obtenerAudioContext() {
+    if (!audioContext) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      audioContext = new AudioCtor();
+    }
+    return audioContext;
+  }
+
+  function reproducirBeep({ frequency = 440, duration = 0.07, volume = 0.028, type = 'sine', sweep = 0 } = {}) {
+    const context = obtenerAudioContext();
+    if (!context) return;
+
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, now);
+    if (sweep) {
+      oscillator.frequency.exponentialRampToValueAtTime(Math.max(60, frequency + sweep), now + duration);
+    }
+
+    gainNode.gain.setValueAtTime(0.0001, now);
+    gainNode.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + duration + 0.02);
+  }
+
+  function reproducirClickJuego() {
+    reproducirBeep({ frequency: 320, duration: 0.05, volume: 0.022, type: 'triangle', sweep: 80 });
+  }
+
+  function reproducirMemoriaNaranja() {
+    reproducirBeep({ frequency: 620, duration: 0.11, volume: 0.03, type: 'sawtooth', sweep: 140 });
+  }
+
+  function reproducirVictoria() {
+    reproducirBeep({ frequency: 660, duration: 0.10, volume: 0.024, type: 'triangle', sweep: 80 });
+    setTimeout(() => reproducirBeep({ frequency: 880, duration: 0.12, volume: 0.022, type: 'triangle', sweep: 110 }), 90);
+  }
+
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('#game-modal button');
+    if (button) {
+      reproducirClickJuego();
+    }
+  });
+
+  // ─────────────────────────────────────────────
+  // CONTENIDO DE LOS JUEGOS, DÍA POR DÍA
+  // Agregar entradas con la fecha en formato YYYY-MM-DD (hora local).
+  // Cada día se activa solo a las 10:00 de Buenos Aires.
+  // Si falta una fecha, ese día el contenido se genera automáticamente.
+  //
+  // wordle:   palabra de 4 a 7 letras, sin acentos ni ñ
+  // ahorcado: { palabra: 'XXX', categoria: 'Pista' }, hasta ~10 letras
+  // sopa:     4 a 6 palabras, máximo 8 letras cada una
+  // memoria:  8 números del 0 al 24 (posición en la grilla 5x5)
+  // cuentas:  null (se generan solas)
+  //
+  // Publicar: commit + push a main. GitHub Pages tarda 1-2 min.
+  // Probar otra fecha sin publicar: ?dia=2026-09-15
+  // ─────────────────────────────────────────────
+  const HORA_CORTE = 10;
+  const OFFSET_ARG = -3;
+  const VERSION_JUEGOS = 1;
+
+  const CALENDARIO = {
+    '2026-08-28': {
+      wordle: 'GENIA',
+      ahorcado: { palabra: 'PATENTE', categoria: 'Autos' },
+      sopa: ['ALEX', 'FERNET', 'JOAQUI', 'BAILE', 'TASTY', ''],
+      memoria: [4, 12, 7, 20, 3, 16, 9, 22],
+      cuentas: null
+    },
+    '2026-08-29': {
+      wordle: 'GAVIOTA',
+      ahorcado: { palabra: 'QUEVEDO', categoria: 'Música' },
+      sopa: ['ALEXIA', 'POPA', 'MILI', 'CANDE', 'FRANSHU', 'JUANA'],
+      memoria: [0, 24, 12, 6, 18, 2, 20, 14],
+      cuentas: null
+    }
+  };
+
+  function diaLogico() {
+    const params = new URLSearchParams(window.location.search);
+    const override = params.get('dia');
+    if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
+
+    const ahora = new Date();
+    const ms = ahora.getTime() + (OFFSET_ARG * 60 * 60 * 1000) - (HORA_CORTE * 60 * 60 * 1000);
+    const ajustada = new Date(ms);
+    const y = ajustada.getUTCFullYear();
+    const m = String(ajustada.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(ajustada.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function diaLogicoOverrideActivo() {
+    const params = new URLSearchParams(window.location.search);
+    const override = params.get('dia');
+    return Boolean(override && /^\d{4}-\d{2}-\d{2}$/.test(override));
+  }
+
+  function fechaExisteEnCalendario(fecha) {
+    return Boolean(fecha && CALENDARIO && Object.prototype.hasOwnProperty.call(CALENDARIO, fecha));
+  }
+
+  function obtenerContenidoDelDia(juegoId) {
+    const fecha = diaLogico();
+    const entrada = CALENDARIO && CALENDARIO[fecha];
+    if (!entrada || !Object.prototype.hasOwnProperty.call(entrada, juegoId)) return null;
+    const contenido = entrada[juegoId];
+    return contenido === null || contenido === undefined ? null : contenido;
+  }
+
+  function validarCalendarioDia(fecha, entrada) {
+    const warnings = [];
+    if (!entrada || typeof entrada !== 'object') return warnings;
+
+    const wordle = entrada.wordle;
+    if (wordle !== null && wordle !== undefined) {
+      const valor = String(wordle).toUpperCase();
+      if (!/^[A-Z]{4,7}$/.test(valor) || /[ÑÁÉÍÓÚÜ]/.test(valor) || /[ÀÈÌÒÙ]/.test(valor)) {
+        warnings.push(`[${fecha}] wordle inválido: "${valor}" (debe tener entre 4 y 7 letras, sin acentos ni ñ).`);
+      }
+    }
+
+    const sopa = Array.isArray(entrada.sopa) ? entrada.sopa : [];
+    if (sopa.length) {
+      if (sopa.length < 4 || sopa.length > 6) {
+        warnings.push(`[${fecha}] sopa inválida: ${sopa.length} palabras (debe estar entre 4 y 6).`);
+      }
+      sopa.forEach((palabra) => {
+        const texto = String(palabra || '').toUpperCase();
+        if (texto.length > 8) {
+          warnings.push(`[${fecha}] sopa inválida: "${texto}" tiene ${texto.length} letras (máximo 8).`);
+        }
+      });
+    }
+
+    const memoria = Array.isArray(entrada.memoria) ? entrada.memoria : [];
+    if (memoria.length) {
+      if (memoria.length !== 8) {
+        warnings.push(`[${fecha}] memoria inválida: ${memoria.length} números (debe ser 8).`);
+      }
+      if (memoria.some((numero) => !Number.isInteger(numero) || numero < 0 || numero > 24)) {
+        warnings.push(`[${fecha}] memoria inválida: los números deben estar entre 0 y 24.`);
+      }
+      if (memoria.some((numero, index) => index > 0 && numero === memoria[index - 1])) {
+        warnings.push(`[${fecha}] memoria inválida: no pueden haber dos números iguales consecutivos.`);
+      }
+    }
+
+    const ahorcado = entrada.ahorcado;
+    if (ahorcado && typeof ahorcado === 'object') {
+      const palabra = String(ahorcado.palabra || '').toUpperCase();
+      if (palabra && (palabra.length > 10 || !/^[A-Z]+$/.test(palabra) || /[ÑÁÉÍÓÚÜ]/.test(palabra))) {
+        warnings.push(`[${fecha}] ahorcado inválido: "${palabra}" (máximo ~10 letras, sin acentos ni ñ).`);
+      }
+    }
+
+    return warnings;
+  }
+
+  const VALIDACIONES_CALENDARIO = [];
+
+  function validarCalendarioCompleto() {
+    const warnings = [];
+    Object.entries(CALENDARIO || {}).forEach(([fecha, entrada]) => {
+      warnings.push(...validarCalendarioDia(fecha, entrada));
+    });
+    VALIDACIONES_CALENDARIO.length = 0;
+    VALIDACIONES_CALENDARIO.push(...warnings);
+    warnings.forEach((warning) => console.warn(warning));
+    return warnings;
+  }
+
   const DEFAULT_ESTADO = {
     medallas: 0,
     medallasTotales: 0,
     historial: [],
     canjes: [],
-    perdidos: []
+    perdidos: [],
+    versionVista: 0
   };
   const PREMIOS = [
     { id: 'cafe', nombre: 'Un café de Rústica', costo: 15, emoji: '☕' },
@@ -2297,7 +2540,7 @@
       desc: 'Adiviná la palabra en 6 intentos',
       montar(contenedor, rand, onGanar, onPerder) {
         return montarWordle(contenedor, rand, onGanar, onPerder);
-      }
+      } 
     },
     cuentas: {
       id: 'cuentas',
@@ -2341,7 +2584,7 @@
   const WORDLE_SOLUCIONES = WORDLE_DICCIONARIO.filter((p) => p.length === 5);
   const wordleWarn = WORDLE_DICCIONARIO.filter((p) => p.length !== 5);
   if (wordleWarn.length) {
-    console.warn('Palabras Wordle descartadas por longitud:', wordleWarn);
+    console.warn('Candidatas automáticas descartadas por longitud (fallback Wordle de 5 letras):', wordleWarn);
   }
 
   const JUEGO_POR_DIA = {
@@ -2449,6 +2692,28 @@
     });
   }
 
+  function diaSiguiente() {
+    const [y, m, d] = diaLogico().split('-').map(Number);
+    const fecha = new Date(Date.UTC(y, m - 1, d));
+    fecha.setUTCDate(fecha.getUTCDate() + 1);
+    const yy = fecha.getUTCFullYear();
+    const mm = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(fecha.getUTCDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function tiempoHastaProximoCambio() {
+    const ahora = new Date();
+    const ahoraEnArg = new Date(ahora.getTime() + (OFFSET_ARG * 60 * 60 * 1000));
+    const fechaHoy = new Date(Date.UTC(ahoraEnArg.getUTCFullYear(), ahoraEnArg.getUTCMonth(), ahoraEnArg.getUTCDate(), HORA_CORTE, 0, 0));
+    const fechaSiguiente = new Date(fechaHoy.getTime() + (24 * 60 * 60 * 1000));
+    const siguiente = ahora.getTime() >= fechaHoy.getTime() - (OFFSET_ARG * 60 * 60 * 1000) ? fechaSiguiente : fechaHoy;
+    const diff = Math.max(0, siguiente.getTime() - ahora.getTime());
+    const horas = Math.floor(diff / (60 * 60 * 1000));
+    const minutos = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+    return { horas, minutos, texto: `${horas}h ${minutos}m` };
+  }
+
   function activarPanelModerador(){
     const params = new URLSearchParams(window.location.search);
     const esAdmin = params.get('moderador') === '1' || params.get('admin') === '1';
@@ -2457,18 +2722,117 @@
 
     panelModerador.classList.add('visible');
 
+    const meta = document.getElementById('moderador-meta');
+    const overrideEl = document.getElementById('moderador-override');
+    const btnRegenerar = document.getElementById('moderador-regenerar');
+    const btnReset = document.getElementById('moderador-reset');
+    const diaActual = diaLogico();
+    const overrideActivo = diaLogicoOverrideActivo();
+    const juegoHoy = obtenerJuegoDelDia();
+    const linkMañana = `?dia=${diaSiguiente()}`;
+    const fechasOrdenadas = Object.keys(CALENDARIO || {}).sort();
+    const fechaHoy = fechaExisteEnCalendario(diaActual);
+    const fechasFuturas = fechasOrdenadas.filter((fecha) => fecha >= diaActual).sort();
+    const ultimoCargado = fechasFuturas.length ? fechasFuturas[fechasFuturas.length - 1] : '—';
+    const faltan = fechasFuturas.length ? Math.max(0, fechasFuturas.length - 1) : 0;
+    const warnings = validarCalendarioCompleto();
+    const alertaFaltan = faltan < 3 ? '<span style="color:#ff6b6b; font-weight:700;">¡Quedan menos de 3 días cargados!</span>' : '<span style="color:#8bf0b4; font-weight:700;">OK</span>';
+    const proximoCambio = tiempoHastaProximoCambio();
+
+    if (meta) {
+      meta.innerHTML = `Día lógico: <strong>${diaActual}</strong><br>Entrada del calendario: <strong>${fechaHoy ? 'Sí' : 'No'}</strong><br>Versión: <strong>v${VERSION_JUEGOS}</strong> · Corte: <strong>${HORA_CORTE}:00 (hora AR)</strong><br>Próximo cambio en <strong>${proximoCambio.texto}</strong><br>Juego del día: <strong>${juegoHoy.nombre}</strong><br>Contenido cargado hasta el <strong>${ultimoCargado}</strong>, faltan <strong>${faltan}</strong> días. ${alertaFaltan}<br><a href="${linkMañana}" target="_blank" rel="noreferrer noopener">Previsualizar mañana</a>`;
+    }
+
+    if (warnings.length) {
+      const warningBox = document.getElementById('moderador-warnings');
+      if (warningBox) {
+        warningBox.innerHTML = warnings.map((warning) => `<li>${warning}</li>`).join('');
+        warningBox.hidden = false;
+      }
+    } else {
+      const warningBox = document.getElementById('moderador-warnings');
+      if (warningBox) {
+        warningBox.innerHTML = '<li>Sin warnings de validación.</li>';
+        warningBox.hidden = false;
+      }
+    }
+
+    if (overrideEl) {
+      overrideEl.hidden = !overrideActivo;
+      overrideEl.textContent = overrideActivo ? `Override activo: ${diaActual}` : '';
+    }
+
+    if (btnRegenerar) {
+      btnRegenerar.onclick = () => {
+        const confirmar = window.confirm('¿Querés regenerar los juegos de hoy? Se limpiarán los registros de historial y perdidos del día lógico actual.');
+        if (!confirmar) return;
+
+        try {
+          const estado = leerEstado();
+          const nuevoEstado = {
+            ...estado,
+            historial: Array.isArray(estado.historial) ? estado.historial.filter(item => item && item.fecha !== diaActual) : [],
+            perdidos: Array.isArray(estado.perdidos) ? estado.perdidos.filter(item => item && item.fecha !== diaActual) : []
+          };
+          guardarEstado(nuevoEstado);
+        } catch (error) {}
+
+        window.location.reload();
+      };
+    }
+
+    if (btnReset) {
+      btnReset.onclick = () => {
+        const confirmarPrimero = window.confirm('¿Seguro que querés borrar TODO el estado?');
+        if (!confirmarPrimero) return;
+        const confirmarSegundo = window.confirm('Esta acción borra localStorage, IndexedDB y cookie. No se puede deshacer.');
+        if (!confirmarSegundo) return;
+
+        try {
+          if (window.localStorage) {
+            window.localStorage.removeItem('estadoUsuario');
+          }
+        } catch (error) {}
+
+        try {
+          document.cookie = 'estadoUsuario=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax';
+        } catch (error) {}
+
+        if ('indexedDB' in window) {
+          const request = indexedDB.open('saludo', 1);
+          request.onsuccess = function () {
+            const db = request.result;
+            const tx = db.transaction('estado', 'readwrite');
+            const store = tx.objectStore('estado');
+            store.clear();
+            tx.oncomplete = function () {
+              window.location.reload();
+            };
+          };
+          request.onerror = function () {
+            window.location.reload();
+          };
+          return;
+        }
+
+        window.location.reload();
+      };
+    }
+
     const historial = JSON.parse(localStorage.getItem('visitasModerador') || '[]');
     const ahora = new Date();
+    const nombreActual = (nombre && nombre.textContent ? nombre.textContent.trim() : '').replace(/\s+/g, ' ') || 'Persona desconocida';
     const registro = {
       fecha: ahora.toISOString(),
-      texto: formatearFecha(ahora) + ' · ' + formatearHora(ahora)
+      nombre: nombreActual,
+      texto: `${nombreActual} · ${formatearFecha(ahora)} · ${formatearHora(ahora)}`
     };
 
     historial.unshift(registro);
     const recientes = historial.slice(0, 8);
     localStorage.setItem('visitasModerador', JSON.stringify(recientes));
 
-    listaModerador.innerHTML = recientes.map(item => '<li>' + item.texto + '</li>').join('');
+    listaModerador.innerHTML = recientes.map(item => '<li>' + (item.nombre ? `${item.nombre} · ` : '') + (item.texto || item.fecha || '') + '</li>').join('');
   }
 
   function obtenerClimaActual(codigo) {
@@ -2515,8 +2879,7 @@
   }
 
   function semillaDelDia() {
-    const fecha = new Date();
-    return `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}`;
+    return `${diaLogico()}-v${VERSION_JUEGOS}`;
   }
 
   function obtenerJuegoPorId(id) {
@@ -2524,8 +2887,9 @@
   }
 
   function obtenerJuegoDelDia() {
-    const hoy = new Date().getDay();
-    const id = JUEGO_POR_DIA[hoy] || 'sopa';
+    const [y, m, d] = diaLogico().split('-').map(Number);
+    const dia = new Date(y, m - 1, d).getDay();
+    const id = JUEGO_POR_DIA[dia] || 'sopa';
     return obtenerJuegoPorId(id);
   }
 
@@ -2537,7 +2901,8 @@
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
       historial: Array.isArray(estado.historial) ? estado.historial : [],
       canjes: Array.isArray(estado.canjes) ? estado.canjes : [],
-      perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : []
+      perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : [],
+      versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
   }
 
@@ -2661,12 +3026,37 @@
 
       if (!fuentes.length) return this.defaultState();
 
-      const mejor = fuentes.reduce((masAvanzado, actual) => {
-        const scoreActual = Number(actual.medallasTotales) || 0;
-        const scoreMasAvanzado = Number(masAvanzado.medallasTotales) || 0;
-        return scoreActual > scoreMasAvanzado ? actual : masAvanzado;
-      }, fuentes[0]);
+      const combinado = fuentes.reduce((acumulado, actual) => {
+        const unirItems = (key) => {
+          const items = [
+            ...(Array.isArray(acumulado[key]) ? acumulado[key] : []),
+            ...(Array.isArray(actual[key]) ? actual[key] : [])
+          ];
+          const mapa = new Map();
+          items.forEach((item) => {
+            if (!item || typeof item !== 'object') return;
+            const clave = `${item.fecha || 'sin-fecha'}|${item.juegoId || item.juego || item.id || Math.random()}`;
+            mapa.set(clave, item);
+          });
+          return Array.from(mapa.values());
+        };
 
+        return {
+          medallas: Math.max(Number(acumulado.medallas) || 0, Number(actual.medallas) || 0),
+          medallasTotales: Math.max(Number(acumulado.medallasTotales) || 0, Number(actual.medallasTotales) || 0),
+          historial: unirItems('historial'),
+          canjes: unirItems('canjes'),
+          perdidos: unirItems('perdidos')
+        };
+      }, {
+        medallas: 0,
+        medallasTotales: 0,
+        historial: [],
+        canjes: [],
+        perdidos: []
+      });
+
+      const mejor = normalizarEstado(combinado);
       await this.guardar(mejor);
       return mejor;
     },
@@ -2753,7 +3143,7 @@
   }
 
   function hoyClave() {
-    return new Date().toISOString().slice(0, 10);
+    return diaLogico();
   }
 
   function mostrarToastGame(mensaje) {
@@ -2765,6 +3155,15 @@
     toast.classList.add('visible');
     window.clearTimeout(toast._timer);
     toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 1800);
+  }
+
+  function mostrarToastVersion(mensaje) {
+    mostrarToastGame(mensaje);
+    const toast = document.getElementById('game-toast');
+    if (toast) {
+      window.clearTimeout(toast._timer);
+      toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 2000);
+    }
   }
 
   function mostrarMedallaOverlay() {
@@ -2880,6 +3279,7 @@
   }
 
   function ganarMedalla(juegoId = obtenerJuegoDelDia().id) {
+    const overrideActivo = diaLogicoOverrideActivo();
     const estado = leerEstado();
     const fecha = hoyClave();
     const juegoActual = obtenerJuegoPorId(juegoId);
@@ -2892,6 +3292,14 @@
       const status = document.getElementById('game-status');
       if (status) {
         status.textContent = 'Ya ganaste esta medalla hoy';
+      }
+      return;
+    }
+
+    if (overrideActivo) {
+      const status = document.getElementById('game-status');
+      if (status) {
+        status.textContent = 'Modo prueba: no se guarda la medalla';
       }
       return;
     }
@@ -2921,6 +3329,7 @@
       }
     }
 
+    reproducirVictoria();
     mostrarMedallaOverlay();
   }
 
@@ -3070,7 +3479,7 @@
   }
 
   function evaluarWordle(guess, solution) {
-    const result = Array(5).fill('absent');
+    const result = Array(solution.length).fill('absent');
     const remaining = {};
 
     for (let i = 0; i < solution.length; i++) {
@@ -3403,6 +3812,7 @@
 
   // ═══ MEMORIA ═══
   function montarMemoria(contenedor, rand, onGanar, onPerder) {
+    const contenidoCalendario = obtenerContenidoDelDia('memoria');
     const yaGanado = yaGanoMedallaHoy('memoria');
     const shell = document.createElement('div');
     shell.className = 'memoria-shell';
@@ -3455,19 +3865,29 @@
       cell.style.background = tipo === 'error' ? '#c9566a' : '#ffd98a';
       cell.style.borderColor = tipo === 'error' ? '#e37e8f' : '#ffd98a';
       cell.style.boxShadow = tipo === 'error' ? '0 0 18px rgba(201,86,106,.55)' : '0 0 18px rgba(255,217,138,.55)';
+
+      if (tipo === 'prendido' || tipo === 'tocado') {
+        reproducirMemoriaNaranja();
+      }
+
       return later(() => {
         resetCellVisual(cell);
       }, ms);
     };
 
-    const secuencia = [];
-    let ultimo = -1;
-    while (secuencia.length < MEMORIA_META) {
-      const indice = Math.floor(rand() * cells.length);
-      if (indice === ultimo) continue;
-      ultimo = indice;
-      secuencia.push(indice);
-    }
+    const secuencia = Array.isArray(contenidoCalendario) && contenidoCalendario.length === 8
+      ? contenidoCalendario.slice()
+      : (() => {
+          const res = [];
+          let ultimo = -1;
+          while (res.length < MEMORIA_META) {
+            const indice = Math.floor(rand() * cells.length);
+            if (indice === ultimo) continue;
+            ultimo = indice;
+            res.push(indice);
+          }
+          return res;
+        })();
 
     let rondaActual = 1;
     let indiceUsuario = 0;
@@ -3665,10 +4085,17 @@
   }
 
   function montarAhorcado(contenedor, rand, onGanar, onPerder) {
-    const hoy = new Date();
-    const esFechaObjetivo = hoy.getDate() === 28 && hoy.getMonth() === 7;
-    const palabras = ['CIELO', 'NIEVE', 'AMOR', 'SOL', 'ARCO', 'JUEGO', 'MUNDO', 'RISA', 'PAZ', 'FUEGO', 'TIGRE', 'LUNA', 'PUEBLO', 'FELIZ', 'DIA'];
-    const palabra = esFechaObjetivo ? 'PANDYLOVE' : palabras[Math.floor(rand() * palabras.length)].toUpperCase();
+    const contenidoCalendario = obtenerContenidoDelDia('ahorcado');
+    const palabraBase = contenidoCalendario && typeof contenidoCalendario === 'object' && contenidoCalendario.palabra
+      ? String(contenidoCalendario.palabra).toUpperCase()
+      : (() => {
+          const palabras = ['CIELO', 'NIEVE', 'AMOR', 'SOL', 'ARCO', 'JUEGO', 'MUNDO', 'RISA', 'PAZ', 'FUEGO', 'TIGRE', 'LUNA', 'PUEBLO', 'FELIZ', 'DIA'];
+          return palabras[Math.floor(rand() * palabras.length)].toUpperCase();
+        })();
+    const categoria = contenidoCalendario && typeof contenidoCalendario === 'object' && contenidoCalendario.categoria
+      ? String(contenidoCalendario.categoria)
+      : 'Pista';
+    const palabra = palabraBase;
     const letras = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
     const letrasUsadas = new Set();
     let errores = 0;
@@ -3790,7 +4217,7 @@
     renderTeclado();
 
     if (status) {
-      status.textContent = 'Adiviná la palabra sin perder las 6 vidas';
+      status.textContent = categoria ? `Adiviná la palabra sin perder las 6 vidas · ${categoria}` : 'Adiviná la palabra sin perder las 6 vidas';
     }
 
     return function desmontar() {
@@ -3799,13 +4226,20 @@
   }
 
   function montarWordle(contenedor, rand, onGanar, onPerder) {
-    const hoy = new Date();
-    const esFechaObjetivo = hoy.getDate() === 28 && hoy.getMonth() === 7;
-    const solution = esFechaObjetivo ? 'ANUEL' : WORDLE_SOLUCIONES[Math.floor(rand() * WORDLE_SOLUCIONES.length)].toUpperCase();
+    const contenidoCalendario = obtenerContenidoDelDia('wordle');
+    const fallback = WORDLE_SOLUCIONES[Math.floor(rand() * WORDLE_SOLUCIONES.length)].toUpperCase();
+    const rawSolution = typeof contenidoCalendario === 'string' ? contenidoCalendario : fallback;
+    const candidate = String(rawSolution).toUpperCase();
+    const validWordle = /^[A-Z]{4,7}$/.test(candidate) && !/[ÑÁÉÍÓÚÜÀÈÌÒÙ]/.test(candidate) && candidate.length >= 4 && candidate.length <= 7;
+    if (typeof contenidoCalendario === 'string' && !validWordle) {
+      console.warn(`[${diaLogico()}] wordle inválido: "${candidate}". Se usó la semilla.`);
+    }
+    const solution = validWordle ? candidate : fallback;
+    const largo = solution.length;
     const rows = [];
     const keyboardMap = {};
-    const boardState = Array.from({ length: 6 }, () => Array(5).fill(''));
-    const boardStates = Array.from({ length: 6 }, () => Array(5).fill('absent'));
+    const boardState = Array.from({ length: 6 }, () => Array(largo).fill(''));
+    const boardStates = Array.from({ length: 6 }, () => Array(largo).fill('absent'));
     const rowKeys = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
     let currentGuess = '';
     let activeRow = 0;
@@ -3816,17 +4250,23 @@
 
     const board = document.createElement('div');
     board.className = 'wordle-board';
+    const ratio = largo / 6;
+    board.style.setProperty('--wordle-ratio', String(ratio));
 
     for (let rowIndex = 0; rowIndex < 6; rowIndex++) {
       const row = document.createElement('div');
       row.className = 'wordle-row';
+      row.style.gridTemplateColumns = `repeat(${largo}, minmax(0, 1fr))`;
+      row.style.gap = largo > 6 ? '4px' : '5px';
       rows.push(row);
 
-      for (let colIndex = 0; colIndex < 5; colIndex++) {
+      for (let colIndex = 0; colIndex < largo; colIndex++) {
         const cell = document.createElement('div');
         cell.className = 'wordle-cell';
         cell.dataset.row = String(rowIndex);
         cell.dataset.col = String(colIndex);
+        const fontSize = largo <= 5 ? '20px' : largo === 6 ? '18px' : '16px';
+        cell.style.fontSize = fontSize;
         row.appendChild(cell);
       }
       board.appendChild(row);
@@ -3847,7 +4287,7 @@
         key.dataset.letter = letter;
         key.addEventListener('click', () => {
           if (finished) return;
-          if (currentGuess.length < 5) {
+          if (currentGuess.length < largo) {
             currentGuess += letter;
             renderBoard();
           }
@@ -3897,7 +4337,7 @@
     function renderBoard() {
       rows.forEach((row, rowIndex) => {
         const cells = [...row.children];
-        for (let colIndex = 0; colIndex < 5; colIndex++) {
+        for (let colIndex = 0; colIndex < largo; colIndex++) {
           const cell = cells[colIndex];
           const letter = rowIndex === activeRow ? currentGuess[colIndex] || '' : boardState[rowIndex][colIndex];
           cell.textContent = letter;
@@ -3942,21 +4382,22 @@
 
     function intentarSolucion() {
       if (finished) return;
-      if (currentGuess.length !== 5) {
+      if (currentGuess.length !== largo) {
         if (status) status.textContent = 'Faltan letras';
         shakeRow();
         return;
       }
 
       const guess = currentGuess.toUpperCase();
-      if (guess.length !== 5 || !/^[A-Z]{5}$/.test(guess)) {
+      const regexLargo = new RegExp(`^[A-Z]{${largo}}$`);
+      if (guess.length !== largo || !regexLargo.test(guess)) {
         if (status) status.textContent = 'Faltan letras';
         shakeRow();
         return;
       }
 
-      const base = Array(5).fill('');
-      for (let i = 0; i < 5; i++) {
+      const base = Array(largo).fill('');
+      for (let i = 0; i < largo; i++) {
         base[i] = guess[i];
       }
 
@@ -3999,7 +4440,7 @@
       }
       if (/^[a-zA-Z]$/.test(event.key)) {
         const letter = event.key.toUpperCase();
-        if (currentGuess.length < 5) {
+        if (currentGuess.length < largo) {
           currentGuess += letter;
           renderBoard();
         }
@@ -4012,7 +4453,7 @@
       finished = true;
       const mensaje = document.getElementById('game-status');
       if (mensaje) mensaje.textContent = 'Ya ganaste la medalla de hoy';
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < largo; i++) {
         const row = rows[0];
         const cell = row.children[i];
         cell.textContent = solution[i];
@@ -4033,10 +4474,21 @@
   }
 
   function montarSopaDeLetras(contenedor, rand, onGanar, onPerder) {
+    const contenidoCalendario = obtenerContenidoDelDia('sopa');
     const size = 8;
     const board = Array.from({ length: size }, () => Array(size).fill(''));
     const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const palabras = ['DELAROSE', 'LUNA', 'QUEVEDO', 'FRAN', 'FRIENDS', 'CIELO'];
+    const palabrasBase = Array.isArray(contenidoCalendario) && contenidoCalendario.length >= 4 && contenidoCalendario.length <= 6
+      ? contenidoCalendario.map((palabra) => String(palabra).toUpperCase())
+      : ['DELAROSE', 'LUNA', 'QUEVEDO', 'FRAN', 'FRIENDS', 'CIELO'];
+    const palabras = palabrasBase.filter((palabra) => {
+      const ok = typeof palabra === 'string' && palabra.length >= 1 && palabra.length <= 8 && /^[A-Z]+$/.test(palabra);
+      if (!ok && Array.isArray(contenidoCalendario)) {
+        console.warn(`[${diaLogico()}] sopa inválida: "${palabra}" no entra en la grilla 8x8. Se usa la semilla.`);
+      }
+      return ok;
+    });
+    const palabrasUsables = palabras.length ? palabras : ['DELAROSE', 'LUNA', 'QUEVEDO', 'FRAN', 'FRIENDS', 'CIELO'];
     const palabrasColocadas = [];
     const direcciones = [
       [0, 1], [1, 0], [1, 1], [1, -1],
@@ -4044,6 +4496,11 @@
     ];
 
     function intentarColocar(palabra) {
+      const valido = palabra && palabra.length >= 1 && palabra.length <= 8;
+      if (!valido) {
+        console.warn(`Sopa inválida: "${palabra}" no entra en la grilla 8x8.`);
+        return false;
+      }
       const ordenDirecciones = [...direcciones].sort(() => rand() - 0.5);
 
       for (const [dr, dc] of ordenDirecciones) {
@@ -4085,7 +4542,7 @@
       return false;
     }
 
-    for (const palabra of palabras) {
+    for (const palabra of palabrasUsables) {
       const pudo = intentarColocar(palabra);
       if (!pudo) {
         const fallback = [
@@ -4386,7 +4843,8 @@
   function pintarCielo(){
     const ahora = new Date();
     const h = ahora.getHours();
-    const dia = ahora.getDay();
+    const [y, m, d] = diaLogico().split('-').map(Number);
+    const dia = new Date(y, m - 1, d).getDay();
     const esCumple = ahora.getMonth() === 8 && ahora.getDate() === 7;
     const t = TEMAS.find(x => h < x.max) || TEMAS[TEMAS.length - 1];
     const r = document.documentElement.style;
@@ -4483,6 +4941,47 @@
     }
   });
 
+  async function comprobarVersionPages() {
+    try {
+      const url = `${window.location.pathname}?v=${Date.now()}`;
+      const respuesta = await fetch(url, { cache: 'no-store' });
+      if (!respuesta.ok) return;
+      const html = await respuesta.text();
+      const match = html.match(/VERSION_JUEGOS\s*=\s*(\d+)/);
+      const versionRemota = match ? Number(match[1]) : null;
+      if (versionRemota !== null && versionRemota !== VERSION_JUEGOS) {
+        const toast = document.getElementById('game-toast');
+        if (toast) {
+          toast.innerHTML = 'Hay una actualización disponible <button type="button" id="toast-actualizar" style="margin-left:8px; padding:4px 8px; border-radius:6px; border:none; background:#fff; color:#1d2435; font-weight:700; cursor:pointer;">Actualizar</button>';
+          toast.classList.remove('visible');
+          void toast.offsetWidth;
+          toast.classList.add('visible');
+          const boton = document.getElementById('toast-actualizar');
+          if (boton) {
+            boton.addEventListener('click', () => {
+              window.location.reload(true);
+            }, { once: true });
+          }
+          window.clearTimeout(toast._timer);
+          toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 12000);
+        }
+      }
+    } catch (error) {
+      // Sin conexión o restricciones del navegador: no romper la experiencia.
+    }
+  }
+
+  let diaVisible = diaLogico();
+
+  function comprobarCambioDeDia() {
+    const nuevoDia = diaLogico();
+    if (nuevoDia === diaVisible) return;
+    diaVisible = nuevoDia;
+    renderMenuJuegos();
+    pintarCielo();
+    activarPanelModerador();
+  }
+
   (async function iniciarPersistencia() {
     try {
       const estado = await Almacen.leer();
@@ -4490,14 +4989,28 @@
       const estadoNormalizado = normalizarEstado(estado);
       const saldo = Number(estadoNormalizado.medallas) || 0;
       const total = Number(estadoNormalizado.medallasTotales) || 0;
-      if (saldo === 0 && total === 0 && (!estadoNormalizado.historial || !estadoNormalizado.historial.length) && (!estadoNormalizado.canjes || !estadoNormalizado.canjes.length)) {
+      const perdidos = Array.isArray(estadoNormalizado.perdidos) ? estadoNormalizado.perdidos : [];
+      const versionVista = Number(estadoNormalizado.versionVista) || 0;
+
+      if (VERSION_JUEGOS > versionVista) {
+        const nuevoEstado = {
+          ...estadoNormalizado,
+          versionVista: VERSION_JUEGOS
+        };
+        await Almacen.guardar(nuevoEstado);
+        mostrarToastVersion('Juegos actualizados');
+      }
+
+      if (saldo === 0 && total === 0 && (!estadoNormalizado.historial || !estadoNormalizado.historial.length) && (!estadoNormalizado.canjes || !estadoNormalizado.canjes.length) && (!perdidos || !perdidos.length)) {
         return;
       }
       const estadoActual = JSON.parse(JSON.stringify({
         medallas: saldo,
         medallasTotales: total,
         historial: Array.isArray(estadoNormalizado.historial) ? estadoNormalizado.historial : [],
-        canjes: Array.isArray(estadoNormalizado.canjes) ? estadoNormalizado.canjes : []
+        canjes: Array.isArray(estadoNormalizado.canjes) ? estadoNormalizado.canjes : [],
+        perdidos,
+        versionVista: VERSION_JUEGOS > versionVista ? VERSION_JUEGOS : versionVista
       }));
       await Almacen.guardar(estadoActual);
       actualizarBadgeMedallas();
@@ -4513,7 +5026,10 @@
   pintarCielo();
   cargarClima();
   setInterval(pintarCielo, 60000);
+  setInterval(comprobarCambioDeDia, 60000);
   setInterval(cargarClima, 600000);
+  setInterval(comprobarVersionPages, 30 * 60 * 1000);
+  comprobarVersionPages();
 })();
 </script>
 </body>
