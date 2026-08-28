@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- El control real de caché lo manda vercel.json. Este meta queda como referencia extra. -->
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <title>Que tengas un gran día</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -229,31 +230,41 @@
     flex-wrap:wrap;
   }
 
-  .franja{
+  .franja,
+  .fecha-hoy,
+  .firma,
+  .dia-semana,
+  .pie,
+  .ayuda {
     margin:0;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(11px,1.4vw,13px);
-    letter-spacing:.18em; text-transform:uppercase;
-    color:var(--tinta-suave);
-  }
-
-  .fecha-hoy{
-    margin:0;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(12px,1.5vw,16px);
-    letter-spacing:.14em;
+    font-size:clamp(10px,1.1vw,13px);
+    letter-spacing:.12em;
     text-transform:uppercase;
     color:var(--tinta-suave);
   }
 
+  .franja {
+    letter-spacing:.18em;
+  }
+
+  .fecha-hoy {
+    letter-spacing:.14em;
+  }
+
   .saludo{
     margin:0;
+    display:flex;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    row-gap:0;
+    column-gap:.12em;
     font-weight:300;
-    font-size:clamp(38px,9.5vw,116px);
-    line-height:.98;
-    letter-spacing:-.025em;
+    font-size:clamp(50px,7.75vw,160px);
+    line-height:.8;
+    letter-spacing:-.06em;
     font-variation-settings:"SOFT" 40,"WONK" 1;
-    max-width:12ch;
+    max-width:100%;
     text-wrap:balance;
   }
   .saludo em{
@@ -261,12 +272,21 @@
     font-weight:600;
   }
 
-  .linea-nombre{display:block; margin-top:.18em}
+  #saludo-texto {
+    font-weight:300;
+    text-transform:none;
+  }
+
+  .linea-nombre {
+    display:inline-block;
+    margin-top:0;
+    line-height:.78;
+  }
 
   #nombre{
     display:inline-block;
     min-width:3ch;
-    padding:0 .12em .06em;
+    padding:0 .05em .02em;
     font-style:italic;
     font-weight:600;
     outline:none;
@@ -278,28 +298,29 @@
     display:flex; flex-wrap:wrap; align-items:center;
     gap:14px;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:13px;
   }
   .ayuda{color:var(--tinta-suave)}
 
-  .firma{
-    margin:0;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(10px,1.1vw,13px);
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--tinta-suave);
+  .firma {
     opacity:.9;
   }
 
   .dia-mensaje{
     margin:0;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(11px,1.2vw,14px);
-    letter-spacing:.1em;
-    text-transform:uppercase;
+    font-family:"Fraunces",Georgia,serif;
+    font-size:clamp(40px,7vw,132px);
+    line-height:.82;
+    letter-spacing:-.06em;
     color:var(--tinta-suave);
     opacity:.95;
+    font-weight:300;
+    text-transform:none;
+    text-wrap:balance;
+    max-width:100%;
+  }
+
+  .dia-semana {
+    opacity:.9;
   }
 
   .weather-badge {
@@ -499,30 +520,32 @@
 
   .game-panel {
     width:min(760px, 92vw);
+    height:min(88dvh, 760px);
     max-height:88dvh;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
     display:flex;
     flex-direction:column;
     background:linear-gradient(180deg, rgba(18,20,35,0.96), rgba(24,15,41,0.96));
     border:1px solid rgba(255,255,255,0.12);
     border-radius:24px;
     box-shadow:0 30px 80px rgba(0,0,0,0.42);
-    padding:22px 22px 18px;
+    padding:clamp(12px, 2.2vw, 22px);
     color:#f5f1ff;
     position:relative;
+    overflow:hidden;
+    min-height:0;
+    gap:clamp(8px, 1.4vh, 14px);
   }
 
   #premios-modal .game-panel {
     max-height: min(88dvh, 760px);
+    height:min(88dvh, 760px);
   }
 
   #premios-modal .premios-grid {
-    max-height:min(40vh, 380px);
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
+    max-height:min(38dvh, 380px);
+    overflow:hidden;
     padding-right:4px;
-    margin-top:20px;
+    margin-top:10px;
   }
 
   @media (max-width: 560px) {
@@ -575,7 +598,33 @@
     color:#ffd98a;
   }
 
+  .game-refresh-status {
+    position:absolute;
+    right:18px;
+    bottom:14px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    pointer-events:none;
+    box-shadow:0 10px 22px rgba(0,0,0,0.14);
+  }
+
+  .game-refresh-timer {
+    color:#ffd98a;
+    font-weight:700;
+  }
+
   .game-option {
+    position:relative;
     width:100%;
     text-align:left;
     padding:14px 14px 12px;
@@ -586,6 +635,48 @@
     cursor:pointer;
     transition:transform .18s ease, border-color .18s ease, background .18s ease;
     font:inherit;
+    overflow:hidden;
+  }
+
+  .game-option-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .game-option-thumb {
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.18);
+    box-shadow:0 10px 20px rgba(8, 12, 23, 0.18);
+    font-size:20px;
+    line-height:1;
+    background:linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.06));
+  }
+
+  .game-option-streak {
+    position:absolute;
+    top:8px;
+    right:8px;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:3px 7px;
+    border-radius:999px;
+    background:rgba(255, 130, 74, 0.18);
+    border:1px solid rgba(255, 153, 85, 0.7);
+    color:#ffd6a1;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.04em;
+    line-height:1;
+    box-shadow:0 4px 14px rgba(255, 115, 54, 0.18);
   }
 
   .game-option:hover {
@@ -651,11 +742,12 @@
   .memoria-grid {
     display:grid;
     grid-template-columns:repeat(5, 1fr);
-    gap:8px;
-    width:min(100%, calc(88dvh - 240px));
+    gap:clamp(4px, 1vw, 8px);
+    width:min(100%, min(58dvh, 360px));
+    max-width:100%;
     aspect-ratio:1;
     margin:0 auto;
-    padding:10px;
+    padding:clamp(8px, 1.2vw, 10px);
     border-radius:18px;
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.1);
@@ -693,15 +785,19 @@
   .ahorcado-shell {
     display:flex;
     flex-direction:column;
-    gap:18px;
-    width:min(440px, 100%);
+    gap:clamp(10px, 2vh, 18px);
+    width:min(100%, 420px);
     margin:0 auto;
+    justify-content:center;
+    min-height:0;
   }
 
   .ahorcado-dibujo {
     position:relative;
-    width:180px;
-    height:180px;
+    width:min(28vw, 180px);
+    height:min(28vw, 180px);
+    max-width:180px;
+    max-height:180px;
     margin:0 auto;
     border-radius:18px;
     background:rgba(255,255,255,0.02);
@@ -828,34 +924,38 @@
   .wordle-shell {
     display:flex;
     flex-direction:column;
-    gap:16px;
-    width:min(440px, 100%);
+    gap:12px;
+    width:min(100%, 360px);
     margin:0 auto;
+    justify-content:center;
+    min-height:0;
   }
 
   .wordle-board {
     display:grid;
     grid-template-rows:repeat(6, minmax(0, 1fr));
-    gap:8px;
-    width:100%;
+    gap:clamp(3px, 0.55vw, 6px);
+    width:min(100%, min(46vw, 290px));
+    max-width:100%;
+    margin:0 auto;
   }
 
   .wordle-row {
     display:grid;
     grid-template-columns:repeat(5, minmax(0, 1fr));
-    gap:8px;
+    gap:clamp(3px, 0.55vw, 6px);
   }
 
   .wordle-cell {
     aspect-ratio:1;
     display:grid;
     place-items:center;
-    border-radius:12px;
+    border-radius:10px;
     background:rgba(255,255,255,0.04);
     border:1px solid rgba(255,255,255,0.14);
     color:#f5f1ff;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(18px, 4vw, 26px);
+    font-size:clamp(14px, 1.8vmin, 20px);
     font-weight:700;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -898,26 +998,27 @@
   .wordle-keyboard {
     display:flex;
     flex-direction:column;
-    gap:8px;
-    width:100%;
+    gap:clamp(4px, 0.7vh, 7px);
+    width:min(100%, min(64vw, 340px));
+    margin:0 auto;
   }
 
   .wordle-key-row {
     display:flex;
-    gap:6px;
+    gap:clamp(3px, 0.6vw, 5px);
     justify-content:center;
   }
 
   .wordle-key {
-    min-width:32px;
-    height:34px;
-    padding:0 10px;
+    min-width:clamp(22px, 2.6vw, 30px);
+    height:clamp(26px, 3vh, 32px);
+    padding:0 clamp(6px, 1.2vw, 8px);
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     background:rgba(255,255,255,0.1);
     color:#f5f1ff;
     font-family:"DM Mono",ui-monospace,monospace;
-    font-size:12px;
+    font-size:clamp(9px, 1vw, 11px);
     font-weight:700;
     letter-spacing:.08em;
     text-transform:uppercase;
@@ -943,12 +1044,176 @@
     margin:0;
   }
 
-  .cuentas-shell {
-    width:min(440px, 100%);
+  .top5-shell {
+    width:min(100%, 360px);
     margin:0 auto;
     display:flex;
     flex-direction:column;
-    gap:16px;
+    gap:clamp(8px, 1.3vh, 12px);
+    align-items:stretch;
+    min-height:0;
+  }
+
+  .top5-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+    border:1px solid rgba(255,255,255,0.12);
+  }
+
+  .top5-pill {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:78px;
+    padding:6px 8px;
+    border-radius:999px;
+    background:rgba(255, 214, 124, 0.12);
+    border:1px solid rgba(255, 214, 124, 0.4);
+    color:#ffddb2;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:9px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+
+  .top5-category {
+    margin:0;
+    font-size:clamp(15px, 2vw, 20px);
+    line-height:1.2;
+    letter-spacing:-.04em;
+    font-weight:700;
+    color:#f5f1ff;
+  }
+
+  .top5-lives {
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:4px;
+  }
+
+  .top5-life {
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.3);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);
+    transition:all .18s ease;
+  }
+
+  .top5-life.active {
+    background:linear-gradient(180deg, #ffc76d, #ff8c5b);
+    border-color:rgba(255, 184, 104, 0.8);
+    box-shadow:0 0 14px rgba(255, 184, 104, 0.45);
+  }
+
+  .top5-list {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .top5-row {
+    display:grid;
+    grid-template-columns:28px 1fr auto;
+    gap:8px;
+    align-items:center;
+    padding:8px 10px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    transition:border-color .18s ease, transform .18s ease;
+  }
+
+  .top5-row.correct {
+    border-color:rgba(88, 219, 134, 0.7);
+    background:rgba(88, 219, 134, 0.08);
+  }
+
+  .top5-row.wrong {
+    border-color:rgba(255, 116, 96, 0.7);
+    background:rgba(255, 116, 96, 0.06);
+  }
+
+  .top5-num {
+    display:grid;
+    place-items:center;
+    width:28px;
+    height:28px;
+    border-radius:9px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    font-family:"DM Mono",ui-monospace,monospace;
+    color:#f4e9ff;
+    font-size:11px;
+    font-weight:700;
+  }
+
+  .top5-input {
+    width:100%;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.03);
+    border-radius:10px;
+    color:#f5f1ff;
+    padding:8px 10px;
+    font:inherit;
+    font-size:13px;
+    outline:none;
+    transition:border-color .12s ease, background .12s ease, transform .12s ease;
+  }
+
+  .top5-input:focus {
+    border-color:rgba(255, 204, 106, 0.7);
+    background:rgba(255,255,255,0.05);
+  }
+
+  .top5-input.correct {
+    border-color:rgba(88, 219, 134, 0.7);
+    background:rgba(88, 219, 134, 0.08);
+  }
+
+  .top5-input.wrong {
+    border-color:rgba(255, 116, 96, 0.7);
+    background:rgba(255, 116, 96, 0.06);
+  }
+
+  .top5-check {
+    border:none;
+    border-radius:10px;
+    padding:10px 12px;
+    background:linear-gradient(180deg, rgba(255, 208, 105, 0.96), rgba(244, 153, 88, 0.94));
+    color:#1f1a2d;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:transform .12s ease, filter .12s ease;
+    font-size:11px;
+  }
+
+  .top5-check:active {
+    transform:translateY(1px) scale(.99);
+  }
+
+  .top5-check:disabled {
+    opacity:0.55;
+    cursor:default;
+  }
+
+  .cuentas-shell {
+    width:min(100%, 420px);
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(10px, 1.7vh, 16px);
+    min-height:0;
   }
 
   .cuentas-timer {
@@ -1761,74 +2026,91 @@
     filter:drop-shadow(0 0 8px rgba(255,255,255,.22));
   }
 
+  .animacion.madrugada .particula,
+  .animacion.dia .particula,
+  .animacion.tarde .particula,
+  .animacion.atardecer .particula,
+  .animacion.noche .particula {
+    position:absolute;
+    opacity:0;
+    transform-origin:center;
+    border-radius:50%;
+  }
+
+  .animacion.madrugada .particula {
+    width:12px;
+    height:12px;
+    background:rgba(255,255,255,.34);
+    box-shadow:0 0 16px rgba(255,255,255,.22), 0 0 28px rgba(191,216,255,.18);
+    animation:haze-drift 14s ease-in-out infinite alternate;
+  }
+
+  .animacion.dia .particula {
+    width:5px;
+    height:5px;
+    background:rgba(255,255,255,.7);
+    box-shadow:0 0 12px rgba(255,255,255,.45), 0 0 18px rgba(126,211,255,.28);
+    animation:dust-sway 9s ease-in-out infinite;
+  }
+
+  .animacion.tarde .particula {
+    width:8px;
+    height:8px;
+    background:radial-gradient(circle, rgba(255,245,208,1) 0%, rgba(255,201,120,1) 45%, rgba(255,154,87,1) 100%);
+    box-shadow:0 0 14px rgba(255,186,96,.38), 0 0 20px rgba(255,150,98,.2);
+    animation:golden-drift 10s ease-in-out infinite;
+  }
+
+  .animacion.atardecer .particula {
+    width:9px;
+    height:9px;
+    background:radial-gradient(circle, rgba(255,243,201,1) 0%, rgba(255,182,96,1) 30%, rgba(232,99,74,1) 100%);
+    box-shadow:0 0 16px rgba(255,168,95,.38), 0 0 24px rgba(211,92,66,.22);
+    animation:ember-float 12s ease-in-out infinite;
+  }
+
   .animacion.noche .particula {
     width:4px;
     height:4px;
-    border-radius:50%;
-    background:#fff;
-    box-shadow:0 0 8px rgba(255,255,255,.9), 0 0 14px rgba(255,255,255,.75);
-    animation: twinkle linear infinite;
+    background:rgba(255,255,255,.9);
+    box-shadow:0 0 10px rgba(255,255,255,.8), 0 0 18px rgba(164,190,255,.55);
+    animation:star-twinkle 4s ease-in-out infinite;
   }
 
-  .animacion.dia .particula {
-    width:30px;
-    height:16px;
-    background:transparent;
-    animation: bird-fly linear infinite;
-    opacity:1;
-  }
-
+  .animacion.madrugada .particula::before,
   .animacion.dia .particula::before,
-  .animacion.dia .particula::after {
-    content:"";
-    position:absolute;
-    top:50%;
-    width:14px;
-    height:8px;
-    background:rgba(36, 72, 48, .9);
-    border-radius:50% 50% 50% 10%;
-    transform:translateY(-50%);
-    box-shadow:0 0 8px rgba(255,255,255,.12);
-  }
-
-  .animacion.dia .particula::before {
-    left:0;
-    transform:translateY(-50%) rotate(-18deg);
-  }
-
-  .animacion.dia .particula::after {
-    right:0;
-    transform:translateY(-50%) rotate(18deg);
-  }
-
-  .animacion.dia .particula {
-    width:9px;
-    height:14px;
-    background:linear-gradient(180deg, rgba(255,233,242,1) 0%, rgba(252,177,214,1) 28%, rgba(221,90,157,1) 100%);
-    border-radius:80% 20% 80% 20%;
-    box-shadow:0 0 8px rgba(255,168,210,.25), inset -1px -2px 4px rgba(146,36,91,.18);
-    animation: petal-fall 8s linear infinite;
-    transform-origin:center;
-    position:absolute;
-    opacity:0;
-  }
-
-  .animacion.dia .particula::before,
-  .animacion.dia .particula::after {
+  .animacion.tarde .particula::before,
+  .animacion.atardecer .particula::before,
+  .animacion.noche .particula::before,
+  .animacion.madrugada .particula::after,
+  .animacion.dia .particula::after,
+  .animacion.tarde .particula::after,
+  .animacion.atardecer .particula::after,
+  .animacion.noche .particula::after {
     content:"";
     position:absolute;
     inset:0;
+    border-radius:50%;
     background:inherit;
-    border-radius:inherit;
     box-shadow:inherit;
   }
 
-  .animacion.dia .particula::before {
-    transform:rotate(22deg) scale(1.04);
+  .animacion.madrugada .particula::before,
+  .animacion.dia .particula::before,
+  .animacion.tarde .particula::before,
+  .animacion.atardecer .particula::before,
+  .animacion.noche .particula::before {
+    transform:scale(1.8);
+    opacity:.35;
   }
 
-  .animacion.dia .particula::after {
-    transform:rotate(-24deg) scale(0.96);
+  .animacion.madrugada .particula::after,
+  .animacion.dia .particula::after,
+  .animacion.tarde .particula::after,
+  .animacion.atardecer .particula::after,
+  .animacion.noche .particula::after {
+    transform:scale(0.55);
+    opacity:.8;
   }
 
   .globos {
@@ -1895,21 +2177,78 @@
     100% { transform:translate3d(110vw,0,0) scale(.9); opacity:0; }
   }
 
-  @keyframes petal-fall {
+  @keyframes haze-drift {
     0% {
-      transform:translate3d(0,-12vh,0) rotate(0deg) scale(.5);
+      transform:translate3d(-2vw, 0, 0) scale(.7);
       opacity:0;
     }
-    12% {
-      opacity:1;
-    }
+    20% { opacity:.7; }
     50% {
-      transform:translate3d(calc(var(--drift, 18px) * 0.55), 52vh, 0) rotate(160deg) scale(.8);
-      opacity:1;
+      transform:translate3d(28vw, 45vh, 0) scale(1.1);
+      opacity:.9;
     }
     100% {
-      transform:translate3d(var(--drift, 18px), 108vh, 0) rotate(290deg) scale(.55);
+      transform:translate3d(60vw, 100vh, 0) scale(.8);
       opacity:0;
+    }
+  }
+
+  @keyframes dust-sway {
+    0% {
+      transform:translate3d(-10vw, -10vh, 0) scale(.6);
+      opacity:0;
+    }
+    20% { opacity:1; }
+    50% {
+      transform:translate3d(38vw, 38vh, 0) scale(1.2);
+      opacity:.9;
+    }
+    100% {
+      transform:translate3d(82vw, 108vh, 0) scale(.5);
+      opacity:0;
+    }
+  }
+
+  @keyframes golden-drift {
+    0% {
+      transform:translate3d(-6vw, -10vh, 0) scale(.5);
+      opacity:0;
+    }
+    18% { opacity:1; }
+    52% {
+      transform:translate3d(36vw, 42vh, 0) scale(1.15);
+      opacity:.9;
+    }
+    100% {
+      transform:translate3d(68vw, 112vh, 0) scale(.7);
+      opacity:0;
+    }
+  }
+
+  @keyframes ember-float {
+    0% {
+      transform:translate3d(-4vw, -14vh, 0) scale(.55);
+      opacity:0;
+    }
+    20% { opacity:1; }
+    46% {
+      transform:translate3d(26vw, 28vh, 0) scale(1.1);
+      opacity:.92;
+    }
+    100% {
+      transform:translate3d(72vw, 104vh, 0) scale(.6);
+      opacity:0;
+    }
+  }
+
+  @keyframes star-twinkle {
+    0%, 100% {
+      transform:translate3d(0, 0, 0) scale(.7);
+      opacity:.2;
+    }
+    50% {
+      transform:translate3d(var(--drift, 18px), 26vh, 0) scale(1.6);
+      opacity:1;
     }
   }
 
@@ -2123,16 +2462,12 @@
       flex-direction:column;
       flex:1 1 auto;
       min-height:0;
-      gap:10px;
-    }
+    gap:clamp(8px, 1.3vh, 12px);
+    width:100%;
+  }
 
-    .game-grid {
-      width:min(100%, calc(88dvh - 260px));
-      aspect-ratio:1;
-      margin:0 auto;
-      padding:6px;
-      gap:3px;
-      border-radius:12px;
+  .game-grid {
+    width:min(100%, min(52dvh, 310px));
       flex-shrink:0;
     }
 
@@ -2247,7 +2582,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14.7 7l5 .7-3.6 3.6.9 5.2-4.9-2.6-4.9 2.6.9-5.2L4.3 7.7l5-.7L12 2.5Zm0 4.8 1.3 2.6 2.9.4-2.1 2 0 3-2.1-1.1-2.1 1.1 0-3-2.1-2 2.9-.4L12 7.3Z"/></svg>
       <span id="medal-count">0</span>
     </button>
-    <a id="game-badge" class="game-badge" href="#" aria-label="Juegos del día">juegos del día</a>
+    <a id="game-badge" class="game-badge" href="#" aria-label="Juegos">juegos</a>
   </div>
 
   <div id="game-modal" class="game-modal" aria-hidden="true">
@@ -2255,7 +2590,7 @@
       <div id="game-toast" class="game-toast" aria-live="polite"></div>
       <div class="game-header">
         <div>
-          <div id="game-kicker" class="game-kicker">juegos del día</div>
+          <div id="game-kicker" class="game-kicker">juegos</div>
           <h2 id="game-title">Elegí tu juego</h2>
         </div>
         <button id="game-close" class="game-close" type="button" aria-label="Cerrar juego">×</button>
@@ -2263,6 +2598,10 @@
       <div id="game-status" class="game-status">Seleccioná uno de los 4 juegos de hoy</div>
       <div id="game-menu" class="game-menu" aria-label="Menú de juegos"></div>
       <div id="game-stage" class="game-stage hidden"></div>
+      <div id="game-refresh-status" class="game-refresh-status" aria-live="polite">
+        <span id="game-refresh-timer" class="game-refresh-timer">00:00:00</span>
+        <span>Para nuevos juegos!</span>
+      </div>
     </div>
   </div>
 
@@ -2333,11 +2672,12 @@
     </div>
 
     <h1 class="saludo">
-      <span id="saludo-texto">Buenos días</span>,
-      <span class="linea-nombre"><span id="nombre" aria-label="Nombre de quien recibe el saludo">Francisca</span></span>
+      <span id="saludo-texto">Hola</span>
+      <span class="linea-nombre"><span id="nombre" aria-label="Nombre de quien recibe el saludo">Fran</span></span>
     </h1>
 
-    <p class="dia-mensaje" id="dia-mensaje">Feliz día</p>
+    <p class="dia-mensaje" id="dia-mensaje">Que tengas un gran día!</p>
+    <p class="dia-semana" id="dia-semana">Feliz día</p>
 
     <p class="firma">Santiago te manda un abrazo</p>
 
@@ -2354,10 +2694,15 @@
   const ayuda  = document.getElementById('ayuda');
   const saludoTexto = document.getElementById('saludo-texto');
   const diaMensaje = document.getElementById('dia-mensaje');
+  const diaSemana = document.getElementById('dia-semana');
   const globos = document.getElementById('globos');
   const animacionDia = document.getElementById('animacion-dia');
   const panelModerador = document.getElementById('moderador-panel');
   const listaModerador = document.getElementById('moderador-lista');
+  const DISPOSITIVOS_KEY = 'granDiaDispositivos';
+  const GLOBAL_SYNC_KEY = 'granDiaGlobalSync';
+  const GLOBAL_SYNC_CHANNEL = 'gran-dia-sync';
+  const MODERADOR_KEY = '15995123';
   const weatherBadge = document.getElementById('weather-badge');
   const weatherTexto = document.getElementById('weather-texto');
   const weatherClouds = document.getElementById('weather-clouds');
@@ -2445,16 +2790,52 @@
       ahorcado: { palabra: 'PATENTE', categoria: 'Autos' },
       sopa: ['ALEX', 'FERNET', 'JOAQUI', 'BAILE', 'TASTY', ''],
       memoria: [4, 12, 7, 20, 3, 16, 9, 22],
-      cuentas: null
+      cuentas: null,
+      top5: {
+        categoria: 'Personajes con más minutos en pantalla en Friends',
+        respuestas: ['ROSS', 'RACHEL', 'CHANDLER', 'JOEY', 'MONICA']
+      }
     },
     '2026-08-29': {
       wordle: 'GAVIOTA',
       ahorcado: { palabra: 'QUEVEDO', categoria: 'Música' },
       sopa: ['ALEXIA', 'POPA', 'MILI', 'CANDE', 'FRANSHU', 'JUANA'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
-      cuentas: null
+      cuentas: null,
+      top5: {
+        categoria: 'Top 5 series más vistas',
+        respuestas: ['FRIENDS', 'THE LAST OF US', 'STRANGER THINGS', 'THE OFFICE', 'GAME OF THRONES']
+      }
     }
   };
+
+  function offsetBuenosAiresMs(fecha = new Date()) {
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    const parts = {};
+    fmt.formatToParts(fecha).forEach((part) => {
+      if (part.type !== 'literal') {
+        parts[part.type] = part.value;
+      }
+    });
+    const utcMs = Date.UTC(
+      Number(parts.year),
+      Number(parts.month) - 1,
+      Number(parts.day),
+      Number(parts.hour),
+      Number(parts.minute),
+      Number(parts.second)
+    );
+    return utcMs - fecha.getTime();
+  }
 
   function diaLogico() {
     const params = new URLSearchParams(window.location.search);
@@ -2462,11 +2843,11 @@
     if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
 
     const ahora = new Date();
-    const ms = ahora.getTime() + (OFFSET_ARG * 60 * 60 * 1000) - (HORA_CORTE * 60 * 60 * 1000);
-    const ajustada = new Date(ms);
-    const y = ajustada.getUTCFullYear();
-    const m = String(ajustada.getUTCMonth() + 1).padStart(2, '0');
-    const d = String(ajustada.getUTCDate()).padStart(2, '0');
+    const offset = offsetBuenosAiresMs(ahora);
+    const ahoraArg = new Date(ahora.getTime() + offset);
+    const y = ahoraArg.getUTCFullYear();
+    const m = String(ahoraArg.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(ahoraArg.getUTCDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
 
@@ -2534,6 +2915,24 @@
       }
     }
 
+    const top5 = entrada.top5;
+    if (top5 && typeof top5 === 'object') {
+      const categoria = String(top5.categoria || '').trim();
+      const respuestas = Array.isArray(top5.respuestas) ? top5.respuestas : [];
+      if (!categoria) {
+        warnings.push(`[${fecha}] top5 inválido: falta categoria.`);
+      }
+      if (respuestas.length !== 5) {
+        warnings.push(`[${fecha}] top5 inválido: debe haber 5 respuestas.`);
+      }
+      respuestas.forEach((valor, index) => {
+        const texto = String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s]/g, '').toUpperCase().trim();
+        if (!texto || texto.length > 32) {
+          warnings.push(`[${fecha}] top5 inválido: respuesta ${index + 1} no es válida.`);
+        }
+      });
+    }
+
     return warnings;
   }
 
@@ -2556,6 +2955,7 @@
     historial: [],
     canjes: [],
     perdidos: [],
+    rachas: {},
     versionVista: 0
   };
   const PREMIOS = [
@@ -2569,14 +2969,16 @@
       id: 'wordle',
       nombre: 'Wordle',
       desc: 'Adiviná la palabra en 6 intentos',
+      icono: { emoji: '🔤', fondo: 'linear-gradient(135deg, #7dd3fc, #3b82f6)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarWordle(contenedor, rand, onGanar, onPerder);
-      } 
+      }
     },
     cuentas: {
       id: 'cuentas',
       nombre: 'Cuentas mentales',
       desc: '8 cuentas en 60 segundos',
+      icono: { emoji: '🧮', fondo: 'linear-gradient(135deg, #a78bfa, #7c3aed)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarCuentas(contenedor, rand, onGanar, onPerder);
       }
@@ -2585,6 +2987,7 @@
       id: 'sopa',
       nombre: 'Sopa de letras',
       desc: 'Encontrá las 6 palabras',
+      icono: { emoji: '🧩', fondo: 'linear-gradient(135deg, #34d399, #10b981)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarSopaDeLetras(contenedor, rand, onGanar, onPerder);
       }
@@ -2593,6 +2996,7 @@
       id: 'ahorcado',
       nombre: 'Ahorcado',
       desc: 'Adiviná la palabra sin perder las 6 vidas',
+      icono: { emoji: '🪢', fondo: 'linear-gradient(135deg, #fbbf24, #f97316)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarAhorcado(contenedor, rand, onGanar, onPerder);
       }
@@ -2601,8 +3005,18 @@
       id: 'memoria',
       nombre: 'Memoria',
       desc: 'Repetí la secuencia de luces',
+      icono: { emoji: '🧠', fondo: 'linear-gradient(135deg, #f9a8d4, #ec4899)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarMemoria(contenedor, rand, onGanar, onPerder);
+      }
+    },
+    top5: {
+      id: 'top5',
+      nombre: 'Top 5',
+      desc: 'Completá el ranking del día',
+      icono: { emoji: '🏆', fondo: 'linear-gradient(135deg, #facc15, #fb7185)' },
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarTop5(contenedor, rand, onGanar, onPerder);
       }
     }
   };
@@ -2629,11 +3043,13 @@
   };
 
   const TEMAS = [
-    { max:5,  id:'madrugada', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
-    { max:9,  id:'amanecer',  saludo:'Que tengas un gran día', a:'#2A2160', b:'#FF8A5B', c:'#FFC86B', astro:'#FFE3A8', y:'62%', tinta:'#FFF6EA' },
-    { max:17, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
+    { max:5,  id:'descanso',   saludo:'Que descanses', a:'#0A1029', b:'#1A1B4B', c:'#38295F', astro:'#D7E1FF', y:'36%', tinta:'#F2F5FF' },
+    { max:9,  id:'madrugada', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
+    { max:12, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
+    { max:18, id:'tarde',     saludo:'Que tengas una excelente tarde', a:'#CFEAFF', b:'#BCE7FF', c:'#F8DDA0', astro:'#FFF9DB', y:'24%', tinta:'#1A3C5B' },
     { max:20, id:'atardecer', saludo:'Buenas tardes', a:'#4A1F63', b:'#E0565C', c:'#FFB05C', astro:'#FFD08A', y:'70%', tinta:'#FFF1E6' },
-    { max:24, id:'noche',     saludo:'Buenas noches', a:'#0B1030', b:'#1E1B47', c:'#332A5C', astro:'#CFD8FF', y:'34%', tinta:'#EDF1FF' }
+    { max:23, id:'noche',     saludo:'Buenas noches', a:'#0B1030', b:'#1E1B47', c:'#332A5C', astro:'#CFD8FF', y:'34%', tinta:'#EDF1FF' },
+    { max:24, id:'descanso',  saludo:'Que descanses', a:'#0A1029', b:'#1A1B4B', c:'#38295F', astro:'#D7E1FF', y:'36%', tinta:'#F2F5FF' }
   ];
 
   const MENSAJES_POR_DIA = {
@@ -2702,15 +3118,21 @@
     animacionDia.innerHTML = '';
     animacionDia.className = 'animacion ' + modo;
 
-    const total = modo === 'noche' ? 28 : 18;
+    const total = modo === 'noche' ? 30 : modo === 'madrugada' ? 18 : modo === 'tarde' ? 24 : modo === 'atardecer' ? 26 : 22;
     for (let i = 0; i < total; i++) {
       const part = document.createElement('span');
       part.className = 'particula';
       part.style.left = (Math.random() * 100) + '%';
       part.style.top = (modo === 'noche' ? -5 : -12) + 'vh';
-      part.style.animationDuration = (modo === 'noche' ? 3 + Math.random() * 5 : 6 + Math.random() * 7) + 's';
-      part.style.animationDelay = (Math.random() * 4) + 's';
-      part.style.setProperty('--drift', ((Math.random() * 60) - 30) + 'px');
+      part.style.animationDuration = (
+        modo === 'noche' ? 3 + Math.random() * 4 :
+        modo === 'madrugada' ? 12 + Math.random() * 6 :
+        modo === 'tarde' ? 8 + Math.random() * 6 :
+        modo === 'atardecer' ? 10 + Math.random() * 7 :
+        7 + Math.random() * 5
+      ) + 's';
+      part.style.animationDelay = (Math.random() * 5) + 's';
+      part.style.setProperty('--drift', ((Math.random() * 80) - 40) + 'px');
       animacionDia.appendChild(part);
     }
   }
@@ -2735,23 +3157,204 @@
 
   function tiempoHastaProximoCambio() {
     const ahora = new Date();
-    const ahoraEnArg = new Date(ahora.getTime() + (OFFSET_ARG * 60 * 60 * 1000));
-    const fechaHoy = new Date(Date.UTC(ahoraEnArg.getUTCFullYear(), ahoraEnArg.getUTCMonth(), ahoraEnArg.getUTCDate(), HORA_CORTE, 0, 0));
-    const fechaSiguiente = new Date(fechaHoy.getTime() + (24 * 60 * 60 * 1000));
-    const siguiente = ahora.getTime() >= fechaHoy.getTime() - (OFFSET_ARG * 60 * 60 * 1000) ? fechaSiguiente : fechaHoy;
+    const offset = offsetBuenosAiresMs(ahora);
+    const ahoraArg = new Date(ahora.getTime() + offset);
+    const corteHoy = new Date(Date.UTC(ahoraArg.getUTCFullYear(), ahoraArg.getUTCMonth(), ahoraArg.getUTCDate(), HORA_CORTE, 0, 0));
+    const corteSiguiente = new Date(corteHoy.getTime() + 24 * 60 * 60 * 1000);
+    const siguiente = ahoraArg.getTime() >= corteHoy.getTime() ? corteSiguiente : corteHoy;
     const diff = Math.max(0, siguiente.getTime() - ahora.getTime());
     const horas = Math.floor(diff / (60 * 60 * 1000));
     const minutos = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
     return { horas, minutos, texto: `${horas}h ${minutos}m` };
   }
 
+  function obtenerDeviceId() {
+    try {
+      const clave = 'granDiaDeviceId';
+      let deviceId = sessionStorage.getItem(clave);
+      if (!deviceId) {
+        deviceId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        sessionStorage.setItem(clave, deviceId);
+      }
+      return deviceId;
+    } catch (error) {
+      return `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+  }
+
+  function leerDispositivosRegistrados() {
+    try {
+      const raw = window.localStorage.getItem(DISPOSITIVOS_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function registrarIngresoDispositivo() {
+    try {
+      const lista = leerDispositivosRegistrados();
+      const deviceId = obtenerDeviceId();
+      const nombreActual = (nombre && nombre.textContent ? nombre.textContent.trim() : '').replace(/\s+/g, ' ') || 'Persona desconocida';
+      const ahora = new Date();
+      const entrada = {
+        id: deviceId,
+        nombre: nombreActual,
+        ultimaEntrada: ahora.toISOString(),
+        dia: diaLogico(),
+        userAgent: navigator.userAgent || 'Sin UA',
+        origen: window.location.origin || 'local'
+      };
+
+      const index = lista.findIndex((item) => item && item.id === deviceId);
+      if (index >= 0) {
+        lista[index] = { ...lista[index], ...entrada };
+      } else {
+        lista.unshift(entrada);
+      }
+
+      const ordenados = lista
+        .filter((item) => item && item.id)
+        .sort((a, b) => new Date(b.ultimaEntrada) - new Date(a.ultimaEntrada));
+      window.localStorage.setItem(DISPOSITIVOS_KEY, JSON.stringify(ordenados.slice(0, 50)));
+      return ordenados.slice(0, 50);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function renderListaDispositivos() {
+    const dispositivos = leerDispositivosRegistrados();
+    if (!listaModerador) return;
+
+    if (!dispositivos.length) {
+      listaModerador.innerHTML = '<li>Sin dispositivos registrados.</li>';
+      return;
+    }
+
+    listaModerador.innerHTML = dispositivos.map((dispositivo) => {
+      const fecha = dispositivo && dispositivo.ultimaEntrada ? new Date(dispositivo.ultimaEntrada).toLocaleString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) : 'Sin fecha';
+      return `<li><strong>${dispositivo.nombre || 'Dispositivo'}</strong> · ${fecha} · ${dispositivo.dia || '—'}</li>`;
+    }).join('');
+  }
+
+  function dispararRegeneracionGlobal() {
+    const payload = {
+      type: 'regenerar-juegos',
+      dia: diaLogico(),
+      ts: Date.now(),
+      source: obtenerDeviceId()
+    };
+
+    try {
+      window.localStorage.setItem(GLOBAL_SYNC_KEY, JSON.stringify(payload));
+    } catch (error) {}
+
+    if ('BroadcastChannel' in window) {
+      try {
+        const channel = new BroadcastChannel(GLOBAL_SYNC_CHANNEL);
+        channel.postMessage(payload);
+        channel.close();
+      } catch (error) {}
+    }
+
+    window.dispatchEvent(new CustomEvent('granDiaSync', { detail: payload }));
+  }
+
+  function escucharCambiosGlobales() {
+    const manejarCambio = (payload) => {
+      if (!payload || payload.type !== 'regenerar-juegos') return;
+      if (payload.source === obtenerDeviceId()) return;
+
+      try {
+        const estado = leerEstado();
+        const diaActual = diaLogico();
+        const nuevoEstado = {
+          ...estado,
+          historial: Array.isArray(estado.historial) ? estado.historial.filter(item => item && item.fecha !== diaActual) : [],
+          perdidos: Array.isArray(estado.perdidos) ? estado.perdidos.filter(item => item && item.fecha !== diaActual) : []
+        };
+        guardarEstado(nuevoEstado);
+      } catch (error) {}
+
+      window.location.reload();
+    };
+
+    window.addEventListener('granDiaSync', (event) => {
+      manejarCambio(event.detail);
+    });
+
+    window.addEventListener('storage', (event) => {
+      if (event.key !== GLOBAL_SYNC_KEY || !event.newValue) return;
+      try {
+        manejarCambio(JSON.parse(event.newValue));
+      } catch (error) {}
+    });
+
+    if ('BroadcastChannel' in window) {
+      try {
+        const channel = new BroadcastChannel(GLOBAL_SYNC_CHANNEL);
+        channel.onmessage = (event) => manejarCambio(event.data);
+      } catch (error) {}
+    }
+  }
+
+  function tieneClaveModerador() {
+    const params = new URLSearchParams(window.location.search);
+    const claveQuery = params.get('clave');
+    if (claveQuery === MODERADOR_KEY) return true;
+
+    try {
+      const sesion = window.sessionStorage.getItem('granDiaModeradorAutorizado');
+      if (sesion === MODERADOR_KEY) return true;
+    } catch (error) {}
+
+    return false;
+  }
+
+  function solicitarClaveModerador() {
+    const params = new URLSearchParams(window.location.search);
+    const claveQuery = params.get('clave');
+    if (claveQuery === MODERADOR_KEY) {
+      try { window.sessionStorage.setItem('granDiaModeradorAutorizado', MODERADOR_KEY); } catch (error) {}
+      return true;
+    }
+
+    const ingreso = window.prompt('Ingresá la clave de moderador');
+    if (ingreso === MODERADOR_KEY) {
+      try { window.sessionStorage.setItem('granDiaModeradorAutorizado', MODERADOR_KEY); } catch (error) {}
+      return true;
+    }
+
+    return false;
+  }
+
   function activarPanelModerador(){
     const params = new URLSearchParams(window.location.search);
     const esAdmin = params.get('moderador') === '1' || params.get('admin') === '1';
+    const claveValida = tieneClaveModerador();
+    const accesoExplicito = esAdmin || params.get('clave') === MODERADOR_KEY;
 
-    if (!esAdmin) return;
+    if (!accesoExplicito && !claveValida) {
+      return;
+    }
+
+    if (!claveValida && !esAdmin) {
+      const ingreso = solicitarClaveModerador();
+      if (!ingreso) return;
+    }
 
     panelModerador.classList.add('visible');
+    registrarIngresoDispositivo();
+    renderListaDispositivos();
 
     const meta = document.getElementById('moderador-meta');
     const overrideEl = document.getElementById('moderador-override');
@@ -2808,6 +3411,7 @@
           guardarEstado(nuevoEstado);
         } catch (error) {}
 
+        dispararRegeneracionGlobal();
         window.location.reload();
       };
     }
@@ -2927,14 +3531,68 @@
   function normalizarEstado(estado) {
     const base = JSON.parse(JSON.stringify(DEFAULT_ESTADO));
     if (!estado || typeof estado !== 'object') return base;
+    const rachas = estado.rachas && typeof estado.rachas === 'object' && !Array.isArray(estado.rachas)
+      ? Object.fromEntries(Object.entries(estado.rachas).filter(([key, value]) => key && value && typeof value === 'object').map(([key, value]) => {
+          const dias = Number(value.dias) || 0;
+          return [key, { dias, ultimaFecha: typeof value.ultimaFecha === 'string' ? value.ultimaFecha : null }];
+        }))
+      : {};
     return {
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
       historial: Array.isArray(estado.historial) ? estado.historial : [],
       canjes: Array.isArray(estado.canjes) ? estado.canjes : [],
       perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : [],
+      rachas,
       versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
+  }
+
+  function obtenerMensajeDelDiaSegunHora() {
+    const hora = new Date().getHours();
+    if (hora >= 0 && hora < 5) return 'Que descanses';
+    if (hora >= 5 && hora < 9) return 'Buenos días';
+    if (hora >= 9 && hora < 12) return 'Que tengas un gran día!';
+    if (hora >= 12 && hora < 18) return 'Que tengas una excelente tarde';
+    if (hora >= 18 && hora < 20) return 'Buenas tardes';
+    if (hora >= 20 && hora < 23) return 'Buenas noches';
+    return 'Que descanses';
+  }
+
+  function obtenerRachaJuego(juegoId) {
+    const estado = leerEstado();
+    const racha = estado.rachas && estado.rachas[juegoId];
+    return Number(racha && Number(racha.dias) > 0 ? Number(racha.dias) : 0) || 0;
+  }
+
+  function limpiarRachaJuego(juegoId, estadoActual = leerEstado()) {
+    const estado = normalizarEstado(estadoActual);
+    const rachas = { ...(estado.rachas || {}) };
+    delete rachas[juegoId];
+    return { ...estado, rachas };
+  }
+
+  function actualizarRachaVictoria(juegoId, estadoActual = leerEstado()) {
+    const estado = normalizarEstado(estadoActual);
+    const fechaActual = diaLogico();
+    const rachas = { ...(estado.rachas || {}) };
+    const actual = rachas[juegoId] || { dias: 0, ultimaFecha: null };
+    const ultimaFecha = typeof actual.ultimaFecha === 'string' ? actual.ultimaFecha : null;
+
+    let nuevoTotal = 1;
+    if (ultimaFecha) {
+      const ultima = new Date(`${ultimaFecha}T00:00:00`);
+      const hoy = new Date(`${fechaActual}T00:00:00`);
+      const diferenciaDias = Math.round((hoy.getTime() - ultima.getTime()) / 86400000);
+      if (diferenciaDias === 1) {
+        nuevoTotal = Number(actual.dias || 0) + 1;
+      } else if (diferenciaDias === 0) {
+        nuevoTotal = Number(actual.dias || 0) || 1;
+      }
+    }
+
+    rachas[juegoId] = { dias: nuevoTotal, ultimaFecha: fechaActual };
+    return { ...estado, rachas };
   }
 
   const Almacen = {
@@ -3305,7 +3963,7 @@
       perdidos: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.perdidos) ? estado.perdidos : [])]
     };
 
-    guardarEstado(nuevoEstado);
+    guardarEstado(limpiarRachaJuego(juegoId, nuevoEstado));
     renderMenuJuegos();
   }
 
@@ -3342,7 +4000,8 @@
       historial: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.historial) ? estado.historial : [])]
     };
 
-    guardarEstado(nuevoEstado);
+    const conRacha = actualizarRachaVictoria(juegoId, nuevoEstado);
+    guardarEstado(conRacha);
     actualizarBadgeMedallas();
     renderPremios();
     renderMenuJuegos();
@@ -3624,6 +4283,230 @@
       texto: `${dividendo} ÷ ${divisor} = ?`,
       respuesta: correcto,
       distractores: normalizarDistractores(correcto, [correcto + 1, correcto - 1, correcto + 3, correcto + 5], 3)
+    };
+  }
+
+  const TOP5_CATEGORIAS = [
+    {
+      categoria: 'Top 5 Personajes con más minutos en pantalla en Friends',
+      respuestas: ['ROSS', 'RACHEL', 'CHANDLER', 'JOEY', 'MONICA']
+    },
+    {
+      categoria: 'Top 5 películas favoritas',
+      respuestas: ['EL PADRINO', 'LA LISTA DE SCHINDLER', 'INCEPTION', 'PULP FICTION', 'CASABLANCA']
+    },
+    {
+      categoria: 'Top 5 destinos para viajar',
+      respuestas: ['PARÍS', 'TOKIO', 'BARCELONA', 'BALI', 'NEW YORK']
+    },
+    {
+      categoria: 'Top 5 comidas preferidas',
+      respuestas: ['ASADO', 'PIZZA', 'EMPANADAS', 'SUSHI', 'PASTA']
+    },
+    {
+      categoria: 'Top 5 series más vistas',
+      respuestas: ['FRIENDS', 'THE LAST OF US', 'STRANGER THINGS', 'THE OFFICE', 'GAME OF THRONES']
+    }
+  ];
+
+  function normalizarTexto(valor) {
+    return String(valor || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .toUpperCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function montarTop5(contenedor, rand, onGanar, onPerder) {
+    const status = document.getElementById('game-status');
+    const yaGanado = yaGanoMedallaHoy('top5');
+
+    if (yaGanado) {
+      if (status) status.textContent = 'Ya ganaste la medalla de hoy';
+      return function desmontar() {
+        contenedor.innerHTML = '';
+      };
+    }
+
+    const contenidoCalendario = obtenerContenidoDelDia('top5');
+    const categoriaBase = contenidoCalendario && typeof contenidoCalendario === 'object' && contenidoCalendario.categoria
+      ? contenidoCalendario
+      : TOP5_CATEGORIAS[Math.floor(rand() * TOP5_CATEGORIAS.length)];
+
+    const shell = document.createElement('div');
+    shell.className = 'top5-shell';
+
+    const categoriaActual = categoriaBase;
+    const respuestasCorrectas = Array.isArray(categoriaActual.respuestas) && categoriaActual.respuestas.length
+      ? categoriaActual.respuestas.map((item) => normalizarTexto(item))
+      : TOP5_CATEGORIAS[Math.floor(rand() * TOP5_CATEGORIAS.length)].respuestas.map((item) => normalizarTexto(item));
+    const posicionadas = Array(respuestasCorrectas.length).fill(null);
+    const posicionesAdivinadas = new Set();
+    let vidas = 3;
+    let terminado = false;
+
+    const header = document.createElement('div');
+    header.className = 'top5-header';
+    header.innerHTML = `
+      <div>
+        <div class="top5-pill">Top 5</div>
+        <p class="top5-category">${categoriaActual.categoria}</p>
+      </div>
+      <div class="top5-lives" aria-label="vidas restantes"></div>
+    `;
+    shell.appendChild(header);
+
+    const livesEl = header.querySelector('.top5-lives');
+    function renderLives() {
+      livesEl.innerHTML = '';
+      Array.from({ length: 3 }, (_, index) => {
+        const dot = document.createElement('span');
+        dot.className = 'top5-life' + (index < vidas ? ' active' : '');
+        return dot;
+      }).forEach((dot) => livesEl.appendChild(dot));
+    }
+
+    const list = document.createElement('div');
+    list.className = 'top5-list';
+
+    const rankingCells = respuestasCorrectas.map((_, index) => {
+      const row = document.createElement('div');
+      row.className = 'top5-row';
+
+      const num = document.createElement('span');
+      num.className = 'top5-num';
+      num.textContent = String(index + 1);
+
+      const value = document.createElement('div');
+      value.className = 'top5-input';
+      value.textContent = '—';
+      value.setAttribute('aria-live', 'polite');
+
+      row.appendChild(num);
+      row.appendChild(value);
+      list.appendChild(row);
+      return { row, value };
+    });
+
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'top5-row';
+    inputWrap.style.gridTemplateColumns = '1fr auto';
+    inputWrap.style.marginTop = '8px';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'top5-input';
+    input.placeholder = 'Ingresá una respuesta';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.maxLength = 40;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'top5-check';
+    button.textContent = 'ENTER';
+
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(button);
+
+    function renderRanking() {
+      rankingCells.forEach(({ row, value }, index) => {
+        const valorActual = posicionadas[index];
+        const fueAdivinada = posicionesAdivinadas.has(index);
+        const mostrarComoEquivocada = terminado && !fueAdivinada && valorActual !== null;
+        const texto = valorActual || '—';
+
+        value.textContent = texto;
+        row.classList.toggle('correct', !terminado && fueAdivinada);
+        row.classList.toggle('wrong', mostrarComoEquivocada);
+        value.classList.toggle('correct', !terminado && fueAdivinada);
+        value.classList.toggle('wrong', mostrarComoEquivocada);
+      });
+    }
+
+    function revelarSolucion() {
+      posicionadas.forEach((_, index) => {
+        if (!posicionesAdivinadas.has(index)) {
+          posicionadas[index] = categoriaActual.respuestas[index];
+        }
+      });
+      renderRanking();
+      input.value = '';
+      button.disabled = true;
+      input.disabled = true;
+      if (status) {
+        status.textContent = `Perdiste. La respuesta correcta era: ${categoriaActual.respuestas.join(', ')}`;
+      }
+    }
+
+    function validarRespuesta() {
+      if (terminado) return;
+
+      const valor = normalizarTexto(input.value);
+      if (!valor) {
+        if (status) status.textContent = 'Completá la respuesta antes de validar';
+        input.focus();
+        return;
+      }
+
+      const posicion = respuestasCorrectas.indexOf(valor);
+      if (posicion === -1) {
+        vidas -= 1;
+        input.value = '';
+        if (status) {
+          status.textContent = vidas > 0 ? `Te equivocaste, te quedan ${vidas} vidas` : 'Perdiste';
+        }
+        renderLives();
+
+        if (vidas <= 0) {
+          terminado = true;
+          revelarSolucion();
+          if (typeof onPerder === 'function') onPerder(`Perdiste. Las respuestas eran: ${categoriaActual.respuestas.join(', ')}`);
+        }
+        return;
+      }
+
+      if (posicionadas[posicion]) {
+        if (status) status.textContent = 'Esa respuesta ya está en el ranking';
+        input.value = '';
+        return;
+      }
+
+      posicionadas[posicion] = categoriaActual.respuestas[posicion];
+      posicionesAdivinadas.add(posicion);
+      input.value = '';
+      renderRanking();
+
+      if (status) status.textContent = 'Respuesta correcta';
+
+      const completo = posicionadas.every(Boolean);
+      if (completo) {
+        terminado = true;
+        button.disabled = true;
+        input.disabled = true;
+        if (status) status.textContent = '¡Ganaste!';
+        if (typeof onGanar === 'function') onGanar();
+      }
+    }
+
+    button.addEventListener('click', validarRespuesta);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        validarRespuesta();
+      }
+    });
+
+    renderLives();
+    renderRanking();
+    shell.appendChild(list);
+    shell.appendChild(inputWrap);
+    contenedor.appendChild(shell);
+
+    return function desmontar() {
+      contenedor.innerHTML = '';
     };
   }
 
@@ -4749,6 +5632,22 @@
     return `${horas}:${minutos}:${segundos}`;
   }
 
+  function obtenerTiempoHastaProximaActualizacion() {
+    const ahora = new Date();
+    const offset = offsetBuenosAiresMs(ahora);
+    const ahoraArg = new Date(ahora.getTime() + offset);
+    const corteHoy = new Date(Date.UTC(ahoraArg.getUTCFullYear(), ahoraArg.getUTCMonth(), ahoraArg.getUTCDate(), HORA_CORTE, 0, 0));
+    const corteSiguiente = new Date(corteHoy.getTime() + 24 * 60 * 60 * 1000);
+    const siguiente = ahoraArg.getTime() >= corteHoy.getTime() ? corteSiguiente : corteHoy;
+    return Math.max(0, siguiente.getTime() - ahora.getTime());
+  }
+
+  function actualizarRefreshStatus() {
+    const timer = document.getElementById('game-refresh-timer');
+    if (!timer) return;
+    timer.textContent = formatearCuentaRegresiva(obtenerTiempoHastaProximaActualizacion());
+  }
+
   function actualizarCartelBloqueo() {
     const menu = document.getElementById('game-menu');
     if (!menu || !menu.dataset.bloqueado) return;
@@ -4796,18 +5695,21 @@
     }
     delete menu.dataset.bloqueado;
 
-    const hoyId = obtenerJuegoDelDia().id;
     const entries = Object.keys(JUEGOS);
     menu.innerHTML = entries.map((key) => {
       const juego = JUEGOS[key];
       const ganado = yaGanoMedallaHoy(juego.id);
       const perdido = yaPerdioHoy(juego.id) && !ganado;
-      const destacado = juego.id === hoyId;
       const disabled = perdido || ganado;
+      const racha = obtenerRachaJuego(juego.id);
+      const thumbStyle = juego.icono && juego.icono.fondo ? `style="background:${juego.icono.fondo};"` : '';
       return `
-        <button type="button" class="game-option ${destacado ? 'featured' : ''} ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
+        <button type="button" class="game-option ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
+          <div class="game-option-top">
+            <span class="game-option-thumb" ${thumbStyle} aria-hidden="true">${juego.icono ? juego.icono.emoji : '🎮'}</span>
+            ${racha > 0 ? `<span class="game-option-streak" aria-label="Racha de victorias">🔥 ${racha}</span>` : ''}
+          </div>
           <span class="game-option-name">${juego.nombre}</span>
-          <span class="game-option-meta">${perdido ? 'Perdido hoy' : destacado ? 'Juego del día' : 'Disponible'}${ganado ? ' · Ganado' : ''}</span>
         </button>
       `;
     }).join('');
@@ -4852,7 +5754,7 @@
       stage.innerHTML = '';
     }
     if (title) title.textContent = juego.nombre;
-    if (kicker) kicker.textContent = juego.id === obtenerJuegoDelDia().id ? 'juego del día' : 'juego seleccionado';
+    if (kicker) kicker.textContent = 'juego seleccionado';
     if (status) {
       status.textContent = yaGanoMedallaHoy(juego.id) ? 'Ya ganaste esta medalla hoy' : juego.desc;
     }
@@ -4900,6 +5802,7 @@
     const title = document.getElementById('game-title');
     const kicker = document.getElementById('game-kicker');
     const status = document.getElementById('game-status');
+    actualizarRefreshStatus();
 
     if (typeof juegoActivoDesmontar === 'function') {
       juegoActivoDesmontar();
@@ -4913,7 +5816,7 @@
       stage.innerHTML = '';
     }
     if (title) title.textContent = 'Elegí tu juego';
-    if (kicker) kicker.textContent = 'juegos del día';
+    if (kicker) kicker.textContent = 'juegos';
     if (status) status.textContent = `Seleccioná uno de los ${Object.keys(JUEGOS).length} juegos de hoy`;
 
     if (modal) {
@@ -4964,20 +5867,24 @@
     r.setProperty('--tinta-suave', t.tinta + '9E');
     const hora = String(h).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
 
-    const modo = (h >= 5 && h < 23) ? 'dia' : 'noche';
+    const modo = h < 5 ? 'noche' : h < 9 ? 'madrugada' : h < 12 ? 'dia' : h < 18 ? 'tarde' : h < 20 ? 'atardecer' : 'noche';
     generarParticulas(modo);
     fechaHoy.textContent = formatearFecha(ahora);
     franja.textContent = hora + ' · ' + t.id;
 
     if (esCumple) {
-      saludoTexto.textContent = 'Feliz cumpleaños';
-      diaMensaje.textContent = '7 de septiembre, hoy es tu día';
+      saludoTexto.textContent = 'Hola';
+      nombre.textContent = 'Fran';
+      diaMensaje.textContent = 'Que tengas un gran día!';
+      if (diaSemana) diaSemana.textContent = 'Feliz cumpleaños';
       globos.classList.add('visible');
       return;
     }
 
-    saludoTexto.textContent = t.saludo;
-    diaMensaje.textContent = MENSAJES_POR_DIA[dia] || 'Feliz día';
+    saludoTexto.textContent = 'Hola';
+    nombre.textContent = 'Fran';
+    diaMensaje.textContent = obtenerMensajeDelDiaSegunHora();
+    if (diaSemana) diaSemana.textContent = MENSAJES_POR_DIA[dia] || 'Feliz día';
     globos.classList.remove('visible');
   }
 
@@ -5045,18 +5952,44 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       Almacen.guardar(leerEstado());
+      return;
+    }
+
+    comprobarCambioDeDia();
+    if (Date.now() - ultimoChequeoVersion >= 2 * 60 * 1000) {
+      comprobarVersionPages();
     }
   });
 
+  window.addEventListener('pageshow', function () {
+    comprobarCambioDeDia();
+    if (Date.now() - ultimoChequeoVersion >= 2 * 60 * 1000) {
+      comprobarVersionPages();
+    }
+  });
+
+  let ultimoChequeoVersion = 0;
+
   async function comprobarVersionPages() {
     try {
+      const ahora = Date.now();
+      if (ahora - ultimoChequeoVersion < 2 * 60 * 1000) return;
+      ultimoChequeoVersion = ahora;
+
       const url = `${window.location.pathname}?v=${Date.now()}`;
       const respuesta = await fetch(url, { cache: 'no-store' });
       if (!respuesta.ok) return;
       const html = await respuesta.text();
-      const match = html.match(/VERSION_JUEGOS\s*=\s*(\d+)/);
-      const versionRemota = match ? Number(match[1]) : null;
-      if (versionRemota !== null && versionRemota !== VERSION_JUEGOS) {
+
+      const matchVersion = html.match(/VERSION_JUEGOS\s*=\s*(\d+)/);
+      const versionRemota = matchVersion ? Number(matchVersion[1]) : null;
+      const matchCalendario = html.match(/const\s+CALENDARIO\s*=\s*\{[\s\S]*?\n\s*\};/m);
+      const calendarioRemoto = matchCalendario ? matchCalendario[0] : '';
+      const hashCalendarioLocal = hashString('const CALENDARIO = ' + JSON.stringify(CALENDARIO) + ';');
+      const hashCalendarioRemoto = calendarioRemoto ? hashString(calendarioRemoto) : null;
+      const cambioCalendario = hashCalendarioRemoto !== null && hashCalendarioRemoto !== hashCalendarioLocal;
+
+      if ((versionRemota !== null && versionRemota !== VERSION_JUEGOS) || cambioCalendario) {
         const toast = document.getElementById('game-toast');
         if (toast) {
           toast.innerHTML = 'Hay una actualización disponible <button type="button" id="toast-actualizar" style="margin-left:8px; padding:4px 8px; border-radius:6px; border:none; background:#fff; color:#1d2435; font-weight:700; cursor:pointer;">Actualizar</button>';
@@ -5080,16 +6013,47 @@
 
   let diaVisible = diaLogico();
   let bloqueoVisible = juegosBloqueadosPorHoy();
+  let proximoCambioTimer = null;
+
+  function programarProximoCambio() {
+    if (proximoCambioTimer) {
+      clearTimeout(proximoCambioTimer);
+      proximoCambioTimer = null;
+    }
+
+    const ahora = Date.now();
+    const offset = offsetBuenosAiresMs(new Date(ahora));
+    const ahoraArg = new Date(ahora + offset);
+    const corteHoy = Date.UTC(ahoraArg.getUTCFullYear(), ahoraArg.getUTCMonth(), ahoraArg.getUTCDate(), HORA_CORTE, 0, 0);
+    const corteProximo = ahoraArg.getTime() >= corteHoy ? Date.UTC(ahoraArg.getUTCFullYear(), ahoraArg.getUTCMonth(), ahoraArg.getUTCDate() + 1, HORA_CORTE, 0, 0) : corteHoy;
+    const espera = Math.max(1000, Math.min(corteProximo - ahora + 1000, 2147483000));
+    proximoCambioTimer = setTimeout(() => {
+      comprobarCambioDeDia();
+      programarProximoCambio();
+    }, espera);
+  }
 
   function comprobarCambioDeDia() {
     const nuevoDia = diaLogico();
     const nuevoBloqueo = juegosBloqueadosPorHoy();
-    if (nuevoDia === diaVisible && nuevoBloqueo === bloqueoVisible) return;
+    const modal = document.getElementById('game-modal');
+    const stage = document.getElementById('game-stage');
+    const menuVisible = modal && modal.classList.contains('visible') && stage && stage.classList.contains('hidden');
+
+    if (nuevoDia === diaVisible && nuevoBloqueo === bloqueoVisible && !menuVisible) return;
+
     diaVisible = nuevoDia;
     bloqueoVisible = nuevoBloqueo;
+    actualizarRefreshStatus();
     renderMenuJuegos();
     pintarCielo();
+    actualizarBadgeMedallas();
+    renderPremios();
     activarPanelModerador();
+
+    if (menuVisible) {
+      renderMenuJuegos();
+    }
   }
 
   (async function iniciarPersistencia() {
@@ -5130,6 +6094,8 @@
     }
   })();
 
+  registrarIngresoDispositivo();
+  escucharCambiosGlobales();
   activarPanelModerador();
   actualizarBadgeMedallas();
   renderPremios();
@@ -5137,8 +6103,11 @@
   cargarClima();
   setInterval(pintarCielo, 60000);
   setInterval(comprobarCambioDeDia, 60000);
+  setInterval(actualizarRefreshStatus, 1000);
   setInterval(cargarClima, 600000);
-  setInterval(comprobarVersionPages, 30 * 60 * 1000);
+  setInterval(comprobarVersionPages, 10 * 60 * 1000);
+  actualizarRefreshStatus();
+  programarProximoCambio();
   comprobarVersionPages();
 })();
 </script>
