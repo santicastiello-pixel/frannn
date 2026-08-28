@@ -346,7 +346,8 @@
     display:flex;
   }
 
-  .medalla-overlay {
+  .medalla-overlay,
+  .derrota-overlay {
     position:fixed;
     inset:0;
     z-index:60;
@@ -358,11 +359,13 @@
     padding:24px;
   }
 
-  .medalla-overlay.visible {
+  .medalla-overlay.visible,
+  .derrota-overlay.visible {
     display:grid;
   }
 
-  .medalla-card {
+  .medalla-card,
+  .derrota-card {
     text-align:center;
     padding:32px 28px;
     border-radius:24px;
@@ -373,7 +376,8 @@
     animation:medalla-entrada .5s cubic-bezier(.2,.9,.3,1.2);
   }
 
-  .medalla-icono {
+.medalla-icono,
+  .derrota-icono {
     display:grid;
     place-items:center;
     width:90px;
@@ -383,12 +387,20 @@
     overflow:hidden;
   }
 
-  .medalla-icono svg {
+  .medalla-icono svg,
+  .derrota-icono svg {
     width:90px;
     height:90px;
     display:block;
-    filter:drop-shadow(0 10px 20px rgba(255, 214, 110, 0.35));
     animation:medalla-escala 1.4s ease-in-out infinite alternate;
+  }
+
+  .medalla-icono svg {
+    filter:drop-shadow(0 10px 20px rgba(255, 214, 110, 0.35));
+  }
+
+  .derrota-icono svg {
+    filter:drop-shadow(0 10px 20px rgba(255, 133, 126, 0.28));
   }
 
   .medalla-icono::after {
@@ -418,14 +430,16 @@
     100% { transform:translateX(260%) rotate(18deg); opacity:0; }
   }
 
-  .medalla-card h2 {
+  .medalla-card h2,
+  .derrota-card h2 {
     margin:0 0 8px;
     font-size:clamp(26px, 5vw, 36px);
     line-height:1.06;
     letter-spacing:-.04em;
   }
 
-  .medalla-card p {
+  .medalla-card p,
+  .derrota-card p {
     margin:0;
     font-family:"DM Mono",ui-monospace,monospace;
     font-size:11px;
@@ -469,6 +483,70 @@
     }
   }
 
+  .game-menu {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:12px;
+    margin-top:12px;
+  }
+
+  .game-menu.hidden,
+  .game-stage.hidden {
+    display:none;
+  }
+
+  .game-option {
+    width:100%;
+    text-align:left;
+    padding:14px 14px 12px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.04);
+    color:#f5f1ff;
+    cursor:pointer;
+    transition:transform .18s ease, border-color .18s ease, background .18s ease;
+    font:inherit;
+  }
+
+  .game-option:hover {
+    transform:translateY(-1px);
+    border-color:rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.06);
+  }
+
+  .game-option.featured {
+    border-color:rgba(255, 202, 109, 0.7);
+    background:linear-gradient(180deg, rgba(255,190,89,0.18), rgba(255,255,255,0.04));
+  }
+
+  .game-option.featured.lost,
+  .game-option.lost {
+    border-color:rgba(255, 110, 91, 0.7);
+    background:linear-gradient(180deg, rgba(255,110,91,0.18), rgba(255,255,255,0.04));
+  }
+
+  .game-option.won {
+    border-color:rgba(122, 240, 168, 0.7);
+    background:rgba(122, 240, 168, 0.08);
+  }
+
+  .game-option-name {
+    display:block;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:-.03em;
+  }
+
+  .game-option-meta {
+    display:block;
+    margin-top:7px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+
   .game-status {
     margin: 0 0 14px;
     font-family:"DM Mono",ui-monospace,monospace;
@@ -476,6 +554,407 @@
     letter-spacing:.14em;
     text-transform:uppercase;
     color:rgba(255,255,255,0.78);
+  }
+
+  /* ═══ MEMORIA ═══ */
+  .memoria-shell {
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    width:min(440px, 100%);
+    margin:0 auto;
+    flex:1 1 auto;
+    min-height:0;
+    justify-content:center;
+  }
+
+  .memoria-grid {
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:8px;
+    width:min(100%, calc(88dvh - 240px));
+    aspect-ratio:1;
+    margin:0 auto;
+    padding:10px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.1);
+    flex-shrink:0;
+  }
+
+  .memoria-cell {
+    aspect-ratio:1;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    cursor:pointer;
+    transition:background .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+
+  .memoria-cell:disabled {
+    cursor:default;
+  }
+
+  .memoria-cell.prendido {
+    background:#ffd98a;
+    border-color:#ffd98a;
+    box-shadow:0 0 18px rgba(255,217,138,.55);
+  }
+
+  .memoria-cell.tocado {
+    background:rgba(255,255,255,0.28);
+  }
+
+  .memoria-cell.error {
+    background:#c9566a;
+    border-color:#e37e8f;
+  }
+
+  .ahorcado-shell {
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    width:min(440px, 100%);
+    margin:0 auto;
+  }
+
+  .ahorcado-dibujo {
+    position:relative;
+    width:180px;
+    height:180px;
+    margin:0 auto;
+    border-radius:18px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.12);
+  }
+
+  .ahorcado-base,
+  .ahorcado-soporte,
+  .ahorcado-soga,
+  .ahorcado-cabeza,
+  .ahorcado-cuerpo,
+  .ahorcado-brazo-izq,
+  .ahorcado-brazo-der,
+  .ahorcado-pierna-izq,
+  .ahorcado-pierna-der {
+    position:absolute;
+    display:block;
+    opacity:0;
+    transition:opacity .18s ease;
+  }
+
+  .ahorcado-base.visible,
+  .ahorcado-soporte.visible,
+  .ahorcado-soga.visible,
+  .ahorcado-cabeza.visible,
+  .ahorcado-cuerpo.visible,
+  .ahorcado-brazo-izq.visible,
+  .ahorcado-brazo-der.visible,
+  .ahorcado-pierna-izq.visible,
+  .ahorcado-pierna-der.visible {
+    opacity:1;
+  }
+
+  .ahorcado-base {
+    left:18px; right:18px; bottom:16px; height:6px; border-radius:999px; background:#f4ecff;
+  }
+
+  .ahorcado-soporte {
+    left:32px; bottom:22px; width:6px; height:120px; background:#f4ecff;
+  }
+
+  .ahorcado-soga {
+    left:116px; bottom:58px; width:46px; height:44px; border:4px solid #f4ecff; border-bottom:none; border-radius:12px 12px 0 0;
+  }
+
+  .ahorcado-cabeza {
+    left:134px; bottom:96px; width:26px; height:26px; border:4px solid #f4ecff; border-radius:50%;
+  }
+
+  .ahorcado-cuerpo {
+    left:146px; bottom:70px; width:4px; height:42px; background:#f4ecff;
+  }
+
+  .ahorcado-brazo-izq {
+    left:126px; bottom:82px; width:28px; height:4px; background:#f4ecff; transform:rotate(30deg); transform-origin:right center;
+  }
+
+  .ahorcado-brazo-der {
+    left:150px; bottom:82px; width:28px; height:4px; background:#f4ecff; transform:rotate(-30deg); transform-origin:left center;
+  }
+
+  .ahorcado-pierna-izq {
+    left:132px; bottom:42px; width:28px; height:4px; background:#f4ecff; transform:rotate(38deg); transform-origin:right center;
+  }
+
+  .ahorcado-pierna-der {
+    left:150px; bottom:42px; width:28px; height:4px; background:#f4ecff; transform:rotate(-38deg); transform-origin:left center;
+  }
+
+  .ahorcado-word {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    font-size:clamp(26px, 7vw, 44px);
+    letter-spacing:.18em;
+    font-family:"DM Mono",ui-monospace,monospace;
+    text-transform:uppercase;
+    color:#f3edff;
+  }
+
+  .ahorcado-letter {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:.72em;
+    min-height:1.1em;
+    border-bottom:2px solid rgba(255,255,255,0.45);
+  }
+
+  .ahorcado-keyboard {
+    display:grid;
+    grid-template-columns:repeat(6, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .ahorcado-key {
+    border:1px solid rgba(255,255,255,0.14);
+    background:rgba(255,255,255,0.04);
+    color:#f5f1ff;
+    border-radius:10px;
+    min-height:40px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .12s ease;
+  }
+
+  .ahorcado-key.used {
+    opacity:.5;
+    cursor:default;
+  }
+
+  .ahorcado-key.correct {
+    background:rgba(43,175,108,0.2);
+    border-color:rgba(43,175,108,0.7);
+  }
+
+  .ahorcado-key.wrong {
+    background:rgba(255,110,91,0.18);
+    border-color:rgba(255,110,91,0.7);
+  }
+
+  .wordle-shell {
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    width:min(440px, 100%);
+    margin:0 auto;
+  }
+
+  .wordle-board {
+    display:grid;
+    grid-template-rows:repeat(6, minmax(0, 1fr));
+    gap:8px;
+    width:100%;
+  }
+
+  .wordle-row {
+    display:grid;
+    grid-template-columns:repeat(5, minmax(0, 1fr));
+    gap:8px;
+  }
+
+  .wordle-cell {
+    aspect-ratio:1;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.14);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(18px, 4vw, 26px);
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    user-select:none;
+    transition:background .2s ease, transform .2s ease, border-color .2s ease;
+  }
+
+  .wordle-cell.filled {
+    border-color:rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.07);
+  }
+
+  .wordle-cell.correct {
+    background:#2baf6c;
+    border-color:#2baf6c;
+  }
+
+  .wordle-cell.present {
+    background:#d8ad2f;
+    border-color:#d8ad2f;
+  }
+
+  .wordle-cell.absent {
+    background:rgba(255,255,255,0.09);
+    border-color:rgba(255,255,255,0.08);
+  }
+
+  .wordle-cell.shake {
+    animation:wordle-shake .28s ease;
+  }
+
+  @keyframes wordle-shake {
+    0%, 100% { transform:translateX(0); }
+    20% { transform:translateX(-4px); }
+    40% { transform:translateX(4px); }
+    60% { transform:translateX(-4px); }
+    80% { transform:translateX(4px); }
+  }
+
+  .wordle-keyboard {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    width:100%;
+  }
+
+  .wordle-key-row {
+    display:flex;
+    gap:6px;
+    justify-content:center;
+  }
+
+  .wordle-key {
+    min-width:32px;
+    height:34px;
+    padding:0 10px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.1);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease, filter .12s ease;
+  }
+
+  .wordle-key:active {
+    transform:scale(.98);
+  }
+
+  .wordle-key.wide {
+    min-width:54px;
+  }
+
+  .wordle-key.correct { background:#2baf6c; }
+  .wordle-key.present { background:#d8ad2f; }
+  .wordle-key.absent { background:rgba(255,255,255,0.08); opacity:.82; }
+
+  .wordle-row .wordle-cell:not(.filled) { color:transparent; }
+
+  .wordle-shell .game-status {
+    margin:0;
+  }
+
+  .cuentas-shell {
+    width:min(440px, 100%);
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .cuentas-timer {
+    position:relative;
+    width:100%;
+    height:12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.12);
+    overflow:hidden;
+  }
+
+  .cuentas-progress {
+    position:absolute;
+    inset:0 auto 0 0;
+    width:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg, rgba(86, 219, 130, 0.95), rgba(255, 198, 91, 0.92), rgba(255, 117, 89, 0.96));
+    transition:width .12s linear;
+  }
+
+  .cuentas-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.8);
+  }
+
+  .cuentas-prompt {
+    display:grid;
+    place-items:center;
+    min-height:96px;
+    padding:22px 18px;
+    border-radius:18px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#f5f1ff;
+    font-size:clamp(28px, 8vw, 43px);
+    line-height:1.1;
+    letter-spacing:-.04em;
+    text-align:center;
+  }
+
+  .cuentas-options {
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+  }
+
+  .cuentas-option {
+    width:100%;
+    min-height:56px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.04);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+
+  .cuentas-option:hover:not(:disabled) {
+    transform:translateY(-1px);
+    border-color:rgba(255,255,255,0.22);
+  }
+
+  .cuentas-option.correct {
+    background:rgba(43,175,108,0.24);
+    border-color:rgba(43,175,108,0.8);
+  }
+
+  .cuentas-option.wrong {
+    background:rgba(255,110,91,0.2);
+    border-color:rgba(255,110,91,0.75);
+  }
+
+  .cuentas-option:disabled {
+    cursor:default;
   }
 
   .game-toast,
@@ -619,71 +1098,6 @@
     letter-spacing:.09em;
     text-transform:uppercase;
     color:rgba(255,255,255,0.8);
-  }
-
-  .respaldo-block {
-    margin-top:20px;
-    padding-top:18px;
-    border-top:1px solid rgba(255,255,255,0.08);
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-
-  .respaldo-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-  }
-
-  .respaldo-header h3 {
-    margin:0;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:10px;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,0.72);
-  }
-
-  .respaldo-row {
-    display:flex;
-    gap:10px;
-  }
-
-  .respaldo-input,
-  .respaldo-copy {
-    width:100%;
-    border:1px solid rgba(255,255,255,0.09);
-    border-radius:12px;
-    background:rgba(255,255,255,0.03);
-    color:#fff;
-    padding:10px 12px;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:10px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-  }
-
-  .respaldo-copy {
-    max-width:180px;
-    cursor:pointer;
-    font-weight:700;
-    background:linear-gradient(135deg, rgba(255,212,125,0.14), rgba(255,255,255,0.04));
-  }
-
-  .respaldo-restore {
-    border:0;
-    border-radius:12px;
-    background:linear-gradient(135deg, #f6d58d 0%, #d5a75d 100%);
-    color:#271b11;
-    padding:10px 12px;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:10px;
-    letter-spacing:.12em;
-    font-weight:700;
-    text-transform:uppercase;
-    cursor:pointer;
   }
 
   .persist-status {
@@ -1581,6 +1995,49 @@
       flex-shrink:0;
     }
 
+    .wordle-shell {
+      flex:1 1 auto;
+      min-height:0;
+      gap:10px;
+      justify-content:center;
+    }
+
+    .wordle-board {
+      width:min(100%, calc((88dvh - 260px) * 0.833));
+      margin:0 auto;
+      gap:5px;
+      flex-shrink:0;
+    }
+
+    .wordle-row {
+      gap:5px;
+    }
+
+    .wordle-cell {
+      font-size:20px;
+      border-radius:8px;
+    }
+
+    .wordle-keyboard {
+      gap:6px;
+      flex-shrink:0;
+    }
+
+    .wordle-key-row {
+      gap:5px;
+    }
+
+    .wordle-key {
+      min-width:28px;
+      height:38px;
+      padding:0 6px;
+      font-size:13px;
+    }
+
+    .wordle-key.wide {
+      min-width:46px;
+    }
+
     .game-content {
       display:flex;
       flex-direction:column;
@@ -1629,22 +2086,9 @@
       gap:12px;
     }
 
-    .premio-button,
-    .respaldo-restore,
-    .respaldo-copy {
+    .premio-button {
       min-height:44px;
       width:100%;
-    }
-
-    .respaldo-row {
-      flex-direction:column;
-    }
-
-    .respaldo-input,
-    .respaldo-copy,
-    .respaldo-restore {
-      width:100%;
-      min-height:44px;
     }
 
     .coffee-wrap {
@@ -1662,7 +2106,13 @@
 
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important; transition:none !important}
-    .medalla-overlay { display:none !important; }
+    .medalla-overlay .medalla-card,
+    .derrota-overlay .derrota-card,
+    .medalla-icono svg,
+    .derrota-icono svg,
+    .medalla-icono::after {
+      animation:none !important;
+    }
   }
 </style>
 </head>
@@ -1710,7 +2160,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14.7 7l5 .7-3.6 3.6.9 5.2-4.9-2.6-4.9 2.6.9-5.2L4.3 7.7l5-.7L12 2.5Zm0 4.8 1.3 2.6 2.9.4-2.1 2 0 3-2.1-1.1-2.1 1.1 0-3-2.1-2 2.9-.4L12 7.3Z"/></svg>
       <span id="medal-count">0</span>
     </button>
-    <a id="game-badge" class="game-badge" href="#" aria-label="Juego del día">juego del día</a>
+    <a id="game-badge" class="game-badge" href="#" aria-label="Juegos del día">juegos del día</a>
   </div>
 
   <div id="game-modal" class="game-modal" aria-hidden="true">
@@ -1718,19 +2168,14 @@
       <div id="game-toast" class="game-toast" aria-live="polite"></div>
       <div class="game-header">
         <div>
-          <div class="game-kicker">juego del día</div>
-          <h2 id="game-title">Sopa de letras</h2>
+          <div id="game-kicker" class="game-kicker">juegos del día</div>
+          <h2 id="game-title">Elegí tu juego</h2>
         </div>
         <button id="game-close" class="game-close" type="button" aria-label="Cerrar juego">×</button>
       </div>
-      <div id="game-status" class="game-status">Encontrá todas las palabras</div>
-      <div class="game-content">
-        <div id="game-grid" class="game-grid" aria-label="Sopa de letras"></div>
-        <div class="game-words">
-          <h3>Palabras</h3>
-          <ul id="game-word-list"></ul>
-        </div>
-      </div>
+      <div id="game-status" class="game-status">Seleccioná uno de los 4 juegos de hoy</div>
+      <div id="game-menu" class="game-menu" aria-label="Menú de juegos"></div>
+      <div id="game-stage" class="game-stage hidden"></div>
     </div>
   </div>
 
@@ -1756,6 +2201,21 @@
     </div>
   </div>
 
+  <div id="derrota-overlay" class="derrota-overlay" aria-hidden="true" role="status">
+    <div class="derrota-card" aria-live="polite">
+      <div class="derrota-icono" aria-hidden="true">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Derrota">
+          <circle cx="60" cy="60" r="42" fill="#8b4a56" opacity="0.96"/>
+          <path d="M40 42 L58 60 L40 78 L46 84 L60 70 L74 84 L80 78 L62 60 L80 42 L74 36 L60 50 L46 36 Z" fill="#f7d3d8"/>
+          <circle cx="60" cy="60" r="32" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="4"/>
+        </svg>
+      </div>
+      <h2>Perdiste</h2>
+      <p id="derrota-subtitle">Volvé a intentar mañana</p>
+      <p id="derrota-detalle" style="margin-top:10px; display:block;">La palabra era X</p>
+    </div>
+  </div>
+
   <div id="premios-modal" class="game-modal" aria-hidden="true">
     <div class="game-panel" role="dialog" aria-modal="true" aria-labelledby="premios-title">
       <div id="premios-toast" class="premios-toast" aria-live="polite"></div>
@@ -1769,17 +2229,6 @@
       <div id="premios-saldo" class="game-status">Tenés 0 medallas</div>
       <div id="premios-lista" class="premios-grid"></div>
       <div id="premios-historial" class="premios-historial" aria-live="polite"></div>
-
-      <div class="respaldo-block">
-        <div class="respaldo-header">
-          <h3>Respaldo</h3>
-        </div>
-        <div class="respaldo-row">
-          <input id="respaldo-input" class="respaldo-input" type="text" placeholder="Código de respaldo" aria-label="Código de respaldo">
-          <button id="respaldo-restore" class="respaldo-restore" type="button">Restaurar</button>
-        </div>
-        <button id="respaldo-copy" class="respaldo-copy" type="button">Copiar código de respaldo</button>
-      </div>
     </div>
   </div>
 
@@ -1832,22 +2281,77 @@
     medallas: 0,
     medallasTotales: 0,
     historial: [],
-    canjes: []
+    canjes: [],
+    perdidos: []
   };
   const PREMIOS = [
-    { id: 'cafe', nombre: 'Un café de Rústica', costo: 3, emoji: '☕' },
-    { id: 'peli', nombre: 'Capítulo de Friends', costo: 5, emoji: '🎬' },
-    { id: 'cena', nombre: 'Unas papas de Mc', costo: 10, emoji: '🍟' },
-    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 25, emoji: '⛍' }
+    { id: 'cafe', nombre: 'Un café de Rústica', costo: 15, emoji: '☕' },
+    { id: 'peli', nombre: 'Capítulo de Friends', costo: 25, emoji: '🎬' },
+    { id: 'cena', nombre: 'Unas papas de Mc', costo: 40, emoji: '🍟' },
+    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 60, emoji: '⛍' }
   ];
-  const JUEGOS_POR_DIA = {
-    1: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] },
-    2: { nombre: 'Ahorcado', palabras: ['AMOR', 'RISA', 'FELIZ', 'BESO', 'LUZ'] },
-    3: { nombre: 'Memoria', palabras: ['CORAZON', 'MUNDO', 'BESO', 'SUEÑO', 'SILENCIO'] },
-    4: { nombre: 'Sopa de letras', palabras: ['HILARIO', 'AURA', 'MATCHA', 'JHONNY', 'UADE'] },
-    5: { nombre: 'Pares', palabras: ['PASEO', 'ARCO', 'LUZ', 'JARDIN', 'MUSICA'] },
-    6: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] },
-    0: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] }
+  const JUEGOS = {
+    wordle: {
+      id: 'wordle',
+      nombre: 'Wordle',
+      desc: 'Adiviná la palabra en 6 intentos',
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarWordle(contenedor, rand, onGanar, onPerder);
+      }
+    },
+    cuentas: {
+      id: 'cuentas',
+      nombre: 'Cuentas mentales',
+      desc: '8 cuentas en 60 segundos',
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarCuentas(contenedor, rand, onGanar, onPerder);
+      }
+    },
+    sopa: {
+      id: 'sopa',
+      nombre: 'Sopa de letras',
+      desc: 'Encontrá las 6 palabras',
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarSopaDeLetras(contenedor, rand, onGanar, onPerder);
+      }
+    },
+    ahorcado: {
+      id: 'ahorcado',
+      nombre: 'Ahorcado',
+      desc: 'Adiviná la palabra sin perder las 6 vidas',
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarAhorcado(contenedor, rand, onGanar, onPerder);
+      }
+    },
+    memoria: {
+      id: 'memoria',
+      nombre: 'Memoria',
+      desc: 'Repetí la secuencia de luces',
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarMemoria(contenedor, rand, onGanar, onPerder);
+      }
+    }
+  };
+
+  const WORDLE_DICCIONARIO = [
+    'ABRIR','ACTOR','ADELA','AGUDO','ALERO','AMIGO','ANGEL','ANIMA','APARE','APENO','ARDOR','ARMAR','ARRAS','ARROZ','ASADO','ASIDE','ASTRO','ATLAS','AUROR','AVION','AZULA','BAILE','BALON','BANDA','BEBER','BELLO','BENZO','BESAR','BICHO','BOLSA','BORDE','BRAZO','BRISA','BUENO','CABAL','CABLE','CADEN','CALOR','CAMPO','CANOA','CANTO','CAPIT','CARNE','CASCO','CENAR','CIELO','CINCO','CLAVE','COBRA','CODER','COLOR','COMA','CONO','CORTE','CRACK','CREMA','CUERO','DARDO','DELTA','DIA','DIANA','DICHO','DINAR','DOLAR','DULCE','EJEMPLO','ELENA','ELEVA','EMBATE','ENERO','ENTRE','ERIZO','ESCON','ESTAR','FAROL','FECHA','FELIZ','FENIX','FIRMA','FONDA','FORRO','FRUTA','FUEGO','GALLO','GANAR','GESTO','GIRAS','GLOBO','GRANO','GRASA','GUSAN','HABLA','HACER','HALLO','HAYA','HELIO','HIELO','HONGO','IDEAL','IGUAL','IMPAR','JOVEN','JUANE','JUEGO','LAZAR','LENTE','LIBRO','LIMON','LISTA','LLAVE','LUGAR','LUZ','MADRE','MANGO','MAYOR','MEJOR','MENTE','METRO','MUNDO','NIEVE','NOCHE','NUEVE','OTRO','PARED','PEINE','PERRO','PIEZA','PILAR','PINTA','PIZZA','PLATA','PODER','PONER','POTRO','PRESA','PUNTO','QUEMA','QUIEN','RADAR','RAIZ','RAYO','RISA','ROBOT','ROCA','RUIDO','SALTO','SANTO','SILLA','SONAR','SUAVE','TAREA','TEJER','TEMOR','TEXTO','TIGRE','TORRE','TRAJE','TRIGO','TROZO','URANO','VALOR','VAPOR','VERDE','VIVIR','VOLAR','YUNTA','ZORRO','ZUECO'];
+
+  const MEMORIA_META = 8;
+
+  const WORDLE_SOLUCIONES = WORDLE_DICCIONARIO.filter((p) => p.length === 5);
+  const wordleWarn = WORDLE_DICCIONARIO.filter((p) => p.length !== 5);
+  if (wordleWarn.length) {
+    console.warn('Palabras Wordle descartadas por longitud:', wordleWarn);
+  }
+
+  const JUEGO_POR_DIA = {
+    1: 'wordle',
+    2: 'cuentas',
+    3: 'sopa',
+    4: 'ahorcado',
+    5: 'memoria',
+    6: 'wordle',
+    0: 'wordle'
   };
 
   const TEMAS = [
@@ -1866,16 +2370,6 @@
     5: 'Feliz viernes, buen finde!',
     6: 'Feliz sábado',
     0: 'Feliz domingo'
-  };
-
-  const ANIMACION_POR_DIA = {
-    1: 'lunes',
-    2: 'martes',
-    3: 'miercoles',
-    4: 'jueves',
-    5: 'viernes',
-    6: 'sabado',
-    0: 'domingo'
   };
 
   function formatearFecha(ahora){
@@ -2002,9 +2496,37 @@
     }
   }
 
+  function hashString(texto) {
+    let hash = 2166136261;
+    for (let i = 0; i < texto.length; i++) {
+      hash ^= texto.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function mulberry32(seed) {
+    return function () {
+      let t = (seed += 0x6D2B79F5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function semillaDelDia() {
+    const fecha = new Date();
+    return `${fecha.getFullYear()}-${fecha.getMonth() + 1}-${fecha.getDate()}`;
+  }
+
+  function obtenerJuegoPorId(id) {
+    return JUEGOS[id] || JUEGOS.sopa;
+  }
+
   function obtenerJuegoDelDia() {
     const hoy = new Date().getDay();
-    return JUEGOS_POR_DIA[hoy] || JUEGOS_POR_DIA[1];
+    const id = JUEGO_POR_DIA[hoy] || 'sopa';
+    return obtenerJuegoPorId(id);
   }
 
   function normalizarEstado(estado) {
@@ -2014,7 +2536,8 @@
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
       historial: Array.isArray(estado.historial) ? estado.historial : [],
-      canjes: Array.isArray(estado.canjes) ? estado.canjes : []
+      canjes: Array.isArray(estado.canjes) ? estado.canjes : [],
+      perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : []
     };
   }
 
@@ -2176,36 +2699,6 @@
 
       return limpio;
     },
-    exportar() {
-      const estado = normalizarEstado(leerEstado());
-      const json = JSON.stringify(estado);
-      return btoa(encodeURIComponent(json));
-    },
-    async importar(codigo) {
-      if (!codigo || typeof codigo !== 'string') {
-        mostrarToastPremios('Código inválido');
-        return false;
-      }
-
-      try {
-        const json = decodeURIComponent(atob(codigo));
-        const parsed = JSON.parse(json);
-        const estado = normalizarEstado(parsed);
-        if (!estado || !Array.isArray(estado.historial) || !Array.isArray(estado.canjes)) {
-          mostrarToastPremios('Código inválido');
-          return false;
-        }
-
-        await this.guardar(estado);
-        actualizarBadgeMedallas();
-        renderPremios();
-        mostrarToastPremios('Respaldo restaurado');
-        return true;
-      } catch (error) {
-        mostrarToastPremios('Código inválido');
-        return false;
-      }
-    }
   };
 
   function mostrarAvisoPersistencia() {
@@ -2280,6 +2773,7 @@
     const texto = document.getElementById('medalla-total');
     if (!overlay || !texto) return;
 
+    cerrarJuegoDelDia();
     texto.textContent = total === 1 ? 'Ya tenés 1 medalla' : `Ya tenés ${total} medallas`;
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
@@ -2291,6 +2785,35 @@
 
   function ocultarMedallaOverlay() {
     const overlay = document.getElementById('medalla-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('visible');
+    overlay.setAttribute('aria-hidden', 'true');
+    window.clearTimeout(overlay._timer);
+    if (!document.querySelector('.game-modal.visible') && !document.querySelector('#premios-modal.visible')) {
+      toggleBodyModalLock(false);
+    }
+  }
+
+  function mostrarDerrotaOverlay(mensaje) {
+    const overlay = document.getElementById('derrota-overlay');
+    const subtitle = document.getElementById('derrota-subtitle');
+    const detail = document.getElementById('derrota-detalle');
+    if (!overlay || !subtitle || !detail) return;
+
+    cerrarJuegoDelDia();
+    subtitle.textContent = 'Volvé a intentar mañana';
+    detail.textContent = typeof mensaje === 'string' && mensaje.trim() ? mensaje : 'La palabra era desconocida';
+    detail.style.display = 'block';
+    overlay.classList.add('visible');
+    overlay.setAttribute('aria-hidden', 'false');
+    if (overlay._timer) {
+      window.clearTimeout(overlay._timer);
+    }
+    overlay._timer = window.setTimeout(() => ocultarDerrotaOverlay(), 4000);
+  }
+
+  function ocultarDerrotaOverlay() {
+    const overlay = document.getElementById('derrota-overlay');
     if (!overlay) return;
     overlay.classList.remove('visible');
     overlay.setAttribute('aria-hidden', 'true');
@@ -2319,22 +2842,56 @@
     }
   }
 
-  function yaGanoMedallaHoy() {
+  function yaGanoMedallaHoy(juegoId = obtenerJuegoDelDia().id) {
     const estado = leerEstado();
     const fecha = hoyClave();
-    const juegoActual = obtenerJuegoDelDia().nombre;
-    return estado.historial.some(item => item && item.fecha === fecha && item.juego === juegoActual);
+    const juegoActual = obtenerJuegoPorId(juegoId);
+    return estado.historial.some(item => {
+      if (!item || item.fecha !== fecha) return false;
+      const juego = item.juego;
+      return juego === juegoActual.id || juego === juegoActual.nombre || item.juegoId === juegoActual.id;
+    });
   }
 
-  function ganarMedalla() {
+  function yaPerdioHoy(juegoId = obtenerJuegoDelDia().id) {
     const estado = leerEstado();
     const fecha = hoyClave();
-    const juegoActual = obtenerJuegoDelDia().nombre;
+    const juegoActual = obtenerJuegoPorId(juegoId);
+    return Array.isArray(estado.perdidos) && estado.perdidos.some(item => {
+      if (!item || item.fecha !== fecha) return false;
+      const juego = item.juego;
+      return juego === juegoActual.id || juego === juegoActual.nombre || item.juegoId === juegoActual.id;
+    });
+  }
 
-    if (estado.historial.some(item => item && item.fecha === fecha && item.juego === juegoActual)) {
+  function marcarPerdida(juegoId = obtenerJuegoDelDia().id) {
+    const estado = leerEstado();
+    if (yaGanoMedallaHoy(juegoId) || yaPerdioHoy(juegoId)) return;
+
+    const fecha = hoyClave();
+    const juegoActual = obtenerJuegoPorId(juegoId);
+    const nuevoEstado = {
+      ...estado,
+      perdidos: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.perdidos) ? estado.perdidos : [])]
+    };
+
+    guardarEstado(nuevoEstado);
+    renderMenuJuegos();
+  }
+
+  function ganarMedalla(juegoId = obtenerJuegoDelDia().id) {
+    const estado = leerEstado();
+    const fecha = hoyClave();
+    const juegoActual = obtenerJuegoPorId(juegoId);
+
+    if (estado.historial.some(item => {
+      if (!item || item.fecha !== fecha) return false;
+      const juego = item.juego;
+      return juego === juegoActual.id || juego === juegoActual.nombre || item.juegoId === juegoActual.id;
+    })) {
       const status = document.getElementById('game-status');
       if (status) {
-        status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
+        status.textContent = 'Ya ganaste esta medalla hoy';
       }
       return;
     }
@@ -2343,25 +2900,26 @@
       ...estado,
       medallas: (Number(estado.medallas) || 0) + 1,
       medallasTotales: (Number(estado.medallasTotales) || 0) + 1,
-      historial: [{ fecha, juego: juegoActual }, ...(Array.isArray(estado.historial) ? estado.historial : [])]
+      historial: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.historial) ? estado.historial : [])]
     };
 
     guardarEstado(nuevoEstado);
     actualizarBadgeMedallas();
     renderPremios();
+    renderMenuJuegos();
 
     const status = document.getElementById('game-status');
     if (status) {
-      status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
+      status.textContent = 'Ya ganaste esta medalla hoy';
     }
 
     const modal = document.getElementById('game-modal');
     if (modal && modal.classList.contains('visible')) {
-      cerrarJuegoDelDia();
+      const stage = document.getElementById('game-stage');
+      if (stage) {
+        stage.classList.remove('hidden');
+      }
     }
-
-    const cells = document.querySelectorAll('#game-grid .game-cell');
-    cells.forEach(cell => cell.classList.add('correct'));
 
     mostrarMedallaOverlay();
   }
@@ -2439,48 +2997,6 @@
       }
     }
 
-    const input = document.getElementById('respaldo-input');
-    const copyButton = document.getElementById('respaldo-copy');
-    const restoreButton = document.getElementById('respaldo-restore');
-
-    if (copyButton) {
-      copyButton.onclick = async function () {
-        const codigo = Almacen.exportar();
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(codigo);
-          } else {
-            if (input) {
-              input.value = codigo;
-              input.focus();
-              input.select();
-            }
-          }
-          mostrarToastPremios('Código copiado');
-          if (input) {
-            input.value = codigo;
-          }
-        } catch (error) {
-          if (input) {
-            input.value = codigo;
-            input.focus();
-            input.select();
-          }
-          mostrarToastPremios('Código listo');
-        }
-      };
-    }
-
-    if (restoreButton) {
-      restoreButton.onclick = async function () {
-        const codigo = input ? input.value.trim() : '';
-        const ok = await Almacen.importar(codigo);
-        if (ok) {
-          actualizarBadgeMedallas();
-          renderPremios();
-        }
-      };
-    }
   }
 
   function abrirPremios() {
@@ -2504,22 +3020,23 @@
 
   let temporizadorSopaId = null;
 
-  function bloquearJuegoPorTiempo() {
-    const cells = document.querySelectorAll('#game-grid .game-cell');
-    cells.forEach((cell) => {
-      cell.disabled = true;
-      cell.setAttribute('aria-disabled', 'true');
-      cell.classList.add('locked');
-    });
+  function bloquearJuegoPorTiempo(statusEl, gridEl) {
+    if (gridEl) {
+      const cells = gridEl.querySelectorAll('.game-cell');
+      cells.forEach((cell) => {
+        cell.disabled = true;
+        cell.setAttribute('aria-disabled', 'true');
+        cell.classList.add('locked');
+      });
+    }
 
-    const status = document.getElementById('game-status');
-    if (status) {
-      status.textContent = 'Te quedaste sin tiempo!';
-      status.classList.add('timeout');
+    if (statusEl) {
+      statusEl.textContent = 'Te quedaste sin tiempo!';
+      statusEl.classList.add('timeout');
     }
   }
 
-  function iniciarTemporizadorSopa(status) {
+  function iniciarTemporizadorSopa(status, onPerder) {
     if (temporizadorSopaId) {
       clearInterval(temporizadorSopaId);
       temporizadorSopaId = null;
@@ -2539,7 +3056,9 @@
       if (restante <= 0) {
         clearInterval(temporizadorSopaId);
         temporizadorSopaId = null;
-        bloquearJuegoPorTiempo();
+        if (typeof onPerder === 'function') {
+          onPerder('Se acabó el tiempo');
+        }
         return;
       }
 
@@ -2550,16 +3069,974 @@
     temporizadorSopaId = setInterval(actualizar, 1000);
   }
 
-  function renderizarSopaDeLetras() {
-    const juego = obtenerJuegoDelDia();
-    const title = document.getElementById('game-title');
-    const grid = document.getElementById('game-grid');
-    const wordList = document.getElementById('game-word-list');
+  function evaluarWordle(guess, solution) {
+    const result = Array(5).fill('absent');
+    const remaining = {};
+
+    for (let i = 0; i < solution.length; i++) {
+      if (guess[i] === solution[i]) {
+        result[i] = 'correct';
+      } else {
+        remaining[solution[i]] = (remaining[solution[i]] || 0) + 1;
+      }
+    }
+
+    for (let i = 0; i < guess.length; i++) {
+      const letra = guess[i];
+      if (result[i] === 'correct') continue;
+      if ((remaining[letra] || 0) > 0) {
+        result[i] = 'present';
+        remaining[letra] -= 1;
+      }
+    }
+
+    return result;
+  }
+
+  function generarCuentaPorNivel(nivel, rand) {
+    const tipo = nivel <= 2 ? 'sumaResta' : nivel <= 5 ? 'multiplicacion' : 'division';
+
+    function normalizarDistractores(correcta, lista, max) {
+      const base = Array.isArray(lista) ? lista : [];
+      const result = [];
+      const seen = new Set();
+
+      for (const valor of base) {
+        const int = Number.parseInt(String(valor), 10);
+        if (!Number.isFinite(int) || int < 0 || int === correcta || seen.has(int)) continue;
+        seen.add(int);
+        result.push(int);
+      }
+
+      let intento = 1;
+      while (result.length < max && intento <= 50) {
+        const candidatos = [correcta + intento, correcta - intento, correcta + (intento * 2), correcta - (intento * 2)];
+        for (const valor of candidatos) {
+          const int = Number.parseInt(String(valor), 10);
+          if (!Number.isFinite(int) || int < 0 || int === correcta || seen.has(int)) continue;
+          seen.add(int);
+          result.push(int);
+          if (result.length >= max) break;
+        }
+        intento += 1;
+      }
+
+      if (result.length < max) {
+        let offset = 1;
+        while (result.length < max) {
+          const valor = correcta + offset;
+          if (!seen.has(valor) && valor >= 0) {
+            seen.add(valor);
+            result.push(valor);
+          } else if (correcta + offset + 1 >= 0 && !seen.has(correcta + offset + 1)) {
+            const fallback = correcta + offset + 1;
+            seen.add(fallback);
+            result.push(fallback);
+          }
+          offset += 1;
+          if (offset > 100) {
+            break;
+          }
+        }
+      }
+
+      return result.slice(0, max);
+    }
+
+    if (tipo === 'sumaResta') {
+      let a = Math.floor(rand() * 90) + 10;
+      let b = Math.floor(rand() * 90) + 10;
+      const usarResta = rand() > 0.5;
+      if (usarResta) {
+        if (b > a) [a, b] = [b, a];
+        const correcto = a - b;
+        return {
+          texto: `${a} − ${b} = ?`,
+          respuesta: correcto,
+          distractores: normalizarDistractores(correcto, [correcto + 1, correcto - 1, correcto + 8, correcto - 8], 3)
+        };
+      }
+
+      const correcto = a + b;
+      return {
+        texto: `${a} + ${b} = ?`,
+        respuesta: correcto,
+        distractores: normalizarDistractores(correcto, [correcto + 1, correcto - 1, correcto + 10, correcto - 10], 3)
+      };
+    }
+
+    if (tipo === 'multiplicacion') {
+      const a = Math.floor(rand() * 12) + 2;
+      const b = Math.floor(rand() * 12) + 2;
+      const correcto = a * b;
+      return {
+        texto: `${a} × ${b} = ?`,
+        respuesta: correcto,
+        distractores: normalizarDistractores(correcto, [correcto + 1, correcto - 1, correcto + 10, correcto - 10], 3)
+      };
+    }
+
+    const divisor = Math.floor(rand() * 11) + 2;
+    const cociente = Math.floor(rand() * 11) + 2;
+    const dividendo = divisor * cociente;
+    const correcto = cociente;
+    return {
+      texto: `${dividendo} ÷ ${divisor} = ?`,
+      respuesta: correcto,
+      distractores: normalizarDistractores(correcto, [correcto + 1, correcto - 1, correcto + 3, correcto + 5], 3)
+    };
+  }
+
+  function montarCuentas(contenedor, rand, onGanar, onPerder) {
+    const total = 8;
+    const yaGanado = yaGanoMedallaHoy('cuentas');
     const status = document.getElementById('game-status');
+    if (yaGanado) {
+      if (status) status.textContent = 'Ya ganaste la medalla de hoy';
+      return function desmontar() {
+        contenedor.innerHTML = '';
+      };
+    }
+
+    const shell = document.createElement('div');
+    shell.className = 'cuentas-shell';
+
+    const timer = document.createElement('div');
+    timer.className = 'cuentas-timer';
+    const progress = document.createElement('div');
+    progress.className = 'cuentas-progress';
+    timer.appendChild(progress);
+
+    const meta = document.createElement('div');
+    meta.className = 'cuentas-top';
+    meta.innerHTML = '<span>1 / 8</span><span>60s</span>';
+
+    const prompt = document.createElement('div');
+    prompt.className = 'cuentas-prompt';
+
+    const optionsWrap = document.createElement('div');
+    optionsWrap.className = 'cuentas-options';
+
+    shell.appendChild(timer);
+    shell.appendChild(meta);
+    shell.appendChild(prompt);
+    shell.appendChild(optionsWrap);
+    contenedor.appendChild(shell);
+
+    let tiempoRestante = 60000;
+    let indiceActual = 0;
+    let correctas = 0;
+    let finished = false;
+    let clockId = null;
+    let transitionId = null;
+    let isPaused = false;
+
+    const preguntas = Array.from({ length: total }, (_, index) => {
+      const nivel = index + 1;
+      return generarCuentaPorNivel(nivel, rand);
+    });
+
+    function renderTimer() {
+      const porcentaje = Math.max(0, Math.min(100, (tiempoRestante / 60000) * 100));
+      progress.style.width = `${porcentaje}%`;
+      if (status) status.textContent = `Tiempo: ${Math.ceil(tiempoRestante / 1000)}s · ${Math.min(correctas + 1, total)} / ${total}`;
+    }
+
+    function stopClock() {
+      if (clockId) {
+        clearInterval(clockId);
+        clockId = null;
+      }
+    }
+
+    function startClock() {
+      if (finished || tiempoRestante <= 0) return;
+      stopClock();
+      clockId = setInterval(() => {
+        if (document.hidden) {
+          stopClock();
+          isPaused = true;
+          return;
+        }
+        tiempoRestante = Math.max(0, tiempoRestante - 100);
+        renderTimer();
+        if (tiempoRestante <= 0) {
+          stopClock();
+          terminar(false, 'Se acabó el tiempo');
+        }
+      }, 100);
+    }
+
+    function actualizarMeta() {
+      meta.innerHTML = `<span>${Math.min(indiceActual + 1, total)} / ${total}</span><span>${Math.ceil(tiempoRestante / 1000)}s</span>`;
+    }
+
+    function terminar(gano, mensaje) {
+      if (finished) return;
+      finished = true;
+      stopClock();
+      if (status) status.textContent = mensaje;
+      Array.from(optionsWrap.children).forEach((boton) => {
+        boton.disabled = true;
+      });
+      if (gano && typeof onGanar === 'function') {
+        onGanar();
+      } else if (!gano && typeof onPerder === 'function') {
+        onPerder(mensaje);
+      }
+    }
+
+    function armarOpciones(cuenta) {
+      const opciones = [cuenta.respuesta, ...cuenta.distractores || []];
+      const filtradas = opciones.filter((valor, index, arr) => {
+        const numero = Number.parseInt(String(valor), 10);
+        return Number.isFinite(numero) && numero >= 0 && arr.indexOf(valor) === index;
+      });
+      const resultado = [];
+      const usados = new Set();
+      for (const valor of filtradas) {
+        const key = Number(valor);
+        if (usados.has(key)) continue;
+        usados.add(key);
+        resultado.push(key);
+      }
+      while (resultado.length < 4) {
+        const siguiente = cuenta.respuesta + resultado.length + 1;
+        if (!usados.has(siguiente) && siguiente >= 0) {
+          usados.add(siguiente);
+          resultado.push(siguiente);
+        } else {
+          let intento = 0;
+          while (usados.has(cuenta.respuesta + intento) || cuenta.respuesta + intento < 0) {
+            intento += 1;
+            if (intento > 50) break;
+          }
+          const valor = cuenta.respuesta + intento;
+          if (valor >= 0 && !usados.has(valor)) {
+            usados.add(valor);
+            resultado.push(valor);
+          }
+        }
+      }
+      return resultado.slice(0, 4).sort(() => rand() - 0.5);
+    }
+
+    function mostrarPregunta() {
+      if (finished) return;
+      const cuenta = preguntas[indiceActual];
+      if (!cuenta) {
+        terminar(true, '¡Perfecto! 8/8 en 60 segundos');
+        return;
+      }
+
+      prompt.textContent = cuenta.texto;
+      const opciones = armarOpciones(cuenta);
+      optionsWrap.innerHTML = '';
+
+      opciones.forEach((valor) => {
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'cuentas-option';
+        boton.textContent = String(valor);
+        boton.disabled = false;
+        boton.addEventListener('click', () => {
+          if (finished) return;
+          Array.from(optionsWrap.children).forEach((item) => { item.disabled = true; });
+          const esCorrecta = valor === cuenta.respuesta;
+
+          if (esCorrecta) {
+            boton.classList.add('correct');
+            correctas += 1;
+          } else {
+            boton.classList.add('wrong');
+            const opcionCorrecta = Array.from(optionsWrap.children).find((item) => item.textContent === String(cuenta.respuesta));
+            if (opcionCorrecta) opcionCorrecta.classList.add('correct');
+            if (status) status.textContent = 'Respuesta incorrecta';
+            transitionId = window.setTimeout(() => {
+              terminar(false, 'Perdiste. Podés intentarlo de nuevo');
+            }, 400);
+            return;
+          }
+
+          if (status) status.textContent = 'Correcto';
+          transitionId = window.setTimeout(() => {
+            indiceActual += 1;
+            if (indiceActual >= total) {
+              terminar(true, '¡Perfecto! 8/8 en 60 segundos');
+              return;
+            }
+            actualizarMeta();
+            mostrarPregunta();
+          }, 400);
+        });
+        optionsWrap.appendChild(boton);
+      });
+
+      actualizarMeta();
+      renderTimer();
+      startClock();
+    }
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        stopClock();
+        isPaused = true;
+      } else if (!finished && tiempoRestante > 0 && !isPaused) {
+        startClock();
+      } else if (!finished && tiempoRestante > 0 && isPaused) {
+        isPaused = false;
+        startClock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+
+    mostrarPregunta();
+
+    return function desmontar() {
+      stopClock();
+      if (transitionId) window.clearTimeout(transitionId);
+      document.removeEventListener('visibilitychange', onVisibility);
+      contenedor.innerHTML = '';
+    };
+  }
+
+  // ═══ MEMORIA ═══
+  function montarMemoria(contenedor, rand, onGanar, onPerder) {
+    const yaGanado = yaGanoMedallaHoy('memoria');
+    const shell = document.createElement('div');
+    shell.className = 'memoria-shell';
+
+    const status = document.getElementById('game-status');
+    const statusLine = document.createElement('div');
+    statusLine.className = 'game-status';
+    shell.appendChild(statusLine);
+
+    const grid = document.createElement('div');
+    grid.className = 'memoria-grid';
+    const cells = [];
+
+    for (let i = 0; i < 25; i++) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'memoria-cell';
+      cell.dataset.index = String(i);
+      cell.disabled = true;
+      grid.appendChild(cell);
+      cells.push(cell);
+    }
+
+    shell.appendChild(grid);
+    contenedor.appendChild(shell);
+
+    const timers = [];
+    const later = (fn, ms) => {
+      const id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    };
+
+    const obtenerLongitudRonda = (ronda) => Math.min(2 + ronda, MEMORIA_META);
+    const limpiarTimers = () => {
+      timers.forEach((id) => clearTimeout(id));
+      timers.length = 0;
+    };
+
+    const resetCellVisual = (cell) => {
+      cell.classList.remove('prendido', 'tocado', 'error');
+      cell.style.background = '';
+      cell.style.borderColor = '';
+      cell.style.boxShadow = '';
+    };
+
+    const encenderCelda = (cell, tipo = 'prendido', ms = 550) => {
+      resetCellVisual(cell);
+      cell.classList.add(tipo);
+      cell.style.background = tipo === 'error' ? '#c9566a' : '#ffd98a';
+      cell.style.borderColor = tipo === 'error' ? '#e37e8f' : '#ffd98a';
+      cell.style.boxShadow = tipo === 'error' ? '0 0 18px rgba(201,86,106,.55)' : '0 0 18px rgba(255,217,138,.55)';
+      return later(() => {
+        resetCellVisual(cell);
+      }, ms);
+    };
+
+    const secuencia = [];
+    let ultimo = -1;
+    while (secuencia.length < MEMORIA_META) {
+      const indice = Math.floor(rand() * cells.length);
+      if (indice === ultimo) continue;
+      ultimo = indice;
+      secuencia.push(indice);
+    }
+
+    let rondaActual = 1;
+    let indiceUsuario = 0;
+    let reproduciendo = false;
+    let inputHabilitado = false;
+    let terminado = false;
+    let reiniciarAlVolver = false;
+
+    const actualizarLineaEstado = () => {
+      const longitudActual = obtenerLongitudRonda(rondaActual);
+      statusLine.textContent = `Ronda ${rondaActual} · ${longitudActual} luces`;
+    };
+
+    const bloquearInput = () => {
+      cells.forEach((cell) => {
+        cell.disabled = true;
+      });
+      inputHabilitado = false;
+    };
+
+    const habilitarInput = () => {
+      if (terminado) return;
+      cells.forEach((cell) => {
+        cell.disabled = false;
+      });
+      inputHabilitado = true;
+    };
+
+    const perder = (mensaje) => {
+      if (terminado) return;
+      terminado = true;
+      limpiarTimers();
+      bloquearInput();
+      if (status) status.textContent = mensaje;
+      if (typeof onPerder === 'function') onPerder(mensaje);
+    };
+
+    const avanzarRonda = () => {
+      if (terminado) return;
+      const siguienteRonda = rondaActual + 1;
+      const longitudEsperada = obtenerLongitudRonda(siguienteRonda);
+      if (siguienteRonda > 6 || longitudEsperada > MEMORIA_META) {
+        terminado = true;
+        if (status) status.textContent = '¡Perfecto!';
+        if (typeof onGanar === 'function') onGanar();
+        return;
+      }
+
+      rondaActual = siguienteRonda;
+      indiceUsuario = 0;
+      statusLine.textContent = `Ronda ${rondaActual}`;
+      later(() => {
+        if (!terminado) {
+          reproducirRonda();
+        }
+      }, 700);
+    };
+
+    const reproducirRonda = () => {
+      if (terminado) return;
+      const longitudActual = obtenerLongitudRonda(rondaActual);
+      const pasos = secuencia.slice(0, longitudActual);
+      reproduciendo = true;
+      inputHabilitado = false;
+      bloquearInput();
+      statusLine.textContent = `Ronda ${rondaActual} · ${longitudActual} luces`;
+
+      let paso = 0;
+      const ejecutarPaso = () => {
+        if (terminado) return;
+        const indice = pasos[paso];
+        const cell = cells[indice];
+        if (!cell) return;
+        encenderCelda(cell, 'prendido', 550);
+        later(() => {
+          if (terminado) return;
+          if (paso < pasos.length - 1) {
+            later(() => {
+              paso += 1;
+              ejecutarPaso();
+            }, 250);
+            return;
+          }
+
+          later(() => {
+            if (terminado) return;
+            reproduciendo = false;
+            habilitarInput();
+            statusLine.textContent = `Ronda ${rondaActual} · ${longitudActual} luces`;
+          }, 300);
+        }, 550);
+      };
+
+      later(() => {
+        if (terminado) return;
+        ejecutarPaso();
+      }, 800);
+    };
+
+    const comprobarInput = (cellIndex) => {
+      if (terminado || reproduciendo || !inputHabilitado) return;
+      const esperado = secuencia[indiceUsuario];
+      const cell = cells[cellIndex];
+      if (!cell) return;
+
+      if (cellIndex === esperado) {
+        const feedback = encenderCelda(cell, 'tocado', 180);
+        if (feedback) {
+          later(() => {
+            cell.classList.remove('tocado');
+          }, 180);
+        }
+        indiceUsuario += 1;
+        const longitudActual = obtenerLongitudRonda(rondaActual);
+        if (indiceUsuario >= longitudActual) {
+          if (rondaActual >= 6 || longitudActual >= MEMORIA_META) {
+            terminado = true;
+            bloquearInput();
+            if (status) status.textContent = '¡Perfecto!';
+            if (typeof onGanar === 'function') onGanar();
+            return;
+          }
+
+          bloquearInput();
+          reproduciendo = true;
+          statusLine.textContent = `Ronda ${rondaActual}`;
+          later(() => {
+            if (!terminado) {
+              rondaActual += 1;
+              indiceUsuario = 0;
+              reproducirRonda();
+            }
+          }, 700);
+        }
+        return;
+      }
+
+      encenderCelda(cell, 'error', 420);
+      cells.forEach((item, idx) => {
+        if (idx === esperado && !terminado) {
+          encenderCelda(item, 'prendido', 260);
+        }
+      });
+      perder(`Llegaste a la ronda ${rondaActual}`);
+    };
+
+    cells.forEach((cell) => {
+      cell.addEventListener('click', () => {
+        if (!inputHabilitado || reproduciendo || terminado) return;
+        const cellIndex = Number(cell.dataset.index);
+        comprobarInput(cellIndex);
+      });
+    });
+
+    const onVisibility = () => {
+      if (document.hidden && reproduciendo && !terminado) {
+        limpiarTimers();
+        reiniciarAlVolver = true;
+        reproduciendo = false;
+        bloquearInput();
+        return;
+      }
+
+      if (!document.hidden && reiniciarAlVolver && !terminado) {
+        reiniciarAlVolver = false;
+        rondaActual = 1;
+        indiceUsuario = 0;
+        later(() => reproducirRonda(), 150);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+
+    if (yaGanado) {
+      statusLine.textContent = 'Ya ganaste la medalla de hoy';
+      if (status) status.textContent = 'Ya ganaste la medalla de hoy';
+      cells.forEach((cell) => {
+        cell.disabled = true;
+      });
+      return function desmontar() {
+        limpiarTimers();
+        document.removeEventListener('visibilitychange', onVisibility);
+        contenedor.innerHTML = '';
+      };
+    }
+
+    actualizarLineaEstado();
+    later(() => reproducirRonda(), 800);
+
+    return function desmontar() {
+      limpiarTimers();
+      document.removeEventListener('visibilitychange', onVisibility);
+      contenedor.innerHTML = '';
+    };
+  }
+
+  function montarAhorcado(contenedor, rand, onGanar, onPerder) {
+    const hoy = new Date();
+    const esFechaObjetivo = hoy.getDate() === 28 && hoy.getMonth() === 7;
+    const palabras = ['CIELO', 'NIEVE', 'AMOR', 'SOL', 'ARCO', 'JUEGO', 'MUNDO', 'RISA', 'PAZ', 'FUEGO', 'TIGRE', 'LUNA', 'PUEBLO', 'FELIZ', 'DIA'];
+    const palabra = esFechaObjetivo ? 'PANDYLOVE' : palabras[Math.floor(rand() * palabras.length)].toUpperCase();
+    const letras = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+    const letrasUsadas = new Set();
+    let errores = 0;
+    let terminado = false;
+    const status = document.getElementById('game-status');
+    const yaGanado = yaGanoMedallaHoy('ahorcado');
+
+    const shell = document.createElement('div');
+    shell.className = 'ahorcado-shell';
+
+    const dibujo = document.createElement('div');
+    dibujo.className = 'ahorcado-dibujo';
+
+    const partes = [
+      'base', 'soporte', 'soga', 'cabeza', 'cuerpo', 'brazo-izq', 'brazo-der', 'pierna-izq', 'pierna-der'
+    ];
+
+    partes.forEach((parte) => {
+      const el = document.createElement('span');
+      el.className = `ahorcado-${parte}`;
+      dibujo.appendChild(el);
+    });
+
+    const wordWrap = document.createElement('div');
+    wordWrap.className = 'ahorcado-word';
+
+    const teclado = document.createElement('div');
+    teclado.className = 'ahorcado-keyboard';
+
+    const renderWord = () => {
+      wordWrap.innerHTML = '';
+      [...palabra].forEach((letra) => {
+        const cell = document.createElement('span');
+        cell.className = 'ahorcado-letter';
+        cell.textContent = letrasUsadas.has(letra) ? letra : '_';
+        wordWrap.appendChild(cell);
+      });
+    };
+
+    const renderDibujo = () => {
+      const items = [...dibujo.children];
+      items.forEach((item, index) => {
+        item.classList.toggle('visible', index < errores);
+      });
+    };
+
+    const renderTeclado = () => {
+      teclado.innerHTML = '';
+      letras.forEach((letra) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ahorcado-key';
+        button.textContent = letra;
+        if (letrasUsadas.has(letra)) {
+          button.classList.add('used');
+          button.disabled = true;
+          if (palabra.includes(letra)) {
+            button.classList.add('correct');
+          } else {
+            button.classList.add('wrong');
+          }
+        }
+        button.addEventListener('click', () => intentarLetra(letra));
+        teclado.appendChild(button);
+      });
+    };
+
+    const intentarLetra = (letra) => {
+      if (terminado || letrasUsadas.has(letra)) return;
+      letrasUsadas.add(letra);
+
+      if (palabra.includes(letra)) {
+        renderWord();
+        renderTeclado();
+        if ([...new Set(palabra)].every((l) => letrasUsadas.has(l))) {
+          terminado = true;
+          if (status) status.textContent = '¡Adivinaste!';
+          if (typeof onGanar === 'function') onGanar();
+        }
+        return;
+      }
+
+      errores += 1;
+      renderDibujo();
+      renderTeclado();
+
+      if (errores >= 6) {
+        terminado = true;
+        if (status) status.textContent = `Perdiste. La palabra era ${palabra}`;
+        if (typeof onPerder === 'function') onPerder(`La palabra era ${palabra}`);
+      } else if (status) {
+        status.textContent = `Letras usadas · ${errores}/6 errores`;
+      }
+    };
+
+    if (yaGanado) {
+      if (status) status.textContent = 'Ya ganaste la medalla de hoy';
+      const letrasPalabra = [...new Set(palabra)];
+      letrasPalabra.forEach((letra) => letrasUsadas.add(letra));
+      renderWord();
+      renderDibujo();
+      renderTeclado();
+      shell.appendChild(dibujo);
+      shell.appendChild(wordWrap);
+      shell.appendChild(teclado);
+      contenedor.appendChild(shell);
+      return function desmontar() {
+        contenedor.innerHTML = '';
+      };
+    }
+
+    shell.appendChild(dibujo);
+    shell.appendChild(wordWrap);
+    shell.appendChild(teclado);
+    contenedor.appendChild(shell);
+
+    renderWord();
+    renderDibujo();
+    renderTeclado();
+
+    if (status) {
+      status.textContent = 'Adiviná la palabra sin perder las 6 vidas';
+    }
+
+    return function desmontar() {
+      contenedor.innerHTML = '';
+    };
+  }
+
+  function montarWordle(contenedor, rand, onGanar, onPerder) {
+    const hoy = new Date();
+    const esFechaObjetivo = hoy.getDate() === 28 && hoy.getMonth() === 7;
+    const solution = esFechaObjetivo ? 'ANUEL' : WORDLE_SOLUCIONES[Math.floor(rand() * WORDLE_SOLUCIONES.length)].toUpperCase();
+    const rows = [];
+    const keyboardMap = {};
+    const boardState = Array.from({ length: 6 }, () => Array(5).fill(''));
+    const boardStates = Array.from({ length: 6 }, () => Array(5).fill('absent'));
+    const rowKeys = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    let currentGuess = '';
+    let activeRow = 0;
+    let finished = false;
+
+    const shell = document.createElement('div');
+    shell.className = 'wordle-shell';
+
+    const board = document.createElement('div');
+    board.className = 'wordle-board';
+
+    for (let rowIndex = 0; rowIndex < 6; rowIndex++) {
+      const row = document.createElement('div');
+      row.className = 'wordle-row';
+      rows.push(row);
+
+      for (let colIndex = 0; colIndex < 5; colIndex++) {
+        const cell = document.createElement('div');
+        cell.className = 'wordle-cell';
+        cell.dataset.row = String(rowIndex);
+        cell.dataset.col = String(colIndex);
+        row.appendChild(cell);
+      }
+      board.appendChild(row);
+    }
+
+    const keyboard = document.createElement('div');
+    keyboard.className = 'wordle-keyboard';
+
+    rowKeys.forEach((rowLetters) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'wordle-key-row';
+
+      [...rowLetters].forEach((letter) => {
+        const key = document.createElement('button');
+        key.type = 'button';
+        key.className = 'wordle-key';
+        key.textContent = letter;
+        key.dataset.letter = letter;
+        key.addEventListener('click', () => {
+          if (finished) return;
+          if (currentGuess.length < 5) {
+            currentGuess += letter;
+            renderBoard();
+          }
+        });
+        rowEl.appendChild(key);
+      });
+
+      if (rowLetters === 'QWERTYUIOP') {
+        const enter = document.createElement('button');
+        enter.type = 'button';
+        enter.className = 'wordle-key wide';
+        enter.textContent = 'ENTER';
+        enter.addEventListener('click', intentarSolucion);
+        rowEl.appendChild(enter);
+      }
+
+      if (rowLetters === 'ZXCVBNM') {
+        const borrar = document.createElement('button');
+        borrar.type = 'button';
+        borrar.className = 'wordle-key wide';
+        borrar.textContent = '⌫';
+        borrar.addEventListener('click', () => {
+          if (finished) return;
+          currentGuess = currentGuess.slice(0, -1);
+          renderBoard();
+        });
+        rowEl.appendChild(borrar);
+      }
+
+      keyboard.appendChild(rowEl);
+    });
+
+    shell.appendChild(board);
+    shell.appendChild(keyboard);
+    contenedor.appendChild(shell);
+
+    const status = document.getElementById('game-status');
+    if (status) {
+      const yaGanado = yaGanoMedallaHoy('wordle');
+      if (yaGanado) {
+        status.textContent = 'Ya ganaste la medalla de hoy';
+      } else {
+        status.textContent = 'Adiviná la palabra en 6 intentos';
+      }
+    }
+
+    function renderBoard() {
+      rows.forEach((row, rowIndex) => {
+        const cells = [...row.children];
+        for (let colIndex = 0; colIndex < 5; colIndex++) {
+          const cell = cells[colIndex];
+          const letter = rowIndex === activeRow ? currentGuess[colIndex] || '' : boardState[rowIndex][colIndex];
+          cell.textContent = letter;
+          cell.classList.toggle('filled', Boolean(letter));
+          cell.classList.remove('correct', 'present', 'absent', 'shake');
+          if (boardStates[rowIndex] && boardStates[rowIndex][colIndex] !== 'absent' && rowIndex < activeRow) {
+            cell.classList.add(boardStates[rowIndex][colIndex]);
+          } else if (rowIndex === activeRow && letter) {
+            cell.classList.add('filled');
+          }
+        }
+      });
+
+      document.querySelectorAll('.wordle-key').forEach((key) => {
+        const letter = key.dataset.letter;
+        const state = keyboardMap[letter];
+        key.classList.remove('correct', 'present', 'absent');
+        if (state) key.classList.add(state);
+      });
+    }
+
+    function shakeRow() {
+      const row = rows[activeRow];
+      if (!row) return;
+      [...row.children].forEach((cell) => {
+        cell.classList.add('shake');
+        window.setTimeout(() => cell.classList.remove('shake'), 260);
+      });
+    }
+
+    function actualizarTecladoDesdeResultado(guess, resultado) {
+      for (let i = 0; i < guess.length; i++) {
+        const letra = guess[i];
+        const nivelActual = keyboardMap[letra];
+        const nivelNuevo = resultado[i];
+        const prioridad = { absent: 0, present: 1, correct: 2 };
+        if (!nivelActual || prioridad[nivelNuevo] > prioridad[nivelActual]) {
+          keyboardMap[letra] = nivelNuevo;
+        }
+      }
+    }
+
+    function intentarSolucion() {
+      if (finished) return;
+      if (currentGuess.length !== 5) {
+        if (status) status.textContent = 'Faltan letras';
+        shakeRow();
+        return;
+      }
+
+      const guess = currentGuess.toUpperCase();
+      if (guess.length !== 5 || !/^[A-Z]{5}$/.test(guess)) {
+        if (status) status.textContent = 'Faltan letras';
+        shakeRow();
+        return;
+      }
+
+      const base = Array(5).fill('');
+      for (let i = 0; i < 5; i++) {
+        base[i] = guess[i];
+      }
+
+      boardState[activeRow] = base;
+      const resultado = evaluarWordle(guess, solution);
+      boardStates[activeRow] = resultado;
+      actualizarTecladoDesdeResultado(guess, resultado);
+      renderBoard();
+
+      if (guess === solution) {
+        finished = true;
+        if (status) status.textContent = '¡Adivinaste!';
+        if (typeof onGanar === 'function') onGanar();
+        return;
+      }
+
+      activeRow += 1;
+      currentGuess = '';
+      if (activeRow >= 6) {
+        finished = true;
+        if (status) status.textContent = `La palabra era ${solution}`;
+        if (typeof onPerder === 'function') onPerder(`La palabra era ${solution}`);
+        return;
+      }
+
+      if (status) status.textContent = `Intento ${activeRow} de 6`;
+      renderBoard();
+    }
+
+    const onKeyDown = (event) => {
+      if (finished) return;
+      if (event.key === 'Enter') {
+        intentarSolucion();
+        return;
+      }
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        currentGuess = currentGuess.slice(0, -1);
+        renderBoard();
+        return;
+      }
+      if (/^[a-zA-Z]$/.test(event.key)) {
+        const letter = event.key.toUpperCase();
+        if (currentGuess.length < 5) {
+          currentGuess += letter;
+          renderBoard();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+
+    if (yaGanoMedallaHoy('wordle')) {
+      finished = true;
+      const mensaje = document.getElementById('game-status');
+      if (mensaje) mensaje.textContent = 'Ya ganaste la medalla de hoy';
+      for (let i = 0; i < 5; i++) {
+        const row = rows[0];
+        const cell = row.children[i];
+        cell.textContent = solution[i];
+        cell.classList.add('correct');
+        cell.classList.add('filled');
+      }
+      return () => {
+        document.removeEventListener('keydown', onKeyDown);
+        contenedor.innerHTML = '';
+      };
+    }
+
+    renderBoard();
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      contenedor.innerHTML = '';
+    };
+  }
+
+  function montarSopaDeLetras(contenedor, rand, onGanar, onPerder) {
     const size = 8;
     const board = Array.from({ length: size }, () => Array(size).fill(''));
     const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const palabras = juego.palabras.slice(0, 6);
+    const palabras = ['DELAROSE', 'LUNA', 'QUEVEDO', 'FRAN', 'FRIENDS', 'CIELO'];
     const palabrasColocadas = [];
     const direcciones = [
       [0, 1], [1, 0], [1, 1], [1, -1],
@@ -2567,7 +4044,7 @@
     ];
 
     function intentarColocar(palabra) {
-      const ordenDirecciones = [...direcciones].sort(() => Math.random() - 0.5);
+      const ordenDirecciones = [...direcciones].sort(() => rand() - 0.5);
 
       for (const [dr, dc] of ordenDirecciones) {
         for (let row = 0; row < size; row++) {
@@ -2633,16 +4110,31 @@
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
         if (!board[row][col]) {
-          board[row][col] = letras[Math.floor(Math.random() * letras.length)];
+          board[row][col] = letras[Math.floor(rand() * letras.length)];
         }
       }
     }
 
-    title.textContent = juego.nombre;
-    grid.innerHTML = '';
+    const content = document.createElement('div');
+    content.className = 'game-content';
+
+    const grid = document.createElement('div');
+    grid.className = 'game-grid';
+    grid.setAttribute('aria-label', 'Sopa de letras');
+
+    const words = document.createElement('div');
+    words.className = 'game-words';
+    words.innerHTML = '<h3>Palabras</h3>';
+
+    const wordList = document.createElement('ul');
+    words.appendChild(wordList);
+    content.appendChild(grid);
+    content.appendChild(words);
+    contenedor.appendChild(content);
+
     const palabrasAdivinadas = new Set();
     const seleccionActual = [];
-    const yaGanadoHoy = yaGanoMedallaHoy();
+    const yaGanadoHoy = yaGanoMedallaHoy('sopa');
 
     function coincideConPalabraSeleccionada() {
       const seleccionCoords = seleccionActual.map(item => [Number(item.dataset.row), Number(item.dataset.col)]);
@@ -2661,13 +4153,15 @@
       return null;
     }
 
-    if (status) {
-      if (yaGanadoHoy) {
-        status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
-      } else {
-        iniciarTemporizadorSopa(status);
-      }
+    const status = document.createElement('div');
+    status.className = 'game-status';
+    if (yaGanadoHoy) {
+      status.textContent = 'Ya ganaste esta medalla hoy';
+    } else {
+      status.textContent = 'Tiempo: 02:00 · Encontrá todas las palabras';
+      iniciarTemporizadorSopa(status, grid, onPerder);
     }
+    contenedor.insertBefore(status, content);
 
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -2685,7 +4179,7 @@
         }
 
         cell.addEventListener('click', () => {
-          if (yaGanadoHoy || cell.disabled || (status && status.textContent === 'Te quedaste sin tiempo!')) return;
+          if (yaGanadoHoy || cell.disabled || status.textContent === 'Te quedaste sin tiempo!') return;
 
           const yaSeleccionada = seleccionActual.includes(cell);
           if (yaSeleccionada) {
@@ -2710,12 +4204,12 @@
             });
             seleccionActual.length = 0;
 
-            if (juego.palabras.every(palabra => palabrasAdivinadas.has(palabra))) {
+            if (palabras.every(palabra => palabrasAdivinadas.has(palabra))) {
               if (temporizadorSopaId) {
                 clearInterval(temporizadorSopaId);
                 temporizadorSopaId = null;
               }
-              ganarMedalla();
+              if (typeof onGanar === 'function') onGanar();
             }
             return;
           }
@@ -2730,12 +4224,110 @@
       }
     }
 
-    wordList.innerHTML = '';
     palabras.forEach((palabra) => {
       const item = document.createElement('li');
       item.textContent = palabra;
       wordList.appendChild(item);
     });
+
+    return function desmontar() {
+      if (temporizadorSopaId) {
+        clearInterval(temporizadorSopaId);
+        temporizadorSopaId = null;
+      }
+      contenedor.innerHTML = '';
+    };
+  }
+
+  let juegoActivoDesmontar = null;
+
+  function renderMenuJuegos() {
+    const menu = document.getElementById('game-menu');
+    if (!menu) return;
+
+    const hoyId = obtenerJuegoDelDia().id;
+    const entries = Object.keys(JUEGOS);
+    menu.innerHTML = entries.map((key) => {
+      const juego = JUEGOS[key];
+      const ganado = yaGanoMedallaHoy(juego.id);
+      const perdido = yaPerdioHoy(juego.id) && !ganado;
+      const destacado = juego.id === hoyId;
+      const disabled = perdido || ganado;
+      return `
+        <button type="button" class="game-option ${destacado ? 'featured' : ''} ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
+          <span class="game-option-name">${juego.nombre}</span>
+          <span class="game-option-meta">${perdido ? 'Perdido hoy' : destacado ? 'Juego del día' : 'Disponible'}${ganado ? ' · Ganado' : ''}</span>
+        </button>
+      `;
+    }).join('');
+
+    menu.querySelectorAll('[data-juego-id]').forEach((boton) => {
+      boton.addEventListener('click', () => abrirJuegoPorId(boton.dataset.juegoId));
+    });
+  }
+
+  function abrirJuegoPorId(juegoId) {
+    const juego = obtenerJuegoPorId(juegoId);
+    const ganado = yaGanoMedallaHoy(juego.id);
+    const perdido = yaPerdioHoy(juego.id) && !ganado;
+    if (perdido) {
+      mostrarToastGame('Ya jugaste este juego hoy y perdiste');
+      return;
+    }
+
+    const modal = document.getElementById('game-modal');
+    const menu = document.getElementById('game-menu');
+    const stage = document.getElementById('game-stage');
+    const title = document.getElementById('game-title');
+    const kicker = document.getElementById('game-kicker');
+    const status = document.getElementById('game-status');
+
+    if (typeof juegoActivoDesmontar === 'function') {
+      juegoActivoDesmontar();
+      juegoActivoDesmontar = null;
+    }
+
+    if (menu) menu.classList.add('hidden');
+    if (stage) {
+      stage.classList.remove('hidden');
+      stage.innerHTML = '';
+    }
+    if (title) title.textContent = juego.nombre;
+    if (kicker) kicker.textContent = juego.id === obtenerJuegoDelDia().id ? 'juego del día' : 'juego seleccionado';
+    if (status) {
+      status.textContent = yaGanoMedallaHoy(juego.id) ? 'Ya ganaste esta medalla hoy' : juego.desc;
+    }
+
+    const rand = mulberry32(hashString(`${semillaDelDia()}-${juego.id}`));
+    const desmontar = juego.montar(stage, rand, () => {
+      if (!yaGanoMedallaHoy(juego.id)) {
+        ganarMedalla(juego.id);
+      }
+    }, (mensaje) => {
+      marcarPerdida(juego.id);
+      const detalle = typeof mensaje === 'string' ? mensaje : '';
+      const overlay = document.getElementById('derrota-overlay');
+      const subtitle = document.getElementById('derrota-subtitle');
+      const detail = document.getElementById('derrota-detalle');
+      if (subtitle) subtitle.textContent = detalle ? 'Volvé a intentar mañana' : 'Volvé a intentar mañana';
+      if (detail) {
+        detail.textContent = detalle || 'La palabra era desconocida';
+        detail.style.display = detalle ? 'block' : 'none';
+      }
+      if (overlay) {
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        if (overlay._timer) window.clearTimeout(overlay._timer);
+        overlay._timer = window.setTimeout(() => ocultarDerrotaOverlay(), 4000);
+      }
+    });
+    juegoActivoDesmontar = typeof desmontar === 'function' ? desmontar : () => {};
+
+    if (modal) {
+      modal.classList.add('visible');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+    toggleBodyModalLock(true);
   }
 
   function toggleBodyModalLock(isOpen) {
@@ -2744,17 +4336,50 @@
 
   function abrirJuegoDelDia() {
     const modal = document.getElementById('game-modal');
-    renderizarSopaDeLetras();
-    modal.classList.add('visible');
-    modal.setAttribute('aria-hidden', 'false');
+    const menu = document.getElementById('game-menu');
+    const stage = document.getElementById('game-stage');
+    const title = document.getElementById('game-title');
+    const kicker = document.getElementById('game-kicker');
+    const status = document.getElementById('game-status');
+
+    if (typeof juegoActivoDesmontar === 'function') {
+      juegoActivoDesmontar();
+      juegoActivoDesmontar = null;
+    }
+
+    renderMenuJuegos();
+    if (menu) menu.classList.remove('hidden');
+    if (stage) {
+      stage.classList.add('hidden');
+      stage.innerHTML = '';
+    }
+    if (title) title.textContent = 'Elegí tu juego';
+    if (kicker) kicker.textContent = 'juegos del día';
+    if (status) status.textContent = `Seleccioná uno de los ${Object.keys(JUEGOS).length} juegos de hoy`;
+
+    if (modal) {
+      modal.classList.add('visible');
+      modal.setAttribute('aria-hidden', 'false');
+    }
     toggleBodyModalLock(true);
   }
 
   function cerrarJuegoDelDia() {
     const modal = document.getElementById('game-modal');
-    if (!modal) return;
-    modal.classList.remove('visible');
-    modal.setAttribute('aria-hidden', 'true');
+    const stage = document.getElementById('game-stage');
+
+    if (typeof juegoActivoDesmontar === 'function') {
+      juegoActivoDesmontar();
+      juegoActivoDesmontar = null;
+    }
+    if (stage) {
+      stage.innerHTML = '';
+      stage.classList.add('hidden');
+    }
+    if (modal) {
+      modal.classList.remove('visible');
+      modal.setAttribute('aria-hidden', 'true');
+    }
     toggleBodyModalLock(false);
   }
 
@@ -2798,6 +4423,7 @@
   const premiosModal = document.getElementById('premios-modal');
   const premiosClose = document.getElementById('premios-close');
   const medallaOverlay = document.getElementById('medalla-overlay');
+  const derrotaOverlay = document.getElementById('derrota-overlay');
 
   gameBadge.addEventListener('click', function(event) {
     event.preventDefault();
@@ -2823,6 +4449,14 @@
     });
   }
 
+  if (derrotaOverlay) {
+    derrotaOverlay.addEventListener('click', function(event) {
+      if (event.target === derrotaOverlay) {
+        ocultarDerrotaOverlay();
+      }
+    });
+  }
+
   premiosClose.addEventListener('click', cerrarPremios);
   premiosModal.addEventListener('click', function(event) {
     if (event.target === premiosModal) {
@@ -2836,6 +4470,9 @@
       cerrarPremios();
       if (medallaOverlay && medallaOverlay.classList.contains('visible')) {
         ocultarMedallaOverlay();
+      }
+      if (derrotaOverlay && derrotaOverlay.classList.contains('visible')) {
+        ocultarDerrotaOverlay();
       }
     }
   });
