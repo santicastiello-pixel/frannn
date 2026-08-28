@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Que tengas un gran día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cielo-a:#2A2160;
+    --cielo-b:#FF8A5B;
+    --cielo-c:#FFC86B;
+    --tinta:#eb901a;
+    --tinta-suave:rgba(255,246,234,.62);
+    --astro:#FFE3A8;
+    --astro-y:62%;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%; min-height:100%}
+  @supports (height: 100dvh) {
+    html, body {
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+  }
+  body{
+    margin:0;
+    font-family:"Fraunces",Georgia,serif;
+    color:var(--tinta);
+    background:var(--cielo-a);
+    overflow-x:hidden;
+    transition:color .9s ease;
+  }
+  body.modal-open {
+    overflow:hidden;
+  }
+
+  /* Cielo */
+  .cielo{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(120% 80% at 50% var(--astro-y),
+        color-mix(in srgb, var(--astro) 55%, transparent) 0%,
+        transparent 46%),
+      linear-gradient(180deg, var(--cielo-a) 0%, var(--cielo-b) 62%, var(--cielo-c) 100%);
+    transition:background 1.2s ease;
+  }
+  .astro{
+    position:fixed; z-index:0;
+    left:50%; top:var(--astro-y);
+    width:min(46vmin,340px); aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:var(--astro);
+    filter:blur(.5px);
+    box-shadow:0 0 90px 30px color-mix(in srgb, var(--astro) 45%, transparent);
+    animation: entrada-sol 7.5s cubic-bezier(.18,.72,.18,1) forwards, brillo-sol 14s ease-in-out infinite 7.5s;
+    transition:top 1.2s ease, background .9s ease;
+    display:grid;
+    place-items:center;
+    opacity:0;
+  }
+
+  .astro::after{
+    content:"";
+    display:block;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(15px,4vw,54px);
+    font-weight:400 ;
+    letter-spacing:.08em;
+    color:rgba(255, 227, 115, 0.8);
+    transform:translateY(2px);
+  }
+
+  @keyframes entrada-sol {
+    0% {
+      transform:translate(-220vw,-50%) scale(.48);
+      opacity:0;
+      filter:blur(8px);
+    }
+    20% {
+      opacity:.35;
+      filter:blur(4px);
+    }
+    70% {
+      opacity:1;
+      filter:blur(1px);
+    }
+    100% {
+      transform:translate(-50%,-50%) scale(1);
+      opacity:1;
+      filter:blur(0);
+    }
+  }
+
+  @keyframes brillo-sol {
+    0%, 100% {
+      box-shadow:0 0 90px 30px color-mix(in srgb, var(--astro) 45%, transparent);
+    }
+    50% {
+      box-shadow:0 0 112px 40px color-mix(in srgb, var(--astro) 58%, transparent);
+    }
+  }
+
+  .moderador-panel {
+    position:fixed;
+    right:18px;
+    top:18px;
+    width:min(320px, calc(100vw - 28px));
+    background:rgba(9, 13, 28, 0.82);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:16px;
+    box-shadow:0 18px 42px rgba(0,0,0,0.28);
+    backdrop-filter:blur(10px);
+    color:#edf4ff;
+    padding:14px 16px 12px;
+    z-index:30;
+    display:none;
+    font-family:"DM Mono", ui-monospace, monospace;
+  }
+
+  .moderador-panel.visible {
+    display:block;
+  }
+
+  .moderador-panel h2 {
+    margin:0 0 8px;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:#cfe0ff;
+    font-weight:500;
+  }
+
+  .moderador-panel .estado {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:11px;
+    color:#d8e4ff;
+  }
+
+  .moderador-panel .estado .led {
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#6ef3a5;
+    box-shadow:0 0 12px rgba(110,243,165,.8);
+  }
+
+  .moderador-panel ul {
+    margin:0;
+    padding-left:16px;
+    color:#edf4ff;
+    font-size:11px;
+    line-height:1.6;
+  }
+
+  .moderador-panel li + li {
+    margin-top:4px;
+  }
+
+  /* Contenido */
+  main{
+    position:relative; z-index:1;
+    min-height:100%;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:clamp(28px,6vw,80px);
+    gap:clamp(24px,4vh,44px);
+  }
+
+  .top-meta {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .franja{
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(11px,1.4vw,13px);
+    letter-spacing:.18em; text-transform:uppercase;
+    color:var(--tinta-suave);
+  }
+
+  .fecha-hoy{
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(12px,1.5vw,16px);
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--tinta-suave);
+  }
+
+  .saludo{
+    margin:0;
+    font-weight:300;
+    font-size:clamp(38px,9.5vw,116px);
+    line-height:.98;
+    letter-spacing:-.025em;
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+    max-width:12ch;
+    text-wrap:balance;
+  }
+  .saludo em{
+    font-style:italic;
+    font-weight:600;
+  }
+
+  .linea-nombre{display:block; margin-top:.18em}
+
+  #nombre{
+    display:inline-block;
+    min-width:3ch;
+    padding:0 .12em .06em;
+    font-style:italic;
+    font-weight:600;
+    outline:none;
+    cursor:default;
+    border-radius:6px;
+  }
+
+  .pie{
+    display:flex; flex-wrap:wrap; align-items:center;
+    gap:14px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:13px;
+  }
+  .ayuda{color:var(--tinta-suave)}
+
+  .firma{
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(10px,1.1vw,13px);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--tinta-suave);
+    opacity:.9;
+  }
+
+  .dia-mensaje{
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:clamp(11px,1.2vw,14px);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--tinta-suave);
+    opacity:.95;
+  }
+
+  .weather-badge {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    width:max-content;
+    padding:9px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.14);
+    color:var(--tinta);
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+
+  .top-actions {
+    position:fixed;
+    top:18px;
+    right:18px;
+    z-index:35;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:10px;
+  }
+
+  .medal-badge,
+  .game-badge {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.12);
+    color:#fff;
+    text-decoration:none;
+    font-family:"DM Mono",ui-monospace,monospace;
+    box-shadow:0 12px 26px rgba(0,0,0,0.14);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+
+  .medal-badge {
+    background:rgba(79, 52, 17, 0.72);
+    border-color:rgba(255,211,121,0.42);
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+
+  .medal-badge svg {
+    width:15px;
+    height:15px;
+    display:block;
+    fill:currentColor;
+  }
+
+  .game-badge {
+    background:rgba(24, 19, 36, 0.73);
+    font-size:10px;
+    letter-spacing:.11em;
+    text-transform:lowercase;
+  }
+
+  .medal-badge:hover,
+  .game-badge:hover {
+    transform:translateY(-1px);
+    box-shadow:0 16px 28px rgba(0,0,0,0.18);
+  }
+
+  .game-modal {
+    position:fixed;
+    inset:0;
+    z-index:40;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(6, 12, 22, 0.64);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+
+  .game-modal.visible {
+    display:flex;
+  }
+
+  .medalla-overlay {
+    position:fixed;
+    inset:0;
+    z-index:60;
+    display:none;
+    place-items:center;
+    background:rgba(6, 12, 22, 0.72);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    padding:24px;
+  }
+
+  .medalla-overlay.visible {
+    display:grid;
+  }
+
+  .medalla-card {
+    text-align:center;
+    padding:32px 28px;
+    border-radius:24px;
+    background:linear-gradient(180deg, rgba(18,20,35,0.96), rgba(24,15,41,0.96));
+    border:1px solid rgba(255,255,255,0.14);
+    box-shadow:0 30px 80px rgba(0,0,0,0.42);
+    color:#f5f1ff;
+    animation:medalla-entrada .5s cubic-bezier(.2,.9,.3,1.2);
+  }
+
+  .medalla-icono {
+    display:grid;
+    place-items:center;
+    width:90px;
+    height:90px;
+    margin:0 auto 18px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .medalla-icono svg {
+    width:90px;
+    height:90px;
+    display:block;
+    filter:drop-shadow(0 10px 20px rgba(255, 214, 110, 0.35));
+    animation:medalla-escala 1.4s ease-in-out infinite alternate;
+  }
+
+  .medalla-icono::after {
+    content:"";
+    position:absolute;
+    inset:-28% auto auto -18%;
+    width:60%;
+    height:130%;
+    background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.7) 48%, transparent 100%);
+    transform:rotate(18deg);
+    animation:medalla-destello 1.8s ease-in-out infinite;
+  }
+
+  @keyframes medalla-entrada {
+    0% { opacity:0; transform:scale(.7); }
+    100% { opacity:1; transform:scale(1); }
+  }
+
+  @keyframes medalla-escala {
+    0% { transform:scale(.94); }
+    100% { transform:scale(1.05); }
+  }
+
+  @keyframes medalla-destello {
+    0% { transform:translateX(-160%) rotate(18deg); opacity:0; }
+    30% { opacity:1; }
+    100% { transform:translateX(260%) rotate(18deg); opacity:0; }
+  }
+
+  .medalla-card h2 {
+    margin:0 0 8px;
+    font-size:clamp(26px, 5vw, 36px);
+    line-height:1.06;
+    letter-spacing:-.04em;
+  }
+
+  .medalla-card p {
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.78);
+  }
+
+  .game-panel {
+    width:min(760px, 92vw);
+    max-height:88dvh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(180deg, rgba(18,20,35,0.96), rgba(24,15,41,0.96));
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:24px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.42);
+    padding:22px 22px 18px;
+    color:#f5f1ff;
+    position:relative;
+  }
+
+  #premios-modal .game-panel {
+    max-height: min(88dvh, 760px);
+  }
+
+  #premios-modal .premios-grid {
+    max-height:min(40vh, 380px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-right:4px;
+    margin-top:20px;
+  }
+
+  @media (max-width: 560px) {
+    #premios-modal .premios-grid {
+      grid-template-columns:1fr;
+      max-height:min(46vh, 420px);
+    }
+  }
+
+  .game-status {
+    margin: 0 0 14px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.78);
+  }
+
+  .game-toast,
+  .premios-toast {
+    position:absolute;
+    left:50%;
+    top:20px;
+    transform:translate(-50%, -8px) scale(.9);
+    opacity:0;
+    padding:10px 16px;
+    border-radius:999px;
+    background:rgba(122, 240, 168, 0.18);
+    border:1px solid rgba(122, 240, 168, 0.6);
+    color:#dfffee;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+
+  .game-toast.visible,
+  .premios-toast.visible {
+    opacity:1;
+    transform:translate(-50%, 0) scale(1);
+    animation: medal-pop .5s ease;
+  }
+
+  @keyframes medal-pop {
+    0% { opacity:0; transform:translate(-50%, -10px) scale(.7); }
+    30% { opacity:1; transform:translate(-50%, 0) scale(1.08); }
+    60% { opacity:1; transform:translate(-50%, 0) scale(1.02); }
+    100% { opacity:1; transform:translate(-50%, 0) scale(1); }
+  }
+
+  .premios-grid {
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:16px;
+    margin-top:20px;
+  }
+
+  .premio-card {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .premio-card.disabled {
+    opacity:0.55;
+  }
+
+  .premio-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+
+  .premio-emoji {
+    font-size:24px;
+    line-height:1;
+  }
+
+  .premio-costo {
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.76);
+  }
+
+  .premio-card h3 {
+    margin:0;
+    font-size:22px;
+    line-height:1.08;
+    letter-spacing:-.03em;
+  }
+
+  .premio-button {
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:10px 12px;
+    background:linear-gradient(135deg, #f6d58d 0%, #d5a75d 100%);
+    color:#271b11;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    font-weight:700;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+
+  .premio-button:disabled {
+    opacity:.5;
+    cursor:not-allowed;
+  }
+
+  .premio-card.disabled .premio-button {
+    background:rgba(255,255,255,0.07);
+    color:rgba(255,255,255,0.56);
+  }
+
+  .premios-historial {
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+
+  .premios-historial h3 {
+    margin:0 0 12px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+
+  .premios-historial ul {
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .premios-historial li {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:10px;
+    padding:9px 10px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.8);
+  }
+
+  .respaldo-block {
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .respaldo-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .respaldo-header h3 {
+    margin:0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+
+  .respaldo-row {
+    display:flex;
+    gap:10px;
+  }
+
+  .respaldo-input,
+  .respaldo-copy {
+    width:100%;
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    color:#fff;
+    padding:10px 12px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+
+  .respaldo-copy {
+    max-width:180px;
+    cursor:pointer;
+    font-weight:700;
+    background:linear-gradient(135deg, rgba(255,212,125,0.14), rgba(255,255,255,0.04));
+  }
+
+  .respaldo-restore {
+    border:0;
+    border-radius:12px;
+    background:linear-gradient(135deg, #f6d58d 0%, #d5a75d 100%);
+    color:#271b11;
+    padding:10px 12px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    font-weight:700;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+
+  .persist-status {
+    position:fixed;
+    left:20px;
+    bottom:20px;
+    z-index:45;
+    display:none;
+    max-width:min(360px, calc(100vw - 40px));
+    padding:10px 12px;
+    border-radius:12px;
+    background:rgba(20,20,26,0.8);
+    border:1px solid rgba(255,255,255,0.12);
+    color:#f4eefc;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:9px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    box-shadow:0 10px 22px rgba(0,0,0,0.18);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  .persist-status.visible {
+    display:block;
+  }
+
+  .game-header {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:18px;
+  }
+
+  .game-kicker {
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.7);
+  }
+
+  .game-header h2 {
+    margin:6px 0 0;
+    font-size:clamp(26px, 4vw, 42px);
+    line-height:1.06;
+    letter-spacing:-.04em;
+  }
+
+  .game-close {
+    border:0;
+    background:rgba(255,255,255,0.09);
+    color:#fff;
+    width:44px;
+    height:44px;
+    min-width:44px;
+    min-height:44px;
+    border-radius:50%;
+    font-size:24px;
+    cursor:pointer;
+  }
+
+  .game-content {
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap:22px;
+    align-items:start;
+  }
+
+  .game-grid {
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    gap:6px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:12px;
+  }
+
+  .game-cell {
+    display:grid;
+    place-items:center;
+    width:100%;
+    min-width:44px;
+    min-height:44px;
+    aspect-ratio:1;
+    border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.06);
+    font-weight:700;
+    color:#f7f3ff;
+    font-size:clamp(12px, 1.8vw, 18px);
+    transition:background .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+
+  .game-cell.selected {
+    background:rgba(255,255,255,0.12);
+    color:#ffffff;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.14);
+    transform:translateY(-1px);
+  }
+
+  .game-cell.correct {
+    background:rgba(49, 210, 115, 0.22);
+    border-color:rgba(90, 245, 150, 0.7);
+    color:#8ef7b7;
+    box-shadow:inset 0 0 0 1px rgba(90,245,150,0.65);
+  }
+
+  .game-words {
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:16px;
+  }
+
+  .game-words h3 {
+    margin:0 0 10px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+
+  .game-words ul {
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .game-words li {
+    padding:7px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:12px;
+    letter-spacing:.04em;
+    transition:opacity .2s ease, color .2s ease, text-decoration-color .2s ease;
+  }
+
+  .game-words li.found {
+    color:rgba(176, 255, 212, 0.82);
+    text-decoration:line-through;
+    text-decoration-thickness:2px;
+    text-decoration-color:rgba(176, 255, 212, 0.9);
+    opacity:0.7;
+  }
+
+  .spotify-panel {
+    position:fixed;
+    top:18px;
+    right:18px;
+    width:min(300px, calc(100vw - 28px));
+    background:rgba(12, 15, 24, 0.42);
+    border:1px solid rgba(255,255,255,0.16);
+    border-radius:16px;
+    padding:12px 14px;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 12px 28px rgba(0,0,0,0.18);
+    z-index:20;
+  }
+
+  .spotify-header {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+  }
+
+  .spotify-logo {
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:linear-gradient(135deg, #1ED760 0%, #18a84d 100%);
+    position:relative;
+    box-shadow:0 0 16px rgba(30, 215, 96, 0.5);
+  }
+
+  .spotify-logo::before {
+    content:"";
+    position:absolute;
+    inset:5px 5px 5px 5px;
+    border-radius:50%;
+    background:rgba(7, 18, 10, 0.12);
+  }
+
+  .spotify-header small {
+    display:block;
+    margin:0 0 2px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.7);
+  }
+
+  .spotify-header h3 {
+    margin:0;
+    font-size:13px;
+    line-height:1.2;
+    color:#fff;
+  }
+
+  .spotify-button {
+    width:100%;
+    border:0;
+    border-radius:10px;
+    padding:9px 12px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:9px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    background:linear-gradient(135deg, #1ED760 0%, #16af48 100%);
+    color:#07160d;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+    box-shadow:0 12px 26px rgba(30,215,96,0.22);
+  }
+
+  .spotify-button:hover {
+    transform:translateY(-1px);
+    box-shadow:0 14px 30px rgba(30,215,96,0.3);
+  }
+
+  .spotify-track-card {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    padding:8px 10px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    min-height:62px;
+  }
+
+  .spotify-track-card.hidden {
+    display:none;
+  }
+
+  .spotify-cover {
+    width:48px;
+    height:48px;
+    border-radius:10px;
+    object-fit:cover;
+    background:linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06));
+    box-shadow:0 8px 18px rgba(0,0,0,0.2);
+  }
+
+  .spotify-track-meta {
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+
+  .spotify-track-name {
+    font-size:12px;
+    color:#fff;
+    line-height:1.2;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .spotify-track-artist {
+    margin-top:3px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:9px;
+    letter-spacing:.08em;
+    color:rgba(255,255,255,0.72);
+    text-transform:uppercase;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .spotify-status {
+    margin:9px 0 0;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:9px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.72);
+  }
+
+  .weather-badge .weather-dot {
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:currentColor;
+    box-shadow:0 0 10px rgba(255,255,255,0.55);
+  }
+
+  .weather-clouds {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+    opacity:0;
+    transition:opacity .8s ease;
+  }
+
+  .weather-clouds.visible {
+    opacity:1;
+  }
+
+  .nube {
+    position:absolute;
+    width:190px;
+    height:56px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.12));
+    border-radius:55px;
+    filter:blur(1.2px);
+    box-shadow:
+      0 18px 26px rgba(255,255,255,0.05),
+      inset 0 -8px 18px rgba(170, 190, 220, 0.08);
+    animation: nube-drift 32s ease-in-out infinite alternate;
+  }
+
+  .nube::before,
+  .nube::after {
+    content:"";
+    position:absolute;
+    background:linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0.08));
+    border-radius:50%;
+  }
+
+  .nube::before {
+    width:70px;
+    height:70px;
+    left:18px;
+    top:-22px;
+  }
+
+  .nube::after {
+    width:88px;
+    height:72px;
+    right:22px;
+    top:-26px;
+  }
+
+  .rain-overlay {
+    position:fixed;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .7s ease;
+    background:linear-gradient(180deg, rgba(255,255,255,0), rgba(155, 196, 255, 0.08));
+  }
+
+  .rain-overlay.visible {
+    opacity:1;
+  }
+
+  .rain-overlay::before {
+    content:"";
+    position:absolute;
+    inset:-20% 0 0 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(182, 214, 255, 0.7) 0px,
+      rgba(182, 214, 255, 0.7) 2px,
+      transparent 3px,
+      transparent 10px
+    );
+    transform:skewY(-8deg);
+    animation: lluvia 0.65s linear infinite;
+    opacity:0.9;
+  }
+
+  .cielo.lluvia-dia {
+    background:
+      linear-gradient(180deg, #afc4d8 0%, #8199b5 36%, #526b82 100%);
+  }
+
+  .cielo.lluvia-noche {
+    background:
+      linear-gradient(180deg, #0f1a2a 0%, #1e2d3d 32%, #2d4057 100%);
+  }
+
+  .coffee-wrap {
+    position:fixed;
+    right:clamp(18px, 4vw, 60px);
+    bottom:clamp(30px, 6vh, 80px);
+    width:clamp(90px, 11vw, 135px);
+    height:clamp(110px, 15vw, 160px);
+    pointer-events:none;
+    z-index:3;
+    opacity:0;
+    transform:translateX(30px) scale(.9);
+    transition:opacity .8s ease, transform .8s ease;
+  }
+
+  .coffee-wrap.visible {
+    opacity:1;
+    transform:translateX(0) scale(1);
+  }
+
+  .coffee-cup {
+    position:absolute;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:76%;
+    animation: coffee-sway 5s ease-in-out infinite;
+  }
+
+  .coffee-cup .cup-body {
+    position:absolute;
+    inset:26% 12% 10% 12%;
+    border-radius:0 0 28px 28px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.88), rgba(240,233,218,0.76));
+    border:2px solid rgba(255,255,255,0.42);
+    box-shadow:inset 0 -12px 18px rgba(111, 76, 45, 0.10), 0 12px 18px rgba(0,0,0,0.08);
+  }
+
+  .coffee-cup .cup-body::before {
+    content:"";
+    position:absolute;
+    left:12%;
+    right:12%;
+    top:14%;
+    height:16%;
+    border-radius:50%;
+    background:rgba(255,255,255,0.5);
+  }
+
+  .coffee-cup .cup-handle {
+    position:absolute;
+    right:-5%;
+    top:30%;
+    width:26%;
+    height:34%;
+    border:5px solid rgba(255,255,255,0.74);
+    border-left:none;
+    border-radius:0 34px 34px 0;
+  }
+
+  .coffee-cup .coffee-surface {
+    position:absolute;
+    left:18%;
+    right:18%;
+    top:16%;
+    height:12%;
+    border-radius:50%;
+    background:linear-gradient(180deg, rgba(99,66,37,1), rgba(57,35,20,0.96));
+    box-shadow:
+      inset 0 2px 2px rgba(255,255,255,0.12),
+      0 0 14px rgba(82,53,29,0.38);
+    overflow:hidden;
+  }
+
+  .coffee-cup .coffee-surface::before {
+    content:"";
+    position:absolute;
+    inset:10% 14% auto 18%;
+    height:40%;
+    border-radius:50%;
+    background:rgba(255,255,255,0.11);
+    transform:rotate(-8deg);
+  }
+
+  .coffee-cup .steam {
+    position:absolute;
+    left:34%;
+    top:-30%;
+    width:12px;
+    height:52px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.5);
+    border-color:rgba(255,255,255,0.46) transparent transparent transparent;
+    animation: steam-rise 3.2s ease-in-out infinite;
+  }
+
+  .coffee-cup .steam:nth-child(2) {
+    left:52%;
+    animation-delay:1s;
+  }
+
+  .coffee-cup .steam:nth-child(3) {
+    left:68%;
+    animation-delay:2s;
+  }
+
+  .coffee-cup {
+    position:absolute;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:74%;
+    animation: coffee-sway 5s ease-in-out infinite;
+  }
+
+  .coffee-cup .cup-body {
+    position:absolute;
+    inset:18% 12% 8% 12%;
+    border-radius:0 0 26px 26px;
+    background:rgba(255,255,255,0.7);
+    border:2px solid rgba(255,255,255,0.28);
+    box-shadow:inset 0 -10px 18px rgba(101, 73, 38, 0.12);
+  }
+
+  .coffee-cup .cup-body::before {
+    content:"";
+    position:absolute;
+    left:12%;
+    right:12%;
+    top:14%;
+    height:14%;
+    border-radius:50%;
+    background:rgba(255,255,255,0.4);
+  }
+
+  .coffee-cup .cup-handle {
+    position:absolute;
+    right:-8%;
+    top:24%;
+    width:24%;
+    height:32%;
+    border:5px solid rgba(255,255,255,0.72);
+    border-left:none;
+    border-radius:0 42px 42px 0;
+  }
+
+  .coffee-cup .coffee-surface {
+    position:absolute;
+    left:16%;
+    right:16%;
+    top:10%;
+    height:12%;
+    border-radius:50%;
+    background:rgba(126, 89, 52, 0.92);
+    box-shadow:0 0 16px rgba(126,89,52,0.4);
+  }
+
+  .coffee-cup .steam {
+    position:absolute;
+    left:32%;
+    top:-28%;
+    width:10px;
+    height:42px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.38);
+    border-color:rgba(255,255,255,0.38) transparent transparent transparent;
+    transform:translateY(0) rotate(12deg);
+    animation: steam-rise 3s ease-in-out infinite;
+  }
+
+  .coffee-cup .steam:nth-child(2) {
+    left:52%;
+    animation-delay:1s;
+  }
+
+  .coffee-cup .steam:nth-child(3) {
+    left:68%;
+    animation-delay:2s;
+  }
+
+  .animacion {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:2;
+    opacity:.9;
+  }
+
+  .particula {
+    position:absolute;
+    top:-15%;
+    display:block;
+    opacity:0;
+    filter:drop-shadow(0 0 8px rgba(255,255,255,.22));
+  }
+
+  .animacion.noche .particula {
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 8px rgba(255,255,255,.9), 0 0 14px rgba(255,255,255,.75);
+    animation: twinkle linear infinite;
+  }
+
+  .animacion.dia .particula {
+    width:30px;
+    height:16px;
+    background:transparent;
+    animation: bird-fly linear infinite;
+    opacity:1;
+  }
+
+  .animacion.dia .particula::before,
+  .animacion.dia .particula::after {
+    content:"";
+    position:absolute;
+    top:50%;
+    width:14px;
+    height:8px;
+    background:rgba(36, 72, 48, .9);
+    border-radius:50% 50% 50% 10%;
+    transform:translateY(-50%);
+    box-shadow:0 0 8px rgba(255,255,255,.12);
+  }
+
+  .animacion.dia .particula::before {
+    left:0;
+    transform:translateY(-50%) rotate(-18deg);
+  }
+
+  .animacion.dia .particula::after {
+    right:0;
+    transform:translateY(-50%) rotate(18deg);
+  }
+
+  .animacion.dia .particula {
+    width:9px;
+    height:14px;
+    background:linear-gradient(180deg, rgba(255,233,242,1) 0%, rgba(252,177,214,1) 28%, rgba(221,90,157,1) 100%);
+    border-radius:80% 20% 80% 20%;
+    box-shadow:0 0 8px rgba(255,168,210,.25), inset -1px -2px 4px rgba(146,36,91,.18);
+    animation: petal-fall 8s linear infinite;
+    transform-origin:center;
+    position:absolute;
+    opacity:0;
+  }
+
+  .animacion.dia .particula::before,
+  .animacion.dia .particula::after {
+    content:"";
+    position:absolute;
+    inset:0;
+    background:inherit;
+    border-radius:inherit;
+    box-shadow:inherit;
+  }
+
+  .animacion.dia .particula::before {
+    transform:rotate(22deg) scale(1.04);
+  }
+
+  .animacion.dia .particula::after {
+    transform:rotate(-24deg) scale(0.96);
+  }
+
+  .globos {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:3;
+    opacity:0;
+    transition:opacity .8s ease;
+  }
+
+  .globos.visible {
+    opacity:1;
+  }
+
+  .globo {
+    position:absolute;
+    top:-12vh;
+    width:26px;
+    height:34px;
+    border-radius:50% 50% 48% 48%;
+    background:linear-gradient(180deg, #ff7aa2, #ff4d6d);
+    box-shadow:inset -8px -6px 0 rgba(255,255,255,.18), 0 0 18px rgba(255,255,255,.25);
+    animation: caer-viernes linear infinite;
+  }
+
+  .globo::before {
+    content:"";
+    position:absolute;
+    left:50%; transform:translateX(-50%);
+    bottom:-10px;
+    width:2px;
+    height:14px;
+    background:rgba(255,255,255,.7);
+  }
+
+  .globo::after {
+    content:"";
+    position:absolute;
+    left:50%; transform:translateX(-50%);
+    top:12px;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:rgba(255,255,255,.25);
+  }
+
+  .globo:nth-child(2n) { background:linear-gradient(180deg, #7bdff2, #35b7d7); }
+  .globo:nth-child(3n) { background:linear-gradient(180deg, #ffd166, #ff9f1c); }
+  .globo:nth-child(4n) { background:linear-gradient(180deg, #c77dff, #8a5cf6); }
+  .globo:nth-child(5n) { background:linear-gradient(180deg, #7ae582, #2ec27e); }
+
+  @keyframes twinkle {
+    0%, 100% { transform:scale(.5); opacity:0; }
+    30% { opacity:1; }
+    70% { transform:scale(1.5); opacity:.8; }
+  }
+
+  @keyframes bird-fly {
+    0% { transform:translate3d(-10vw,-8vh,0) scale(.8); opacity:0; }
+    15% { opacity:1; }
+    50% { transform:translate3d(40vw,12vh,0) scale(1); }
+    100% { transform:translate3d(110vw,0,0) scale(.9); opacity:0; }
+  }
+
+  @keyframes petal-fall {
+    0% {
+      transform:translate3d(0,-12vh,0) rotate(0deg) scale(.5);
+      opacity:0;
+    }
+    12% {
+      opacity:1;
+    }
+    50% {
+      transform:translate3d(calc(var(--drift, 18px) * 0.55), 52vh, 0) rotate(160deg) scale(.8);
+      opacity:1;
+    }
+    100% {
+      transform:translate3d(var(--drift, 18px), 108vh, 0) rotate(290deg) scale(.55);
+      opacity:0;
+    }
+  }
+
+  @keyframes lluvia {
+    0% { transform: translate3d(-10px, -20px, 0) skewY(-8deg); opacity: 0; }
+    20% { opacity: 0.9; }
+    100% { transform: translate3d(12px, 80px, 0) skewY(-8deg); opacity: 0.25; }
+  }
+
+  @keyframes coffee-sway {
+    0%, 100% { transform:rotate(-3deg) translateY(0); }
+    50% { transform:rotate(3deg) translateY(-4px); }
+  }
+
+  @keyframes steam-rise {
+    0% {
+      opacity:0;
+      transform:translateY(14px) scaleY(0.8);
+    }
+    30% {
+      opacity:0.7;
+    }
+    100% {
+      opacity:0;
+      transform:translateY(-18px) scaleY(1.2);
+    }
+  }
+
+  @keyframes nube-drift {
+    0% {
+      transform: translateX(-14px) scale(1);
+    }
+    100% {
+      transform: translateX(18px) scale(1.04);
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      min-height:100dvh;
+    }
+
+    main {
+      padding: 120px 18px 36px;
+      gap: 16px;
+      justify-content: flex-start;
+    }
+
+    .top-meta {
+      order: 2;
+      margin-top: 8px;
+    }
+
+    .weather-badge {
+      order: 3;
+      margin-bottom: 2px;
+      font-size: 10px;
+      padding: 7px 10px;
+      letter-spacing: .06em;
+    }
+
+    .saludo {
+      order: 1;
+      margin-top: 12px;
+      max-width: 11ch;
+      font-size: 42px;
+      line-height: .96;
+      letter-spacing: -.04em;
+    }
+
+    .dia-mensaje,
+    .firma,
+    .pie {
+      order: 4;
+      letter-spacing: .06em;
+    }
+
+    .franja,
+    .fecha-hoy {
+      font-size: 10px;
+      letter-spacing: .06em;
+    }
+
+    .dia-mensaje { font-size: 11px; }
+    .firma { font-size: 10px; }
+
+    .astro {
+      width:min(54vmin, 220px);
+      top: 23%;
+      opacity: 0.9;
+    }
+
+    .moderador-panel {
+      right: 12px;
+      top: 12px;
+      width: min(290px, calc(100vw - 24px));
+      padding: 12px 14px 10px;
+    }
+
+    .top-actions {
+      right: 12px;
+      top: 12px;
+      gap:8px;
+      z-index:36;
+    }
+
+    .game-badge,
+    .medal-badge {
+      padding: 8px 12px;
+      font-size: 9px;
+      letter-spacing: .1em;
+    }
+
+    .game-modal {
+      padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom);
+      align-items:center;
+    }
+
+    .game-panel {
+      display:flex;
+      flex-direction:column;
+      width:96vw;
+      height:88dvh;
+      max-height:88dvh;
+      padding:12px 10px calc(12px + env(safe-area-inset-bottom));
+      border-radius:18px;
+      overflow:hidden;
+      gap:12px;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    .game-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-shrink:0;
+      margin:0;
+    }
+
+    .game-kicker {
+      font-size:9px;
+      letter-spacing:.12em;
+    }
+
+    .game-header h2 {
+      margin:4px 0 0;
+      font-size:20px;
+      line-height:1.08;
+      letter-spacing:-.03em;
+    }
+
+    .game-close {
+      width:40px;
+      height:40px;
+      min-width:40px;
+      min-height:40px;
+      flex-shrink:0;
+    }
+
+    .game-status {
+      margin:0;
+      flex-shrink:0;
+    }
+
+    .game-content {
+      display:flex;
+      flex-direction:column;
+      flex:1 1 auto;
+      min-height:0;
+      gap:10px;
+    }
+
+    .game-grid {
+      width:min(100%, calc(88dvh - 260px));
+      aspect-ratio:1;
+      margin:0 auto;
+      padding:6px;
+      gap:3px;
+      border-radius:12px;
+      flex-shrink:0;
+    }
+
+    .game-cell {
+      min-width:0;
+      min-height:0;
+      font-size:17px;
+      font-weight:600;
+      border-radius:6px;
+    }
+
+    .game-words {
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      padding:10px;
+    }
+
+    .game-words ul {
+      gap:6px;
+    }
+
+    .game-words li {
+      padding:5px 8px;
+      font-size:11px;
+      letter-spacing:.02em;
+    }
+
+    .premios-grid {
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    .premio-button,
+    .respaldo-restore,
+    .respaldo-copy {
+      min-height:44px;
+      width:100%;
+    }
+
+    .respaldo-row {
+      flex-direction:column;
+    }
+
+    .respaldo-input,
+    .respaldo-copy,
+    .respaldo-restore {
+      width:100%;
+      min-height:44px;
+    }
+
+    .coffee-wrap {
+      opacity:.75;
+      transform:scale(.65);
+      transform-origin:bottom right;
+      right: 12px;
+      bottom: 10px;
+    }
+
+    .globos .globo {
+      transform: scale(.82);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important}
+    .medalla-overlay { display:none !important; }
+  }
+</style>
+</head>
+<body>
+  <aside id="moderador-panel" class="moderador-panel" aria-live="polite">
+    <h2>Panel moderador</h2>
+    <div class="estado">
+      <span>Actividad</span>
+      <span class="led" aria-hidden="true"></span>
+    </div>
+    <ul id="moderador-lista"></ul>
+  </aside>
+
+  <div class="cielo" aria-hidden="true"></div>
+  <div class="astro" aria-hidden="true"></div>
+  <div id="coffee-wrap" class="coffee-wrap" aria-hidden="true">
+    <div class="coffee-cup">
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="cup-body"></div>
+      <div class="coffee-surface"></div>
+      <div class="cup-handle"></div>
+    </div>
+  </div>
+  <div id="weather-clouds" class="weather-clouds" aria-hidden="true"></div>
+  <div id="rain-layer" class="rain-overlay" aria-hidden="true"></div>
+  <div id="animacion-dia" class="animacion" aria-hidden="true"></div>
+  <div class="globos" id="globos" aria-hidden="true">
+    <span class="globo" style="left:4%; --drift:22px; animation-duration:11s; animation-delay:0s;"></span>
+    <span class="globo" style="left:13%; --drift:-18px; animation-duration:15s; animation-delay:1s;"></span>
+    <span class="globo" style="left:22%; --drift:26px; animation-duration:12s; animation-delay:2s;"></span>
+    <span class="globo" style="left:31%; --drift:-14px; animation-duration:16s; animation-delay:0.5s;"></span>
+    <span class="globo" style="left:40%; --drift:22px; animation-duration:13s; animation-delay:3s;"></span>
+    <span class="globo" style="left:50%; --drift:-20px; animation-duration:12.5s; animation-delay:1.5s;"></span>
+    <span class="globo" style="left:59%; --drift:24px; animation-duration:14s; animation-delay:2.5s;"></span>
+    <span class="globo" style="left:68%; --drift:-16px; animation-duration:11.5s; animation-delay:3.5s;"></span>
+    <span class="globo" style="left:77%; --drift:18px; animation-duration:15.5s; animation-delay:1.8s;"></span>
+    <span class="globo" style="left:86%; --drift:-22px; animation-duration:13.5s; animation-delay:2.8s;"></span>
+    <span class="globo" style="left:94%; --drift:16px; animation-duration:12s; animation-delay:4s;"></span>
+  </div>
+
+  <div class="top-actions" aria-label="Acciones rápidas">
+    <button id="medal-badge" class="medal-badge" type="button" aria-label="Medallas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14.7 7l5 .7-3.6 3.6.9 5.2-4.9-2.6-4.9 2.6.9-5.2L4.3 7.7l5-.7L12 2.5Zm0 4.8 1.3 2.6 2.9.4-2.1 2 0 3-2.1-1.1-2.1 1.1 0-3-2.1-2 2.9-.4L12 7.3Z"/></svg>
+      <span id="medal-count">0</span>
+    </button>
+    <a id="game-badge" class="game-badge" href="#" aria-label="Juego del día">juego del día</a>
+  </div>
+
+  <div id="game-modal" class="game-modal" aria-hidden="true">
+    <div class="game-panel" role="dialog" aria-modal="true" aria-labelledby="game-title">
+      <div id="game-toast" class="game-toast" aria-live="polite"></div>
+      <div class="game-header">
+        <div>
+          <div class="game-kicker">juego del día</div>
+          <h2 id="game-title">Sopa de letras</h2>
+        </div>
+        <button id="game-close" class="game-close" type="button" aria-label="Cerrar juego">×</button>
+      </div>
+      <div id="game-status" class="game-status">Encontrá todas las palabras</div>
+      <div class="game-content">
+        <div id="game-grid" class="game-grid" aria-label="Sopa de letras"></div>
+        <div class="game-words">
+          <h3>Palabras</h3>
+          <ul id="game-word-list"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="medalla-overlay" class="medalla-overlay" aria-hidden="true" role="status">
+    <div class="medalla-card" aria-live="polite">
+      <div class="medalla-icono" aria-hidden="true">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Medalla">
+          <defs>
+            <linearGradient id="medalla-gradient" x1="0" x2="1">
+              <stop offset="0%" stop-color="#ffe29a"/>
+              <stop offset="50%" stop-color="#e9b64a"/>
+              <stop offset="100%" stop-color="#c98b17"/>
+            </linearGradient>
+          </defs>
+          <circle cx="60" cy="60" r="42" fill="url(#medalla-gradient)"/>
+          <circle cx="60" cy="60" r="32" fill="#f8f1d3" opacity="0.9"/>
+          <path d="M60 26 L66 48 L90 48 L70 61 L79 86 L60 68 L41 86 L50 61 L30 48 L54 48 Z" fill="#d59a1d"/>
+          <circle cx="60" cy="60" r="26" fill="none" stroke="#fff2c4" stroke-width="4" opacity="0.8"/>
+        </svg>
+      </div>
+      <h2>¡Ganaste una medalla!</h2>
+      <p id="medalla-total">Ya tenés 1 medalla</p>
+    </div>
+  </div>
+
+  <div id="premios-modal" class="game-modal" aria-hidden="true">
+    <div class="game-panel" role="dialog" aria-modal="true" aria-labelledby="premios-title">
+      <div id="premios-toast" class="premios-toast" aria-live="polite"></div>
+      <div class="game-header">
+        <div>
+          <div class="game-kicker">canje</div>
+          <h2 id="premios-title">Premios</h2>
+        </div>
+        <button id="premios-close" class="game-close" type="button" aria-label="Cerrar premios">×</button>
+      </div>
+      <div id="premios-saldo" class="game-status">Tenés 0 medallas</div>
+      <div id="premios-lista" class="premios-grid"></div>
+      <div id="premios-historial" class="premios-historial" aria-live="polite"></div>
+
+      <div class="respaldo-block">
+        <div class="respaldo-header">
+          <h3>Respaldo</h3>
+        </div>
+        <div class="respaldo-row">
+          <input id="respaldo-input" class="respaldo-input" type="text" placeholder="Código de respaldo" aria-label="Código de respaldo">
+          <button id="respaldo-restore" class="respaldo-restore" type="button">Restaurar</button>
+        </div>
+        <button id="respaldo-copy" class="respaldo-copy" type="button">Copiar código de respaldo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="persist-status" class="persist-status" aria-live="polite">No puedo guardar tu progreso en este navegador</div>
+
+  <main>
+    <div class="top-meta">
+      <p class="franja" id="franja">—</p>
+      <p class="fecha-hoy" id="fecha-hoy">Fecha</p>
+    </div>
+
+    <div class="weather-badge" id="weather-badge" aria-live="polite">
+      <span class="weather-dot" aria-hidden="true"></span>
+      <span id="weather-texto">Cargando clima…</span>
+    </div>
+
+    <h1 class="saludo">
+      <span id="saludo-texto">Buenos días</span>,
+      <span class="linea-nombre"><span id="nombre" aria-label="Nombre de quien recibe el saludo">Francisca</span></span>
+    </h1>
+
+    <p class="dia-mensaje" id="dia-mensaje">Feliz día</p>
+
+    <p class="firma">Santiago te manda un abrazo</p>
+
+    <div class="pie">
+      <span class="ayuda" id="ayuda"></span>
+    </div>
+  </main>
+
+<script>
+(function(){
+  const nombre = document.getElementById('nombre');
+  const franja = document.getElementById('franja');
+  const fechaHoy = document.getElementById('fecha-hoy');
+  const ayuda  = document.getElementById('ayuda');
+  const saludoTexto = document.getElementById('saludo-texto');
+  const diaMensaje = document.getElementById('dia-mensaje');
+  const globos = document.getElementById('globos');
+  const animacionDia = document.getElementById('animacion-dia');
+  const panelModerador = document.getElementById('moderador-panel');
+  const listaModerador = document.getElementById('moderador-lista');
+  const weatherBadge = document.getElementById('weather-badge');
+  const weatherTexto = document.getElementById('weather-texto');
+  const weatherClouds = document.getElementById('weather-clouds');
+  const rainLayer = document.getElementById('rain-layer');
+  const coffeeWrap = document.getElementById('coffee-wrap');
+  const cielo = document.querySelector('.cielo');
+  const DEFAULT_ESTADO = {
+    medallas: 0,
+    medallasTotales: 0,
+    historial: [],
+    canjes: []
+  };
+  const PREMIOS = [
+    { id: 'cafe', nombre: 'Un café de Rústica', costo: 3, emoji: '☕' },
+    { id: 'peli', nombre: 'Capítulo de Friends', costo: 5, emoji: '🎬' },
+    { id: 'cena', nombre: 'Unas papas de Mc', costo: 10, emoji: '🍟' },
+    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 25, emoji: '⛍' }
+  ];
+  const JUEGOS_POR_DIA = {
+    1: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] },
+    2: { nombre: 'Ahorcado', palabras: ['AMOR', 'RISA', 'FELIZ', 'BESO', 'LUZ'] },
+    3: { nombre: 'Memoria', palabras: ['CORAZON', 'MUNDO', 'BESO', 'SUEÑO', 'SILENCIO'] },
+    4: { nombre: 'Sopa de letras', palabras: ['HILARIO', 'AURA', 'MATCHA', 'JHONNY', 'UADE'] },
+    5: { nombre: 'Pares', palabras: ['PASEO', 'ARCO', 'LUZ', 'JARDIN', 'MUSICA'] },
+    6: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] },
+    0: { nombre: 'Sopa de letras', palabras: ['SOL', 'PAZ', 'LUNA', 'DIA', 'RISA', 'CIELO'] }
+  };
+
+  const TEMAS = [
+    { max:5,  id:'madrugada', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
+    { max:9,  id:'amanecer',  saludo:'Que tengas un gran día', a:'#2A2160', b:'#FF8A5B', c:'#FFC86B', astro:'#FFE3A8', y:'62%', tinta:'#FFF6EA' },
+    { max:17, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
+    { max:20, id:'atardecer', saludo:'Buenas tardes', a:'#4A1F63', b:'#E0565C', c:'#FFB05C', astro:'#FFD08A', y:'70%', tinta:'#FFF1E6' },
+    { max:24, id:'noche',     saludo:'Buenas noches', a:'#0B1030', b:'#1E1B47', c:'#332A5C', astro:'#CFD8FF', y:'34%', tinta:'#EDF1FF' }
+  ];
+
+  const MENSAJES_POR_DIA = {
+    1: 'Feliz lunes, hoy tenés baile',
+    2: 'Feliz martes',
+    3: 'Feliz miércoles, hoy tenés baile',
+    4: 'Feliz jueves',
+    5: 'Feliz viernes, buen finde!',
+    6: 'Feliz sábado',
+    0: 'Feliz domingo'
+  };
+
+  const ANIMACION_POR_DIA = {
+    1: 'lunes',
+    2: 'martes',
+    3: 'miercoles',
+    4: 'jueves',
+    5: 'viernes',
+    6: 'sabado',
+    0: 'domingo'
+  };
+
+  function formatearFecha(ahora){
+    return ahora.toLocaleDateString('es-AR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  function generarNubes(){
+    weatherClouds.innerHTML = '';
+    const total = 5;
+    for (let i = 0; i < total; i++) {
+      const nube = document.createElement('div');
+      nube.className = 'nube';
+      nube.style.left = (8 + i * 18) + '%';
+      nube.style.top = (10 + (i % 3) * 17) + '%';
+      nube.style.transform = 'scale(' + (0.7 + Math.random() * 0.7) + ')';
+      nube.style.opacity = (0.35 + Math.random() * 0.3).toFixed(2);
+      weatherClouds.appendChild(nube);
+    }
+  }
+
+  function aplicarEstadoClima(estado, hora) {
+    cielo.classList.remove('lluvia-dia', 'lluvia-noche');
+    weatherClouds.classList.remove('visible');
+    rainLayer.classList.remove('visible');
+    coffeeWrap.classList.remove('visible');
+
+    const esNoche = hora >= 18 || hora < 6;
+
+    if ((hora >= 5 && hora < 9) || (hora >= 18 && hora < 22)) {
+      coffeeWrap.classList.add('visible');
+    }
+
+    if (estado === 'nublado') {
+      generarNubes();
+      weatherClouds.classList.add('visible');
+      return;
+    }
+
+    if (estado === 'lluvioso') {
+      if (hora >= 6 && hora < 20) {
+        cielo.classList.add('lluvia-dia');
+      } else {
+        cielo.classList.add('lluvia-noche');
+      }
+      rainLayer.classList.add('visible');
+      return;
+    }
+  }
+
+  function generarParticulas(modo){
+    animacionDia.innerHTML = '';
+    animacionDia.className = 'animacion ' + modo;
+
+    const total = modo === 'noche' ? 28 : 18;
+    for (let i = 0; i < total; i++) {
+      const part = document.createElement('span');
+      part.className = 'particula';
+      part.style.left = (Math.random() * 100) + '%';
+      part.style.top = (modo === 'noche' ? -5 : -12) + 'vh';
+      part.style.animationDuration = (modo === 'noche' ? 3 + Math.random() * 5 : 6 + Math.random() * 7) + 's';
+      part.style.animationDelay = (Math.random() * 4) + 's';
+      part.style.setProperty('--drift', ((Math.random() * 60) - 30) + 'px');
+      animacionDia.appendChild(part);
+    }
+  }
+
+  function formatearHora(fecha){
+    return fecha.toLocaleTimeString('es-AR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function activarPanelModerador(){
+    const params = new URLSearchParams(window.location.search);
+    const esAdmin = params.get('moderador') === '1' || params.get('admin') === '1';
+
+    if (!esAdmin) return;
+
+    panelModerador.classList.add('visible');
+
+    const historial = JSON.parse(localStorage.getItem('visitasModerador') || '[]');
+    const ahora = new Date();
+    const registro = {
+      fecha: ahora.toISOString(),
+      texto: formatearFecha(ahora) + ' · ' + formatearHora(ahora)
+    };
+
+    historial.unshift(registro);
+    const recientes = historial.slice(0, 8);
+    localStorage.setItem('visitasModerador', JSON.stringify(recientes));
+
+    listaModerador.innerHTML = recientes.map(item => '<li>' + item.texto + '</li>').join('');
+  }
+
+  function obtenerClimaActual(codigo) {
+    if (codigo === 0) return 'soleado';
+    if ([1,2,3,45,48].includes(codigo)) return 'nublado';
+    return 'lluvioso';
+  }
+
+  async function cargarClima() {
+    try {
+      const respuesta = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.6037&longitude=-58.3816&current=temperature_2m,weather_code&timezone=auto');
+      const data = await respuesta.json();
+      const codigo = data.current?.weather_code ?? 0;
+      const temperatura = Math.round(data.current?.temperature_2m ?? 0);
+      const estado = obtenerClimaActual(codigo);
+      const hora = new Date().getHours();
+
+      weatherTexto.textContent = `${estado === 'soleado' ? 'Soleado' : estado === 'nublado' ? 'Nublado' : 'Lluvia'} · ${temperatura}°C`;
+      weatherBadge.style.color = estado === 'lluvioso' ? '#d9f3ff' : estado === 'nublado' ? '#edf6ff' : '#fff1bf';
+      aplicarEstadoClima(estado, hora);
+    } catch (error) {
+      weatherTexto.textContent = 'Clima no disponible';
+      weatherBadge.style.color = '#fff1bf';
+      aplicarEstadoClima('soleado', new Date().getHours());
+    }
+  }
+
+  function obtenerJuegoDelDia() {
+    const hoy = new Date().getDay();
+    return JUEGOS_POR_DIA[hoy] || JUEGOS_POR_DIA[1];
+  }
+
+  function normalizarEstado(estado) {
+    const base = JSON.parse(JSON.stringify(DEFAULT_ESTADO));
+    if (!estado || typeof estado !== 'object') return base;
+    return {
+      medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
+      medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
+      historial: Array.isArray(estado.historial) ? estado.historial : [],
+      canjes: Array.isArray(estado.canjes) ? estado.canjes : []
+    };
+  }
+
+  const Almacen = {
+    defaultState() {
+      return JSON.parse(JSON.stringify(DEFAULT_ESTADO));
+    },
+    _hayLocalStorage() {
+      try {
+        const key = '__saludo_probe__';
+        if (typeof window === 'undefined' || !window.localStorage) return false;
+        window.localStorage.setItem(key, '1');
+        window.localStorage.removeItem(key);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    _leerCookie() {
+      const raw = document.cookie
+        .split('; ')
+        .find(item => item.startsWith('estadoUsuario='));
+      if (!raw) return null;
+
+      try {
+        const value = decodeURIComponent(raw.split('=').slice(1).join('='));
+        const json = atob(value);
+        return JSON.parse(json);
+      } catch (error) {
+        return null;
+      }
+    },
+    _guardarCookie(estado) {
+      const payload = JSON.stringify(estado);
+      const base64 = btoa(encodeURIComponent(payload));
+      const compact = payload.length < 3500 ? base64 : btoa(encodeURIComponent(JSON.stringify({
+        medallas: Number(estado.medallas) || 0,
+        medallasTotales: Number(estado.medallasTotales) || 0
+      })));
+      const expires = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = `estadoUsuario=${encodeURIComponent(compact)}; expires=${expires}; path=/; SameSite=Lax`;
+    },
+    _leerIndexedDB() {
+      return new Promise((resolve) => {
+        if (!('indexedDB' in window)) {
+          resolve(null);
+          return;
+        }
+
+        const request = indexedDB.open('saludo', 1);
+        request.onupgradeneeded = function () {
+          const db = request.result;
+          if (!db.objectStoreNames.contains('estado')) {
+            db.createObjectStore('estado');
+          }
+        };
+        request.onsuccess = function () {
+          const db = request.result;
+          const tx = db.transaction('estado', 'readonly');
+          const store = tx.objectStore('estado');
+          const getRequest = store.get('usuario');
+          getRequest.onsuccess = function () {
+            resolve(getRequest.result || null);
+          };
+          getRequest.onerror = function () {
+            resolve(null);
+          };
+        };
+        request.onerror = function () {
+          resolve(null);
+        };
+      });
+    },
+    async _guardarIndexedDB(estado) {
+      if (!('indexedDB' in window)) return false;
+      return new Promise((resolve) => {
+        const request = indexedDB.open('saludo', 1);
+        request.onupgradeneeded = function () {
+          const db = request.result;
+          if (!db.objectStoreNames.contains('estado')) {
+            db.createObjectStore('estado');
+          }
+        };
+        request.onsuccess = function () {
+          const db = request.result;
+          const tx = db.transaction('estado', 'readwrite');
+          const store = tx.objectStore('estado');
+          store.put(estado, 'usuario');
+          tx.oncomplete = function () { resolve(true); };
+          tx.onerror = function () { resolve(false); };
+        };
+        request.onerror = function () { resolve(false); };
+      });
+    },
+    async leer() {
+      const fuentes = [];
+
+      try {
+        if (this._hayLocalStorage()) {
+          const raw = window.localStorage.getItem('estadoUsuario');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            fuentes.push(normalizarEstado(parsed));
+          }
+        }
+      } catch (error) {}
+
+      try {
+        const idb = await this._leerIndexedDB();
+        if (idb) {
+          fuentes.push(normalizarEstado(idb));
+        }
+      } catch (error) {}
+
+      try {
+        const cookie = this._leerCookie();
+        if (cookie) {
+          fuentes.push(normalizarEstado(cookie));
+        }
+      } catch (error) {}
+
+      if (!fuentes.length) return this.defaultState();
+
+      const mejor = fuentes.reduce((masAvanzado, actual) => {
+        const scoreActual = Number(actual.medallasTotales) || 0;
+        const scoreMasAvanzado = Number(masAvanzado.medallasTotales) || 0;
+        return scoreActual > scoreMasAvanzado ? actual : masAvanzado;
+      }, fuentes[0]);
+
+      await this.guardar(mejor);
+      return mejor;
+    },
+    async guardar(estado) {
+      const limpio = normalizarEstado(estado);
+      let huboPersistencia = false;
+
+      try {
+        if (this._hayLocalStorage()) {
+          window.localStorage.setItem('estadoUsuario', JSON.stringify(limpio));
+          huboPersistencia = true;
+        }
+      } catch (error) {}
+
+      try {
+        const ok = await this._guardarIndexedDB(limpio);
+        if (ok) huboPersistencia = true;
+      } catch (error) {}
+
+      try {
+        this._guardarCookie(limpio);
+        huboPersistencia = true;
+      } catch (error) {}
+
+      if (!huboPersistencia) {
+        mostrarAvisoPersistencia();
+      } else {
+        ocultarAvisoPersistencia();
+      }
+
+      return limpio;
+    },
+    exportar() {
+      const estado = normalizarEstado(leerEstado());
+      const json = JSON.stringify(estado);
+      return btoa(encodeURIComponent(json));
+    },
+    async importar(codigo) {
+      if (!codigo || typeof codigo !== 'string') {
+        mostrarToastPremios('Código inválido');
+        return false;
+      }
+
+      try {
+        const json = decodeURIComponent(atob(codigo));
+        const parsed = JSON.parse(json);
+        const estado = normalizarEstado(parsed);
+        if (!estado || !Array.isArray(estado.historial) || !Array.isArray(estado.canjes)) {
+          mostrarToastPremios('Código inválido');
+          return false;
+        }
+
+        await this.guardar(estado);
+        actualizarBadgeMedallas();
+        renderPremios();
+        mostrarToastPremios('Respaldo restaurado');
+        return true;
+      } catch (error) {
+        mostrarToastPremios('Código inválido');
+        return false;
+      }
+    }
+  };
+
+  function mostrarAvisoPersistencia() {
+    const aviso = document.getElementById('persist-status');
+    if (!aviso) return;
+    aviso.classList.add('visible');
+  }
+
+  function ocultarAvisoPersistencia() {
+    const aviso = document.getElementById('persist-status');
+    if (!aviso) return;
+    aviso.classList.remove('visible');
+  }
+
+  function leerEstado() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const raw = window.localStorage.getItem('estadoUsuario');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return normalizarEstado(parsed);
+        }
+      }
+    } catch (error) {}
+
+    try {
+      const raw = document.cookie
+        .split('; ')
+        .find(item => item.startsWith('estadoUsuario='));
+      if (raw) {
+        const value = decodeURIComponent(raw.split('=').slice(1).join('='));
+        const json = atob(value);
+        return normalizarEstado(JSON.parse(json));
+      }
+    } catch (error) {}
+
+    return normalizarEstado(JSON.parse(JSON.stringify(DEFAULT_ESTADO)));
+  }
+
+  function guardarEstado(estado) {
+    return Almacen.guardar(estado);
+  }
+
+  function formatearFechaCorta(fechaIso) {
+    if (!fechaIso) return '—';
+    const fecha = new Date(fechaIso + 'T00:00:00');
+    return fecha.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  function hoyClave() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function mostrarToastGame(mensaje) {
+    const toast = document.getElementById('game-toast');
+    if (!toast) return;
+    toast.textContent = mensaje;
+    toast.classList.remove('visible');
+    void toast.offsetWidth;
+    toast.classList.add('visible');
+    window.clearTimeout(toast._timer);
+    toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 1800);
+  }
+
+  function mostrarMedallaOverlay() {
+    const overlay = document.getElementById('medalla-overlay');
+    const total = Number((leerEstado().medallas) || 0);
+    const texto = document.getElementById('medalla-total');
+    if (!overlay || !texto) return;
+
+    texto.textContent = total === 1 ? 'Ya tenés 1 medalla' : `Ya tenés ${total} medallas`;
+    overlay.classList.add('visible');
+    overlay.setAttribute('aria-hidden', 'false');
+    if (overlay._timer) {
+      window.clearTimeout(overlay._timer);
+    }
+    overlay._timer = window.setTimeout(() => ocultarMedallaOverlay(), 4000);
+  }
+
+  function ocultarMedallaOverlay() {
+    const overlay = document.getElementById('medalla-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('visible');
+    overlay.setAttribute('aria-hidden', 'true');
+    window.clearTimeout(overlay._timer);
+    if (!document.querySelector('.game-modal.visible') && !document.querySelector('#premios-modal.visible')) {
+      toggleBodyModalLock(false);
+    }
+  }
+
+  function mostrarToastPremios(mensaje) {
+    const toast = document.getElementById('premios-toast');
+    if (!toast) return;
+    toast.textContent = mensaje;
+    toast.classList.remove('visible');
+    void toast.offsetWidth;
+    toast.classList.add('visible');
+    window.clearTimeout(toast._timer);
+    toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 1800);
+  }
+
+  function actualizarBadgeMedallas() {
+    const estado = leerEstado();
+    const badge = document.getElementById('medal-count');
+    if (badge) {
+      badge.textContent = String(Number(estado.medallas) || 0);
+    }
+  }
+
+  function yaGanoMedallaHoy() {
+    const estado = leerEstado();
+    const fecha = hoyClave();
+    const juegoActual = obtenerJuegoDelDia().nombre;
+    return estado.historial.some(item => item && item.fecha === fecha && item.juego === juegoActual);
+  }
+
+  function ganarMedalla() {
+    const estado = leerEstado();
+    const fecha = hoyClave();
+    const juegoActual = obtenerJuegoDelDia().nombre;
+
+    if (estado.historial.some(item => item && item.fecha === fecha && item.juego === juegoActual)) {
+      const status = document.getElementById('game-status');
+      if (status) {
+        status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
+      }
+      return;
+    }
+
+    const nuevoEstado = {
+      ...estado,
+      medallas: (Number(estado.medallas) || 0) + 1,
+      medallasTotales: (Number(estado.medallasTotales) || 0) + 1,
+      historial: [{ fecha, juego: juegoActual }, ...(Array.isArray(estado.historial) ? estado.historial : [])]
+    };
+
+    guardarEstado(nuevoEstado);
+    actualizarBadgeMedallas();
+    renderPremios();
+
+    const status = document.getElementById('game-status');
+    if (status) {
+      status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
+    }
+
+    const modal = document.getElementById('game-modal');
+    if (modal && modal.classList.contains('visible')) {
+      cerrarJuegoDelDia();
+    }
+
+    const cells = document.querySelectorAll('#game-grid .game-cell');
+    cells.forEach(cell => cell.classList.add('correct'));
+
+    mostrarMedallaOverlay();
+  }
+
+  function renderPremios() {
+    const estado = leerEstado();
+    const saldo = document.getElementById('premios-saldo');
+    const lista = document.getElementById('premios-lista');
+    const historial = document.getElementById('premios-historial');
+
+    if (saldo) {
+      saldo.textContent = `Tenés ${Number(estado.medallas) || 0} medallas`;
+    }
+
+    if (lista) {
+      lista.innerHTML = PREMIOS.map((premio) => {
+        const disponible = (Number(estado.medallas) || 0) >= premio.costo;
+        const faltan = Math.max(0, premio.costo - (Number(estado.medallas) || 0));
+        return `
+          <article class="premio-card ${disponible ? '' : 'disabled'}">
+            <div class="premio-top">
+              <span class="premio-emoji" aria-hidden="true">${premio.emoji}</span>
+              <span class="premio-costo">${premio.costo} medallas</span>
+            </div>
+            <h3>${premio.nombre}</h3>
+            <button class="premio-button" type="button" data-premio-id="${premio.id}" ${disponible ? '' : 'disabled'}>
+              ${disponible ? 'Canjear' : `Te faltan ${faltan} medallas`}
+            </button>
+          </article>
+        `;
+      }).join('');
+
+      lista.querySelectorAll('.premio-button').forEach((boton) => {
+        boton.addEventListener('click', function () {
+          const premio = PREMIOS.find(item => item.id === this.dataset.premioId);
+          if (!premio) return;
+
+          const actual = leerEstado();
+          if ((Number(actual.medallas) || 0) < premio.costo) {
+            mostrarToastPremios(`Te faltan ${premio.costo - (Number(actual.medallas) || 0)} medallas`);
+            return;
+          }
+
+          const confirmar = window.confirm(`¿Querés canjear "${premio.nombre}" por ${premio.costo} medallas?`);
+          if (!confirmar) return;
+
+          const nuevoEstado = {
+            ...actual,
+            medallas: (Number(actual.medallas) || 0) - premio.costo,
+            canjes: [
+              ...(Array.isArray(actual.canjes) ? actual.canjes : []),
+              { id: premio.id, nombre: premio.nombre, costo: premio.costo, fecha: hoyClave() }
+            ]
+          };
+
+          guardarEstado(nuevoEstado);
+          actualizarBadgeMedallas();
+          renderPremios();
+          mostrarToastPremios('Canje realizado');
+        });
+      });
+    }
+
+    if (historial) {
+      const canjes = Array.isArray(estado.canjes) ? estado.canjes : [];
+      if (canjes.length === 0) {
+        historial.innerHTML = '';
+      } else {
+        historial.innerHTML = `
+          <h3>Ya canjeaste</h3>
+          <ul>
+            ${canjes.map(item => `<li>${item.nombre} · ${formatearFechaCorta(item.fecha)}</li>`).join('')}
+          </ul>
+        `;
+      }
+    }
+
+    const input = document.getElementById('respaldo-input');
+    const copyButton = document.getElementById('respaldo-copy');
+    const restoreButton = document.getElementById('respaldo-restore');
+
+    if (copyButton) {
+      copyButton.onclick = async function () {
+        const codigo = Almacen.exportar();
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(codigo);
+          } else {
+            if (input) {
+              input.value = codigo;
+              input.focus();
+              input.select();
+            }
+          }
+          mostrarToastPremios('Código copiado');
+          if (input) {
+            input.value = codigo;
+          }
+        } catch (error) {
+          if (input) {
+            input.value = codigo;
+            input.focus();
+            input.select();
+          }
+          mostrarToastPremios('Código listo');
+        }
+      };
+    }
+
+    if (restoreButton) {
+      restoreButton.onclick = async function () {
+        const codigo = input ? input.value.trim() : '';
+        const ok = await Almacen.importar(codigo);
+        if (ok) {
+          actualizarBadgeMedallas();
+          renderPremios();
+        }
+      };
+    }
+  }
+
+  function abrirPremios() {
+    renderPremios();
+    const modal = document.getElementById('premios-modal');
+    if (!modal) return;
+    modal.classList.add('visible');
+    modal.setAttribute('aria-hidden', 'false');
+    toggleBodyModalLock(true);
+  }
+
+  function cerrarPremios() {
+    const modal = document.getElementById('premios-modal');
+    if (!modal) return;
+    modal.classList.remove('visible');
+    modal.setAttribute('aria-hidden', 'true');
+    if (!document.querySelector('.game-modal.visible') && !document.querySelector('#premios-modal.visible')) {
+      toggleBodyModalLock(false);
+    }
+  }
+
+  let temporizadorSopaId = null;
+
+  function bloquearJuegoPorTiempo() {
+    const cells = document.querySelectorAll('#game-grid .game-cell');
+    cells.forEach((cell) => {
+      cell.disabled = true;
+      cell.setAttribute('aria-disabled', 'true');
+      cell.classList.add('locked');
+    });
+
+    const status = document.getElementById('game-status');
+    if (status) {
+      status.textContent = 'Te quedaste sin tiempo!';
+      status.classList.add('timeout');
+    }
+  }
+
+  function iniciarTemporizadorSopa(status) {
+    if (temporizadorSopaId) {
+      clearInterval(temporizadorSopaId);
+      temporizadorSopaId = null;
+    }
+
+    let restante = 120;
+
+    const actualizar = () => {
+      const minutos = String(Math.floor(restante / 60)).padStart(2, '0');
+      const segundos = String(restante % 60).padStart(2, '0');
+
+      if (status) {
+        status.textContent = `Tiempo: ${minutos}:${segundos} · Encontrá todas las palabras`;
+        status.classList.remove('timeout');
+      }
+
+      if (restante <= 0) {
+        clearInterval(temporizadorSopaId);
+        temporizadorSopaId = null;
+        bloquearJuegoPorTiempo();
+        return;
+      }
+
+      restante -= 1;
+    };
+
+    actualizar();
+    temporizadorSopaId = setInterval(actualizar, 1000);
+  }
+
+  function renderizarSopaDeLetras() {
+    const juego = obtenerJuegoDelDia();
+    const title = document.getElementById('game-title');
+    const grid = document.getElementById('game-grid');
+    const wordList = document.getElementById('game-word-list');
+    const status = document.getElementById('game-status');
+    const size = 8;
+    const board = Array.from({ length: size }, () => Array(size).fill(''));
+    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const palabras = juego.palabras.slice(0, 6);
+    const palabrasColocadas = [];
+    const direcciones = [
+      [0, 1], [1, 0], [1, 1], [1, -1],
+      [0, -1], [-1, 0], [-1, -1], [-1, 1]
+    ];
+
+    function intentarColocar(palabra) {
+      const ordenDirecciones = [...direcciones].sort(() => Math.random() - 0.5);
+
+      for (const [dr, dc] of ordenDirecciones) {
+        for (let row = 0; row < size; row++) {
+          for (let col = 0; col < size; col++) {
+            const posiciones = [];
+            let cabe = true;
+
+            for (let i = 0; i < palabra.length; i++) {
+              const r = row + dr * i;
+              const c = col + dc * i;
+
+              if (r < 0 || r >= size || c < 0 || c >= size) {
+                cabe = false;
+                break;
+              }
+
+              const letraActual = board[r][c];
+              if (letraActual !== '' && letraActual !== palabra[i]) {
+                cabe = false;
+                break;
+              }
+
+              posiciones.push({ row: r, col: c });
+            }
+
+            if (!cabe) continue;
+
+            posiciones.forEach((pos, index) => {
+              board[pos.row][pos.col] = palabra[index];
+            });
+
+            palabrasColocadas.push({ palabra, posiciones });
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    for (const palabra of palabras) {
+      const pudo = intentarColocar(palabra);
+      if (!pudo) {
+        const fallback = [
+          { palabra: 'SOL', posiciones: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }] },
+          { palabra: 'PAZ', posiciones: [{ row: 1, col: 3 }, { row: 1, col: 4 }, { row: 1, col: 5 }] },
+          { palabra: 'LUNA', posiciones: [{ row: 2, col: 0 }, { row: 3, col: 0 }, { row: 4, col: 0 }, { row: 5, col: 0 }] },
+          { palabra: 'DIA', posiciones: [{ row: 3, col: 2 }, { row: 4, col: 3 }, { row: 5, col: 4 }] },
+          { palabra: 'RISA', posiciones: [{ row: 6, col: 1 }, { row: 6, col: 2 }, { row: 6, col: 3 }, { row: 6, col: 4 }] },
+          { palabra: 'CIELO', posiciones: [{ row: 7, col: 0 }, { row: 7, col: 1 }, { row: 7, col: 2 }, { row: 7, col: 3 }, { row: 7, col: 4 }] }
+        ];
+
+        const mapa = fallback.find(item => item.palabra === palabra);
+        if (mapa) {
+          mapa.posiciones.forEach((pos, index) => {
+            board[pos.row][pos.col] = palabra[index];
+          });
+          palabrasColocadas.push(mapa);
+        }
+      }
+    }
+
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        if (!board[row][col]) {
+          board[row][col] = letras[Math.floor(Math.random() * letras.length)];
+        }
+      }
+    }
+
+    title.textContent = juego.nombre;
+    grid.innerHTML = '';
+    const palabrasAdivinadas = new Set();
+    const seleccionActual = [];
+    const yaGanadoHoy = yaGanoMedallaHoy();
+
+    function coincideConPalabraSeleccionada() {
+      const seleccionCoords = seleccionActual.map(item => [Number(item.dataset.row), Number(item.dataset.col)]);
+      if (!seleccionCoords.length) return null;
+
+      for (const palabraColocada of palabrasColocadas) {
+        const target = palabraColocada.posiciones.map(pos => [pos.row, pos.col]);
+        if (seleccionCoords.length !== target.length) continue;
+
+        const igual = seleccionCoords.every((coord, index) => coord[0] === target[index][0] && coord[1] === target[index][1]);
+        const invertido = seleccionCoords.every((coord, index) => coord[0] === target[target.length - 1 - index][0] && coord[1] === target[target.length - 1 - index][1]);
+        if (igual || invertido) {
+          return palabraColocada.palabra;
+        }
+      }
+      return null;
+    }
+
+    if (status) {
+      if (yaGanadoHoy) {
+        status.textContent = 'Ya ganaste la medalla de hoy, volvé mañana';
+      } else {
+        iniciarTemporizadorSopa(status);
+      }
+    }
+
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'game-cell';
+        cell.textContent = board[row][col];
+        cell.dataset.row = String(row);
+        cell.dataset.col = String(col);
+        cell.setAttribute('aria-label', 'Letra ' + board[row][col]);
+
+        if (yaGanadoHoy) {
+          cell.classList.add('correct');
+          cell.disabled = true;
+        }
+
+        cell.addEventListener('click', () => {
+          if (yaGanadoHoy || cell.disabled || (status && status.textContent === 'Te quedaste sin tiempo!')) return;
+
+          const yaSeleccionada = seleccionActual.includes(cell);
+          if (yaSeleccionada) {
+            seleccionActual.splice(seleccionActual.indexOf(cell), 1);
+            cell.classList.remove('selected');
+            return;
+          }
+
+          seleccionActual.push(cell);
+          cell.classList.add('selected');
+
+          const palabraEncontrada = coincideConPalabraSeleccionada();
+          if (palabraEncontrada) {
+            palabrasAdivinadas.add(palabraEncontrada);
+            const palabraItem = Array.from(wordList.children).find(item => item.textContent === palabraEncontrada);
+            if (palabraItem) {
+              palabraItem.classList.add('found');
+            }
+            seleccionActual.forEach(item => {
+              item.classList.remove('selected');
+              item.classList.add('correct');
+            });
+            seleccionActual.length = 0;
+
+            if (juego.palabras.every(palabra => palabrasAdivinadas.has(palabra))) {
+              if (temporizadorSopaId) {
+                clearInterval(temporizadorSopaId);
+                temporizadorSopaId = null;
+              }
+              ganarMedalla();
+            }
+            return;
+          }
+
+          if (seleccionActual.length > Math.max(...palabras.map(p => p.length))) {
+            seleccionActual.forEach(item => item.classList.remove('selected'));
+            seleccionActual.length = 0;
+          }
+        });
+
+        grid.appendChild(cell);
+      }
+    }
+
+    wordList.innerHTML = '';
+    palabras.forEach((palabra) => {
+      const item = document.createElement('li');
+      item.textContent = palabra;
+      wordList.appendChild(item);
+    });
+  }
+
+  function toggleBodyModalLock(isOpen) {
+    document.body.classList.toggle('modal-open', isOpen);
+  }
+
+  function abrirJuegoDelDia() {
+    const modal = document.getElementById('game-modal');
+    renderizarSopaDeLetras();
+    modal.classList.add('visible');
+    modal.setAttribute('aria-hidden', 'false');
+    toggleBodyModalLock(true);
+  }
+
+  function cerrarJuegoDelDia() {
+    const modal = document.getElementById('game-modal');
+    if (!modal) return;
+    modal.classList.remove('visible');
+    modal.setAttribute('aria-hidden', 'true');
+    toggleBodyModalLock(false);
+  }
+
+  function pintarCielo(){
+    const ahora = new Date();
+    const h = ahora.getHours();
+    const dia = ahora.getDay();
+    const esCumple = ahora.getMonth() === 8 && ahora.getDate() === 7;
+    const t = TEMAS.find(x => h < x.max) || TEMAS[TEMAS.length - 1];
+    const r = document.documentElement.style;
+    r.setProperty('--cielo-a', t.a);
+    r.setProperty('--cielo-b', t.b);
+    r.setProperty('--cielo-c', t.c);
+    r.setProperty('--astro', t.astro);
+    r.setProperty('--astro-y', t.y);
+    r.setProperty('--tinta', t.tinta);
+    r.setProperty('--tinta-suave', t.tinta + '9E');
+    const hora = String(h).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
+
+    const modo = (h >= 5 && h < 23) ? 'dia' : 'noche';
+    generarParticulas(modo);
+    fechaHoy.textContent = formatearFecha(ahora);
+    franja.textContent = hora + ' · ' + t.id;
+
+    if (esCumple) {
+      saludoTexto.textContent = 'Feliz cumpleaños';
+      diaMensaje.textContent = '7 de septiembre, hoy es tu día';
+      globos.classList.add('visible');
+      return;
+    }
+
+    saludoTexto.textContent = t.saludo;
+    diaMensaje.textContent = MENSAJES_POR_DIA[dia] || 'Feliz día';
+    globos.classList.remove('visible');
+  }
+
+  const gameBadge = document.getElementById('game-badge');
+  const gameModal = document.getElementById('game-modal');
+  const gameClose = document.getElementById('game-close');
+  const medalBadge = document.getElementById('medal-badge');
+  const premiosModal = document.getElementById('premios-modal');
+  const premiosClose = document.getElementById('premios-close');
+  const medallaOverlay = document.getElementById('medalla-overlay');
+
+  gameBadge.addEventListener('click', function(event) {
+    event.preventDefault();
+    abrirJuegoDelDia();
+  });
+
+  medalBadge.addEventListener('click', function() {
+    abrirPremios();
+  });
+
+  gameClose.addEventListener('click', cerrarJuegoDelDia);
+  gameModal.addEventListener('click', function(event) {
+    if (event.target === gameModal) {
+      cerrarJuegoDelDia();
+    }
+  });
+
+  if (medallaOverlay) {
+    medallaOverlay.addEventListener('click', function(event) {
+      if (event.target === medallaOverlay) {
+        ocultarMedallaOverlay();
+      }
+    });
+  }
+
+  premiosClose.addEventListener('click', cerrarPremios);
+  premiosModal.addEventListener('click', function(event) {
+    if (event.target === premiosModal) {
+      cerrarPremios();
+    }
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      cerrarJuegoDelDia();
+      cerrarPremios();
+      if (medallaOverlay && medallaOverlay.classList.contains('visible')) {
+        ocultarMedallaOverlay();
+      }
+    }
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      Almacen.guardar(leerEstado());
+    }
+  });
+
+  (async function iniciarPersistencia() {
+    try {
+      const estado = await Almacen.leer();
+      if (!estado || typeof estado !== 'object') return;
+      const estadoNormalizado = normalizarEstado(estado);
+      const saldo = Number(estadoNormalizado.medallas) || 0;
+      const total = Number(estadoNormalizado.medallasTotales) || 0;
+      if (saldo === 0 && total === 0 && (!estadoNormalizado.historial || !estadoNormalizado.historial.length) && (!estadoNormalizado.canjes || !estadoNormalizado.canjes.length)) {
+        return;
+      }
+      const estadoActual = JSON.parse(JSON.stringify({
+        medallas: saldo,
+        medallasTotales: total,
+        historial: Array.isArray(estadoNormalizado.historial) ? estadoNormalizado.historial : [],
+        canjes: Array.isArray(estadoNormalizado.canjes) ? estadoNormalizado.canjes : []
+      }));
+      await Almacen.guardar(estadoActual);
+      actualizarBadgeMedallas();
+      renderPremios();
+    } catch (error) {
+      mostrarAvisoPersistencia();
+    }
+  })();
+
+  activarPanelModerador();
+  actualizarBadgeMedallas();
+  renderPremios();
+  pintarCielo();
+  cargarClima();
+  setInterval(pintarCielo, 60000);
+  setInterval(cargarClima, 600000);
+})();
+</script>
+</body>
+</html>
