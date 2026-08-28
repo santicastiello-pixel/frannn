@@ -544,6 +544,37 @@
     display:none;
   }
 
+  .game-lock-panel {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    min-height:180px;
+    padding:20px 16px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.12);
+    background:linear-gradient(180deg, rgba(255, 202, 109, 0.13), rgba(255,255,255,0.03));
+    text-align:center;
+  }
+
+  .game-lock-text {
+    margin:0;
+    font-size:15px;
+    line-height:1.5;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#f5f1ff;
+  }
+
+  .game-lock-countdown {
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:18px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#ffd98a;
+  }
+
   .game-option {
     width:100%;
     text-align:left;
@@ -4698,9 +4729,72 @@
 
   let juegoActivoDesmontar = null;
 
+  // Bloqueo único de lanzamiento: 28/08/2026 hasta las 10:00 AR.
+  // Pasada esa hora esta función devuelve false para siempre.
+  // Se puede borrar junto con el bloque .game-lock-panel del CSS después del 28.
+  const FIN_BLOQUEO_MS = Date.UTC(2026, 7, 28, 13, 0, 0);  // 10:00 AR = 13:00 UTC
+
+  function juegosBloqueadosPorHoy() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('bloqueo') === '1') return true;   // forzar, solo para probar
+    if (diaLogicoOverrideActivo()) return false;
+    return Date.now() < FIN_BLOQUEO_MS;
+  }
+
+  function formatearCuentaRegresiva(ms) {
+    const totalSegundos = Math.max(0, Math.ceil(ms / 1000));
+    const horas = String(Math.floor(totalSegundos / 3600)).padStart(2, '0');
+    const minutos = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2, '0');
+    const segundos = String(totalSegundos % 60).padStart(2, '0');
+    return `${horas}:${minutos}:${segundos}`;
+  }
+
+  function actualizarCartelBloqueo() {
+    const menu = document.getElementById('game-menu');
+    if (!menu || !menu.dataset.bloqueado) return;
+    const countdown = menu.querySelector('#game-lock-countdown');
+    if (!countdown) return;
+
+    const restante = FIN_BLOQUEO_MS - Date.now();
+    if (restante <= 0) {
+      countdown.textContent = '00:00:00';
+      if (menu._countdownId) {
+        window.clearInterval(menu._countdownId);
+        menu._countdownId = null;
+      }
+      renderMenuJuegos();
+      return;
+    }
+
+    countdown.textContent = formatearCuentaRegresiva(restante);
+  }
+
   function renderMenuJuegos() {
     const menu = document.getElementById('game-menu');
     if (!menu) return;
+
+    if (juegosBloqueadosPorHoy()) {
+      menu.dataset.bloqueado = '1';
+      menu.innerHTML = `
+        <div class="game-lock-panel">
+          <p class="game-lock-text">LOS JUEGOS VAN A ESTAR LISTOS A LAS 10:00. PACIENCIA FRAN</p>
+          <div id="game-lock-countdown" class="game-lock-countdown">00:00:00</div>
+        </div>
+      `;
+      actualizarCartelBloqueo();
+      if (!menu._countdownId) {
+        menu._countdownId = window.setInterval(actualizarCartelBloqueo, 1000);
+      }
+      const status = document.getElementById('game-status');
+      if (status) status.textContent = 'Los juegos abren a las 10:00';
+      return;
+    }
+
+    if (menu._countdownId) {
+      window.clearInterval(menu._countdownId);
+      menu._countdownId = null;
+    }
+    delete menu.dataset.bloqueado;
 
     const hoyId = obtenerJuegoDelDia().id;
     const entries = Object.keys(JUEGOS);
@@ -4724,6 +4818,14 @@
   }
 
   function abrirJuegoPorId(juegoId) {
+    if (juegosBloqueadosPorHoy()) {
+      const menu = document.getElementById('game-menu');
+      if (menu) renderMenuJuegos();
+      const status = document.getElementById('game-status');
+      if (status) status.textContent = 'Los juegos abren a las 10:00';
+      return;
+    }
+
     const juego = obtenerJuegoPorId(juegoId);
     const ganado = yaGanoMedallaHoy(juego.id);
     const perdido = yaPerdioHoy(juego.id) && !ganado;
@@ -4824,10 +4926,15 @@
   function cerrarJuegoDelDia() {
     const modal = document.getElementById('game-modal');
     const stage = document.getElementById('game-stage');
+    const menu = document.getElementById('game-menu');
 
     if (typeof juegoActivoDesmontar === 'function') {
       juegoActivoDesmontar();
       juegoActivoDesmontar = null;
+    }
+    if (menu && menu._countdownId) {
+      window.clearInterval(menu._countdownId);
+      menu._countdownId = null;
     }
     if (stage) {
       stage.innerHTML = '';
@@ -4972,11 +5079,14 @@
   }
 
   let diaVisible = diaLogico();
+  let bloqueoVisible = juegosBloqueadosPorHoy();
 
   function comprobarCambioDeDia() {
     const nuevoDia = diaLogico();
-    if (nuevoDia === diaVisible) return;
+    const nuevoBloqueo = juegosBloqueadosPorHoy();
+    if (nuevoDia === diaVisible && nuevoBloqueo === bloqueoVisible) return;
     diaVisible = nuevoDia;
+    bloqueoVisible = nuevoBloqueo;
     renderMenuJuegos();
     pintarCielo();
     activarPanelModerador();
