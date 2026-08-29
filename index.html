@@ -60,34 +60,19 @@
     filter:blur(.5px);
     box-shadow:0 0 90px 30px color-mix(in srgb, var(--astro) 45%, transparent);
     animation: entrada-sol 7.5s cubic-bezier(.18,.72,.18,1) forwards, brillo-sol 14s ease-in-out infinite 7.5s;
-    transition:top 1.2s ease, background .9s ease;
-    display:grid;
-    place-items:center;
+    transition:top 1.2s ease, background .9s ease, box-shadow .9s ease;
     opacity:0;
   }
 
-  .astro::after{
-    content:"";
-    display:block;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:clamp(15px,4vw,54px);
-    font-weight:400 ;
-    letter-spacing:.08em;
-    color:rgba(255, 227, 115, 0.8);
-    transform:translateY(2px);
-  }
-
   .astro.moon {
-    background:linear-gradient(180deg, #eef3ff 0%, #dfe9ff 100%);
-    border:1px solid rgba(212, 225, 255, 0.75);
-    box-shadow:0 0 44px rgba(214,225,255,0.42), inset -18px -18px 0 rgba(44,52,86,0.08);
-    overflow:hidden;
+    background:var(--astro);
+    box-shadow:0 0 90px 30px color-mix(in srgb, var(--astro) 45%, transparent);
   }
 
-  .astro.moon svg {
-    display:block;
-    width:100%;
-    height:100%;
+  @media (prefers-reduced-motion: reduce) {
+    .astro {
+      animation: none;
+    }
   }
 
   @keyframes entrada-sol {
@@ -1169,99 +1154,34 @@
     margin:0;
   }
 
-  .top5-shell {
-    width:min(100%, 300px);
-    margin:0 auto;
+  .m10-shell {
     display:flex;
     flex-direction:column;
-    gap:clamp(6px, 1vh, 10px);
-    align-items:stretch;
+    gap:10px;
+    width:min(440px, 100%);
+    margin:0 auto;
     flex:1 1 auto;
     min-height:0;
-    justify-content:center;
+    justify-content:flex-start;
   }
 
-  .top5-shell.top5-compact .top5-row {
-    padding:3px 6px;
-  }
-
-  .top5-shell.top5-compact .top5-input,
-  .top5-shell.top5-compact .top5-num,
-  .top5-shell.top5-compact .top5-check {
-    font-size:11px;
-  }
-
-  .top5-input-row {
+  .m10-header {
     display:flex;
-    align-items:stretch;
-    gap:8px;
-    width:100%;
-  }
-
-  .top5-guess {
-    flex:1 1 auto;
-    width:100%;
-    min-width:0;
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.04);
-    border-radius:12px;
-    color:#f5f1ff;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    min-height:36px;
-    padding:8px 10px;
-    outline:none;
-    transition:border-color .12s ease, background .12s ease, transform .12s ease;
-  }
-
-  .top5-guess:focus {
-    border-color:rgba(255, 204, 106, 0.7);
-    background:rgba(255,255,255,0.05);
-  }
-
-  @media (max-width: 480px) {
-    .top5-category {
-      font-size:13px;
-    }
-
-    .top5-row {
-      padding:5px 8px;
-    }
-
-    .top5-num {
-      width:22px;
-      height:22px;
-      font-size:10px;
-      border-radius:7px;
-    }
-
-    .top5-guess {
-      min-height:36px;
-      padding:8px 10px;
-      font-size:12px;
-    }
-  }
-
-  .top5-header {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
+    flex-direction:column;
     gap:6px;
-    padding:8px 10px;
+    padding:8px 10px 6px;
     border-radius:16px;
     background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
     border:1px solid rgba(255,255,255,0.12);
   }
 
-  .top5-pill {
+  .m10-pill {
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    min-width:60px;
-    padding:4px 7px;
+    width:max-content;
+    min-width:72px;
+    padding:4px 8px;
     border-radius:999px;
     background:rgba(255, 214, 124, 0.12);
     border:1px solid rgba(255, 214, 124, 0.4);
@@ -1272,156 +1192,172 @@
     text-transform:uppercase;
   }
 
-  .top5-category {
+  .m10-category {
     margin:0;
-    font-size:clamp(13px, 1.6vw, 16px);
-    line-height:1.15;
-    letter-spacing:-.04em;
-    font-weight:700;
     color:#f5f1ff;
+    font-family:"Fraunces", Georgia, serif;
+    font-size:clamp(15px, 1.8vw, 20px);
+    line-height:1.15;
+    font-weight:700;
+    letter-spacing:-.04em;
     display:-webkit-box;
-    -webkit-box-orient:vertical;
     -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    max-width:100%;
+  }
+
+  .m10-timer-row {
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    font-family:"DM Mono",ui-monospace,monospace;
+  }
+
+  .m10-time {
+    font-size:clamp(15px, 1.3vw, 18px);
+    font-weight:700;
+    color:#f9f4ff;
+    transition:color .15s ease;
+  }
+
+  .m10-time.warning {
+    color:#ff8e7d;
+  }
+
+  .m10-counter {
+    font-size:12px;
+    letter-spacing:.04em;
+    color:#d9d2f0;
+  }
+
+  .m10-progress {
+    position:relative;
+    width:100%;
+    height:4px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
     overflow:hidden;
   }
 
-  .top5-lives {
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-top:4px;
-  }
-
-  .top5-life {
-    width:11px;
-    height:11px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.3);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);
-    transition:all .18s ease;
-  }
-
-  .top5-life.active {
-    background:linear-gradient(180deg, #ffc76d, #ff8c5b);
-    border-color:rgba(255, 184, 104, 0.8);
-    box-shadow:0 0 14px rgba(255, 184, 104, 0.45);
-  }
-
-  .top5-list {
-    display:flex;
-    flex-direction:column;
-    gap:clamp(5px, 0.9vh, 8px);
-  }
-
-  .top5-row {
-    display:grid;
-    grid-template-columns:22px 1fr;
-    gap:8px;
-    align-items:center;
-    padding:5px 8px;
-    border-radius:12px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.08);
-    transition:border-color .18s ease, transform .18s ease;
-  }
-
-  .top5-row.correct {
-    border-color:rgba(88, 219, 134, 0.7);
-    background:rgba(88, 219, 134, 0.08);
-  }
-
-  .top5-row.wrong {
-    border-color:rgba(255, 116, 96, 0.7);
-    background:rgba(255, 116, 96, 0.06);
-  }
-
-  .top5-num {
-    display:grid;
-    place-items:center;
-    width:22px;
-    height:22px;
-    border-radius:7px;
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.1);
-    font-family:"DM Mono",ui-monospace,monospace;
-    color:#f4e9ff;
-    font-size:10px;
-    font-weight:700;
-  }
-
-  .top5-input {
+  .m10-progress-fill {
+    display:block;
+    height:100%;
     width:100%;
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.03);
-    border-radius:10px;
-    color:#f5f1ff;
-    padding:6px 8px;
-    font:inherit;
-    font-size:12px;
-    outline:none;
-    transition:border-color .12s ease, background .12s ease, transform .12s ease;
+    border-radius:inherit;
+    background:linear-gradient(90deg, #7ae7a4 0%, #9be6ba 55%, #d9f7df 100%);
+    transition:width .25s linear, background .15s ease;
   }
 
-  .top5-guess {
+  .m10-progress-fill.warning {
+    background:linear-gradient(90deg, #ff9978, #ff5f5f);
+  }
+
+  .m10-shell.m10-danger .m10-time,
+  .m10-shell.m10-danger .m10-counter {
+    color:#ffb0a9;
+  }
+
+  .m10-lista {
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:5px;
+    width:100%;
+  }
+
+  .m10-slot {
+    min-height:30px;
+    padding:4px 8px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.03);
+    color:rgba(255,255,255,0.44);
     display:flex;
     align-items:center;
-    justify-content:center;
-    min-height:36px;
-    padding:8px 10px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.04);
-    color:#f5f1ff;
-    font-family:"DM Mono",ui-monospace,monospace;
-    font-size:12px;
-    font-weight:700;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    min-width:0;
+    font-size:11px;
+    line-height:1.2;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
   }
 
-  .top5-input:focus {
+  .m10-slot.completado {
+    color:#b6f5c9;
+    border-color:rgba(120, 225, 165, 0.45);
+    background:rgba(88, 219, 134, 0.08);
+  }
+
+  .m10-shell.m10-compact .m10-slot {
+    min-height:24px;
+    font-size:10px;
+    padding:3px 6px;
+  }
+
+  .m10-shell.m10-compact .m10-category {
+    font-size:15px;
+  }
+
+  .m10-input-wrap {
+    display:flex;
+    align-items:stretch;
+    gap:8px;
+    width:100%;
+    margin-top:auto;
+  }
+
+  .m10-input {
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px;
+    background:rgba(255,255,255,0.04);
+    color:#f5f1ff;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    min-height:38px;
+    padding:8px 10px;
+    outline:none;
+  }
+
+  .m10-input:focus {
     border-color:rgba(255, 204, 106, 0.7);
     background:rgba(255,255,255,0.05);
   }
 
-  .top5-input.correct {
-    border-color:rgba(88, 219, 134, 0.7);
-    background:rgba(88, 219, 134, 0.08);
-  }
-
-  .top5-input.wrong {
-    border-color:rgba(255, 116, 96, 0.7);
-    background:rgba(255, 116, 96, 0.06);
-  }
-
-  .top5-check {
+  .m10-btn {
     border:none;
-    border-radius:10px;
-    padding:10px 12px;
-    min-width:72px;
+    border-radius:12px;
+    padding:0 14px;
     background:linear-gradient(180deg, rgba(255, 208, 105, 0.96), rgba(244, 153, 88, 0.94));
     color:#1f1a2d;
     font-weight:800;
     letter-spacing:.06em;
     text-transform:uppercase;
     cursor:pointer;
-    transition:transform .12s ease, filter .12s ease;
     font-size:11px;
   }
 
-  .top5-check:active {
+  .m10-btn:active {
     transform:translateY(1px) scale(.99);
   }
 
-  .top5-check:disabled {
-    opacity:0.55;
-    cursor:default;
+  @media (max-width: 480px) {
+    .m10-shell {
+      width:min(100%, 360px);
+    }
+
+    .m10-category {
+      font-size:15px;
+    }
+
+    .m10-time {
+      font-size:15px;
+    }
   }
 
   .cuentas-shell {
@@ -2883,7 +2819,7 @@
       <div id="game-status" class="game-status">Seleccioná uno de los 4 juegos de hoy</div>
       <div id="game-menu" class="game-menu" aria-label="Menú de juegos"></div>
       <div id="game-stage" class="game-stage hidden"></div>
-      <div id="game-refresh-status" class="game-refresh-status" aria-live="polite">
+      <div id="game-refresh-status" class="game-refresh-status" aria-live="polite" aria-hidden="false">
         <span id="game-refresh-timer" class="game-refresh-timer">00:00:00</span>
         <span>Para nuevos juegos!</span>
       </div>
@@ -3087,6 +3023,13 @@
   let ultimaVerificacionControl = 0;
   const CONTROL_MIN_INTERVAL_MS = 2 * 60 * 1000;
 
+  // ═══ MENCIONÁ 10 ═══
+  // Reglas del calendario para Mencioná 10:
+  // - Cada entrada debe tener al menos 30 respuestas válidas para que el juego sea natural y no un acertijo de lo que yo cargué.
+  // - La categoría debe ser amplia y permitir respuestas espontáneas (no un ranking fijo ni un top cerrado).
+  // - segundos es opcional; si está presente debe estar entre 60 y 600. El valor por defecto es 180.
+  // - alias es opcional y convierte variantes a la forma canónica.
+  // - Si no hay entrada para un día, se usa un banco interno de categorías con semilla por fecha para no romper el juego.
   const CALENDARIO = {
     '2026-08-28': {
       wordle: 'GENIA',
@@ -3094,9 +3037,17 @@
       sopa: ['ALEX', 'FERNET', 'JOAQUI', 'BAILE', 'TASTY', ''],
       memoria: [4, 12, 7, 20, 3, 16, 9, 22],
       cuentas: null,
-      top5: {
-        categoria: 'Personajes con más minutos en pantalla en Friends',
-        respuestas: ['ROSS', 'RACHEL', 'CHANDLER', 'JOEY', 'MONICA']
+      mencionar10: {
+        categoria: 'Restaurantes de Buenos Aires',
+        validas: [
+          'DON JULIO', 'MISHIGUENE', 'ELENA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
+          'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LA CABRERA', 'EL PREFERIDO',
+          'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'SANTA FE', 'ORQUIDEA', 'CABAÑA',
+          'PUNTA', 'BAR DOUGLAS', 'EL TANO', 'EL DORADO', 'CERVECERIA', 'MALBA', 'EL BARRIO', 'AESTA',
+          'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN', 'BICHO', 'PRIMERA', 'TAMARINDO'
+        ],
+        alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA', NINOGORDO: 'NIÑO GORDO' },
+        segundos: 180
       }
     },
     '2026-08-29': {
@@ -3105,9 +3056,15 @@
       sopa: ['ALEXIA', 'POPA', 'MILI', 'CANDE', 'FRANSHU', 'JUANA'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
       cuentas: null,
-      top5: {
-        categoria: 'Top 5 series más vistas',
-        respuestas: ['FRIENDS', 'THE LAST OF US', 'STRANGER THINGS', 'THE OFFICE', 'GAME OF THRONES']
+      mencionar10: {
+        categoria: 'Boliches de Buenos Aires',
+        validas: [
+          'NONSTOP', 'NILO', 'JET', 'AFRIKA', 'CARAMELO', 'TEQUILA', 'MOSCU', 'MATA', 'ROCA BRUJA',
+          'CHINITO', 'CRUZA', 'KIKA', 'CROBAR', 'BANANA', 'CRETA', 'LA CABRERA', 'NICETO',
+          'BLACK', 'BRESH', 'BRUJAS', 'CAIX', 'THE BOW','MOROCCO', 'MINT', 'PIRATA', 'KAPITAL', 'LA FIESTA', 'EL QUINCHO', 'LA SIRENA', 'EL DORADO','TROPITANGO'
+        ],
+        alias: { 'NON STOP': 'NONSTOP', 'AFRIK': 'AFRIKA', NINOGORDO: 'NIÑO GORDO' },
+        segundos: 180
       }
     }
   };
@@ -3269,22 +3226,42 @@
       }
     }
 
-    const top5 = entrada.top5;
-    if (top5 && typeof top5 === 'object') {
-      const categoria = String(top5.categoria || '').trim();
-      const respuestas = Array.isArray(top5.respuestas) ? top5.respuestas : [];
+    const mencionar10 = entrada.mencionar10;
+    if (mencionar10 && typeof mencionar10 === 'object') {
+      const categoria = String(mencionar10.categoria || '').trim();
+      const validas = Array.isArray(mencionar10.validas) ? mencionar10.validas : [];
+      const alias = mencionar10.alias && typeof mencionar10.alias === 'object' ? mencionar10.alias : {};
+      const vistos = new Set();
+
       if (!categoria) {
-        warnings.push(`[${fecha}] top5 inválido: falta categoria.`);
+        warnings.push(`[${fecha}] mencionar10 inválido: falta categoria.`);
       }
-      if (respuestas.length !== 5) {
-        warnings.push(`[${fecha}] top5 inválido: debe haber 5 respuestas.`);
+      if (validas.length < 30) {
+        warnings.push(`[${fecha}] mencionar10 inválido: debe haber al menos 30 respuestas válidas.`);
       }
-      respuestas.forEach((valor, index) => {
-        const texto = String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s]/g, '').toUpperCase().trim();
-        if (!texto || texto.length > 32) {
-          warnings.push(`[${fecha}] top5 inválido: respuesta ${index + 1} no es válida.`);
+
+      validas.forEach((valor, index) => {
+        const texto = normalizarM10(String(valor || ''));
+        const clave = texto || normalizarM10(String(alias[String(valor || '').toUpperCase().replace(/\s+/g, '')] || ''));
+        if (!texto || texto.length > 64) {
+          warnings.push(`[${fecha}] mencionar10 inválido: entrada ${index + 1} no es válida.`);
+          return;
+        }
+        if (vistos.has(texto)) {
+          warnings.push(`[${fecha}] mencionar10 inválido: hay duplicados después de normalizar.`);
+        }
+        vistos.add(texto);
+        if (clave && clave !== texto && vistos.has(clave)) {
+          warnings.push(`[${fecha}] mencionar10 inválido: alias duplicado tras normalizar.`);
         }
       });
+
+      if (Object.prototype.hasOwnProperty.call(mencionar10, 'segundos')) {
+        const segundos = Number(mencionar10.segundos);
+        if (!Number.isFinite(segundos) || segundos < 60 || segundos > 600) {
+          warnings.push(`[${fecha}] mencionar10 inválido: segundos debe estar entre 60 y 600.`);
+        }
+      }
     }
 
     return warnings;
@@ -3364,13 +3341,13 @@
         return montarMemoria(contenedor, rand, onGanar, onPerder);
       }
     },
-    top5: {
-      id: 'top5',
-      nombre: 'Top 5',
-      desc: 'Completá el ranking del día',
-      icono: { emoji: '🏆', fondo: 'linear-gradient(135deg, #facc15, #fb7185)' },
+    mencionar10: {
+      id: 'mencionar10',
+      nombre: 'Mencioná 10',
+      desc: 'Nombrá 10 antes de que se acabe el tiempo',
+      icono: { emoji: '🔟', fondo: 'linear-gradient(135deg, #facc15, #f97316)' },
       montar(contenedor, rand, onGanar, onPerder) {
-        return montarTop5(contenedor, rand, onGanar, onPerder);
+        return montarMencionar10(contenedor, rand, onGanar, onPerder);
       }
     }
   };
@@ -3412,8 +3389,8 @@
     3: 'Feliz miércoles, hoy tenés baile',
     4: 'Feliz jueves',
     5: 'Feliz viernes, buen finde!',
-    6: 'Feliz sábado',
-    0: 'Feliz domingo'
+    6: 'Feliz sábado!',
+    0: 'Feliz domingo!'
   };
 
   function formatearFecha(ahora){
@@ -3466,99 +3443,6 @@
       rainLayer.classList.add('visible');
       return;
     }
-  }
-
-  function faseLunar(fecha = new Date()) {
-    const REF = Date.UTC(2000, 0, 6, 18, 14, 0);
-    const SINODICO = 29.53058867;
-    const dias = (fecha.getTime() - REF) / 86400000;
-    let fase = (dias % SINODICO) / SINODICO;
-    if (fase < 0) fase += 1;
-    return fase;
-  }
-
-  function renderMoonSVG(fase = 0) {
-    const phase = ((fase % 1) + 1) % 1;
-    const litBias = Math.sin(phase * Math.PI * 2);
-    const shadowX = 50 + litBias * 42;
-    const nearFull = Math.abs(phase - 0.5) < 0.14;
-    const glowOpacity = Math.max(0.08, 0.18 + (1 - Math.abs(phase - 0.5) / 0.5) * 0.8);
-    const earthshineOpacity = Math.max(0.12, 0.18 + (1 - Math.abs(phase - 0.5) / 0.5) * 0.16);
-
-    return `
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <radialGradient id="moon-limb-${Date.now()}" cx="35%" cy="35%" r="75%">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.96)"/>
-            <stop offset="52%" stop-color="rgba(236,243,255,0.9)"/>
-            <stop offset="100%" stop-color="rgba(180,192,220,0.78)"/>
-          </radialGradient>
-          <radialGradient id="moon-halo-${Date.now()}" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.65)" stop-opacity="${Math.min(0.75, glowOpacity)}"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0)" stop-opacity="0"/>
-          </radialGradient>
-          <filter id="moon-noise-${Date.now()}" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="2" result="noise"/>
-            <feColorMatrix in="noise" type="saturate" values="0"/>
-            <feComponentTransfer>
-              <feFuncA type="table" tableValues="0 0.05"/>
-            </feComponentTransfer>
-          </filter>
-          <filter id="moon-terminator-${Date.now()}" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2.4"/>
-          </filter>
-          <filter id="mare-blur-${Date.now()}" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.6"/>
-          </filter>
-        </defs>
-
-        <circle cx="50" cy="50" r="47" fill="url(#moon-halo-${Date.now()})" opacity="${Math.min(0.9, glowOpacity)}"/>
-        <circle cx="50" cy="50" r="42" fill="url(#moon-limb-${Date.now()})"/>
-        <g filter="url(#moon-noise-${Date.now()})" opacity="0.05">
-          <circle cx="50" cy="50" r="42" fill="#ffffff"/>
-        </g>
-
-        <g transform="rotate(180 50 50)" opacity="0.14" filter="url(#mare-blur-${Date.now()})">
-          <ellipse cx="28" cy="38" rx="18" ry="12" fill="#25314d"/>
-          <ellipse cx="62" cy="33" rx="14" ry="10" fill="#25314d"/>
-          <ellipse cx="69" cy="48" rx="12" ry="8" fill="#25314d"/>
-          <path d="M12 42 C 10 30, 20 18, 33 16 C 42 18, 52 27, 54 38 C 52 47, 40 59, 22 61 C 16 55, 12 49, 12 42 Z" fill="#25314d"/>
-          <ellipse cx="76" cy="27" rx="8.5" ry="6" fill="#25314d"/>
-          <ellipse cx="40" cy="66" rx="12.5" ry="8.5" fill="#25314d"/>
-          <ellipse cx="28" cy="72" rx="11.5" ry="8" fill="#25314d"/>
-        </g>
-
-        <g>
-          <ellipse cx="${shadowX}" cy="50" rx="56" ry="42" fill="rgba(12,17,26,0.78)" filter="url(#moon-terminator-${Date.now()})" opacity="0.9"/>
-          <ellipse cx="${shadowX + 2}" cy="50" rx="56" ry="42" fill="rgba(42,56,83,0.32)" opacity="${Math.max(0.16, earthshineOpacity)}"/>
-        </g>
-
-        <g opacity="0.18">
-          <ellipse cx="50" cy="50" rx="42" ry="42" fill="rgba(31, 42, 82, 0.16)"/>
-        </g>
-
-        <g opacity="${Math.max(0, 0.12 + (1 - Math.abs(phase - 0.5) / 0.5) * 0.25)}">
-          <g transform="translate(0 0)">
-            <path d="M47 78 L51 72 L55 78 L51 82 Z" fill="rgba(255,255,255,0.34)"/>
-            <path d="M44 74 L48 67 L52 74 L48 79 Z" fill="rgba(255,255,255,0.18)"/>
-            <path d="M50 74 L54 67 L58 74 L54 79 Z" fill="rgba(255,255,255,0.15)"/>
-          </g>
-          <g opacity="0.12">
-            <path d="M49 77 L45 74 L50 69 L55 74 Z" fill="rgba(255,255,255,0.35)"/>
-            <path d="M46 72 L42 69 L47 64 L51 68 Z" fill="rgba(255,255,255,0.25)"/>
-            <path d="M54 72 L58 69 L53 64 L49 68 Z" fill="rgba(255,255,255,0.2)"/>
-          </g>
-        </g>
-
-        <g opacity="${nearFull ? 0.22 : 0.08}">
-          <circle cx="50" cy="68" r="3.4" fill="rgba(255,255,255,0.8)"/>
-          <path d="M50 52 L50 72" stroke="rgba(255,255,255,0.18)" stroke-width="0.6"/>
-          <path d="M46 54 L50 67 L54 54" stroke="rgba(255,255,255,0.12)" stroke-width="0.6" fill="none"/>
-          <path d="M42 58 L50 68 L58 58" stroke="rgba(255,255,255,0.12)" stroke-width="0.6" fill="none"/>
-          <path d="M40 62 L50 72 L60 62" stroke="rgba(255,255,255,0.08)" stroke-width="0.6" fill="none"/>
-        </g>
-      </svg>
-    `;
   }
 
   function generarParticulas(modo){
@@ -4291,6 +4175,14 @@
     aviso.classList.add('visible');
   }
 
+  function limpiarPerdidosViejosDesdeEstado() {
+    const estado = leerEstado();
+    const limpio = limpiarPerdidosViejos(estado);
+    if (JSON.stringify(estado.perdidos) !== JSON.stringify(limpio.perdidos)) {
+      guardarEstado(limpio);
+    }
+  }
+
   function ocultarAvisoPersistencia() {
     const aviso = document.getElementById('persist-status');
     if (!aviso) return;
@@ -4415,25 +4307,45 @@
     }
   }
 
+  function limpiarPerdidosViejos(estadoActual = leerEstado()) {
+    const estado = normalizarEstado(estadoActual);
+    const idsValidos = new Set(Object.keys(JUEGOS));
+    const perdidos = (Array.isArray(estado.perdidos) ? estado.perdidos : []).filter((item) => {
+      if (!item || typeof item !== 'object') return false;
+      const clave = typeof item.juegoId === 'string' ? item.juegoId : typeof item.juego === 'string' ? item.juego : null;
+      if (!clave) return true;
+      return idsValidos.has(clave) || clave === 'top5';
+    });
+    return { ...estado, perdidos };
+  }
+
   function yaGanoMedallaHoy(juegoId = obtenerJuegoDelDia().id) {
     const estado = leerEstado();
     const fecha = hoyClave();
-    const juegoActual = obtenerJuegoPorId(juegoId);
+    const juegoActual = JUEGOS[juegoId] || null;
     return estado.historial.some(item => {
       if (!item || item.fecha !== fecha) return false;
       const juego = item.juego;
-      return juego === juegoActual.id || juego === juegoActual.nombre || item.juegoId === juegoActual.id;
+      const juegoIdItem = item.juegoId;
+      return (
+        (juegoActual && (juego === juegoActual.id || juego === juegoActual.nombre || juegoIdItem === juegoActual.id)) ||
+        juego === juegoId || juegoIdItem === juegoId
+      );
     });
   }
 
   function yaPerdioHoy(juegoId = obtenerJuegoDelDia().id) {
     const estado = leerEstado();
     const fecha = hoyClave();
-    const juegoActual = obtenerJuegoPorId(juegoId);
+    const juegoActual = JUEGOS[juegoId] || null;
     return Array.isArray(estado.perdidos) && estado.perdidos.some(item => {
       if (!item || item.fecha !== fecha) return false;
       const juego = item.juego;
-      return juego === juegoActual.id || juego === juegoActual.nombre || item.juegoId === juegoActual.id;
+      const juegoIdItem = item.juegoId;
+      return (
+        (juegoActual && (juego === juegoActual.id || juego === juegoActual.nombre || juegoIdItem === juegoActual.id)) ||
+        juego === juegoId || juegoIdItem === juegoId
+      );
     });
   }
 
@@ -4771,26 +4683,30 @@
     };
   }
 
-  const TOP5_CATEGORIAS = [
+  const MENCIONAR10_FALLBACKS = [
     {
-      categoria: 'Top 5 Personajes con más minutos en pantalla en Friends',
-      respuestas: ['ROSS', 'RACHEL', 'CHANDLER', 'JOEY', 'MONICA']
+      categoria: 'Restaurantes de Buenos Aires',
+      validas: [
+        'DON JULIO', 'MISHIGUENE', 'ELENA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
+        'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LA CABRERA', 'EL PREFERIDO',
+        'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'ORQUIDEA', 'CABAÑA', 'PUNTA', 'MALBA',
+        'EL DORADO', 'CERVECERIA', 'AESTA', 'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN',
+        'BICHO', 'TAMARINDO', 'NUEVO', 'MIRAMAR', 'DOMINIC', 'ALBEA', 'LA PIEDRA', 'PABLO'
+      ],
+      alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA', NINOGORDO: 'NIÑO GORDO' },
+      segundos: 180
     },
     {
-      categoria: 'Top 5 películas favoritas',
-      respuestas: ['EL PADRINO', 'LA LISTA DE SCHINDLER', 'INCEPTION', 'PULP FICTION', 'CASABLANCA']
-    },
-    {
-      categoria: 'Top 5 destinos para viajar',
-      respuestas: ['PARÍS', 'TOKIO', 'BARCELONA', 'BALI', 'NEW YORK']
-    },
-    {
-      categoria: 'Top 5 comidas preferidas',
-      respuestas: ['ASADO', 'PIZZA', 'EMPANADAS', 'SUSHI', 'PASTA']
-    },
-    {
-      categoria: 'Top 5 series más vistas',
-      respuestas: ['FRIENDS', 'THE LAST OF US', 'STRANGER THINGS', 'THE OFFICE', 'GAME OF THRONES']
+      categoria: 'Lugares para comer en Buenos Aires',
+      validas: [
+        'DON JULIO', 'MISHIGUENE', 'LA CABRERA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
+        'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LO DE CORA', 'EL PREFERIDO',
+        'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'ORQUIDEA', 'CABAÑA', 'PUNTA', 'MALBA',
+        'EL DORADO', 'CERVECERIA', 'AESTA', 'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN',
+        'BICHO', 'TAMARINDO', 'MIRAMAR', 'DOMINIC', 'ALBEA', 'LA PIEDRA', 'PABLO'
+      ],
+      alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA' },
+      segundos: 180
     }
   ];
 
@@ -4804,9 +4720,19 @@
       .trim();
   }
 
-  function montarTop5(contenedor, rand, onGanar, onPerder) {
+  function normalizarM10(texto) {
+    return String(texto || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9 ]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function montarMencionar10(contenedor, rand, onGanar, onPerder) {
     const status = document.getElementById('game-status');
-    const yaGanado = yaGanoMedallaHoy('top5');
+    const yaGanado = yaGanoMedallaHoy('mencionar10');
 
     if (yaGanado) {
       if (status) status.textContent = 'Ya ganaste la medalla de hoy';
@@ -4815,91 +4741,280 @@
       };
     }
 
-    const contenidoCalendario = obtenerContenidoDelDia('top5');
-    const categoriaBase = contenidoCalendario && typeof contenidoCalendario === 'object' && contenidoCalendario.categoria
+    const contenidoCalendario = obtenerContenidoDelDia('mencionar10');
+    const base = contenidoCalendario && typeof contenidoCalendario === 'object' && contenidoCalendario.categoria
       ? contenidoCalendario
-      : TOP5_CATEGORIAS[Math.floor(rand() * TOP5_CATEGORIAS.length)];
+      : MENCIONAR10_FALLBACKS[Math.floor(rand() * MENCIONAR10_FALLBACKS.length)];
+
+    const categoria = base.categoria || 'Restaurantes de Buenos Aires';
+    const alias = base.alias && typeof base.alias === 'object' ? base.alias : {};
+    const validas = Array.isArray(base.validas) && base.validas.length >= 30
+      ? base.validas
+      : MENCIONAR10_FALLBACKS[Math.floor(rand() * MENCIONAR10_FALLBACKS.length)].validas;
+    const segundosTotales = Number.isFinite(Number(base.segundos)) ? Number(base.segundos) : 180;
+    const tiempoMaximo = Math.min(600, Math.max(60, segundosTotales));
+
+    const mapaCanonico = new Map();
+    validas.forEach((valor) => {
+      const canonico = normalizarM10(valor);
+      if (!canonico) return;
+      mapaCanonico.set(canonico, canonico);
+    });
+    Object.entries(alias).forEach(([clave, valor]) => {
+      const claveNormalizada = normalizarM10(clave);
+      const valorNormalizado = normalizarM10(valor);
+      if (claveNormalizada && valorNormalizado) {
+        mapaCanonico.set(claveNormalizada, valorNormalizado);
+      }
+    });
 
     const shell = document.createElement('div');
-    shell.className = 'top5-shell';
-
-    const categoriaActual = categoriaBase;
-    const respuestasCorrectas = Array.isArray(categoriaActual.respuestas) && categoriaActual.respuestas.length
-      ? categoriaActual.respuestas.map((item) => normalizarTexto(item))
-      : TOP5_CATEGORIAS[Math.floor(rand() * TOP5_CATEGORIAS.length)].respuestas.map((item) => normalizarTexto(item));
-    const posicionadas = Array(respuestasCorrectas.length).fill(null);
-    const posicionesAdivinadas = new Set();
-    let vidas = 3;
-    let terminado = false;
+    shell.className = 'm10-shell';
 
     const header = document.createElement('div');
-    header.className = 'top5-header';
+    header.className = 'm10-header';
     header.innerHTML = `
-      <div>
-        <div class="top5-pill">Top 5</div>
-        <p class="top5-category">${categoriaActual.categoria}</p>
+      <div class="m10-pill">Mencioná 10</div>
+      <p class="m10-category">${categoria}</p>
+      <div class="m10-timer-row">
+        <span class="m10-time" aria-live="polite">${Math.floor(tiempoMaximo / 60)}:${String(tiempoMaximo % 60).padStart(2, '0')}</span>
+        <span class="m10-counter">0 / 10</span>
       </div>
-      <div class="top5-lives" aria-label="vidas restantes"></div>
+      <div class="m10-progress" aria-hidden="true"><div class="m10-progress-fill"></div></div>
     `;
     shell.appendChild(header);
 
-    const livesEl = header.querySelector('.top5-lives');
-    function renderLives() {
-      livesEl.innerHTML = '';
-      Array.from({ length: 3 }, (_, index) => {
-        const dot = document.createElement('span');
-        dot.className = 'top5-life' + (index < vidas ? ' active' : '');
-        return dot;
-      }).forEach((dot) => livesEl.appendChild(dot));
-    }
-
+    const timeEl = header.querySelector('.m10-time');
+    const counterEl = header.querySelector('.m10-counter');
+    const progressFill = header.querySelector('.m10-progress-fill');
     const list = document.createElement('div');
-    list.className = 'top5-list';
+    list.className = 'm10-lista';
 
-    const rankingCells = respuestasCorrectas.map((_, index) => {
-      const row = document.createElement('div');
-      row.className = 'top5-row';
-
-      const num = document.createElement('span');
-      num.className = 'top5-num';
-      num.textContent = String(index + 1);
-
-      const value = document.createElement('div');
-      value.className = 'top5-input';
-      value.textContent = '—';
-      value.setAttribute('aria-live', 'polite');
-
-      row.appendChild(num);
-      row.appendChild(value);
-      list.appendChild(row);
-      return { row, value };
+    const slots = Array.from({ length: 10 }, (_, index) => {
+      const slot = document.createElement('div');
+      slot.className = 'm10-slot';
+      slot.textContent = '—';
+      slot.setAttribute('data-index', String(index));
+      slot.setAttribute('aria-live', 'polite');
+      list.appendChild(slot);
+      return slot;
     });
 
-    let inputValue = '';
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'm10-input-wrap';
 
     const input = document.createElement('input');
     input.type = 'text';
-    input.className = 'top5-guess';
-    input.placeholder = 'Escribí tu respuesta';
+    input.className = 'm10-input';
+    input.placeholder = 'Escribí una respuesta';
     input.autocomplete = 'off';
     input.autocorrect = 'off';
     input.autocapitalize = 'characters';
     input.spellcheck = false;
     input.enterKeyHint = 'done';
     input.inputMode = 'text';
+    input.setAttribute('aria-label', 'Respuesta');
 
-    const syncInput = () => {
-      const valor = normalizarTexto(inputValue);
-      input.value = valor || '';
-      if (status) {
-        status.textContent = valor ? 'Respuesta actual: ' + valor : 'Completá la respuesta antes de validar';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'm10-btn';
+    button.textContent = 'Enviar';
+
+    inputWrap.appendChild(input);
+    inputWrap.appendChild(button);
+    shell.appendChild(list);
+    shell.appendChild(inputWrap);
+
+    let terminado = false;
+    let iniciado = false;
+    let tiempoRestante = tiempoMaximo;
+    let timerId = null;
+    let lastFrame = 0;
+    let respuestas = [];
+    const yaDijo = new Set();
+
+    function syncCounter() {
+      counterEl.textContent = `${respuestas.length} / 10`;
+    }
+
+    function syncTimer() {
+      const minutos = String(Math.floor(tiempoRestante / 60)).padStart(1, '0');
+      const segundos = String(Math.floor(tiempoRestante % 60)).padStart(2, '0');
+      timeEl.textContent = `${minutos}:${segundos}`;
+      timeEl.classList.toggle('warning', tiempoRestante <= 30);
+      shell.classList.toggle('m10-danger', tiempoRestante <= 30);
+      progressFill.style.width = `${(tiempoRestante / tiempoMaximo) * 100}%`;
+      progressFill.classList.toggle('warning', tiempoRestante <= 30);
+    }
+
+    function stopTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      lastFrame = 0;
+    }
+
+    function startTimer() {
+      if (terminado || timerId) return;
+      lastFrame = Date.now();
+      timerId = setInterval(() => {
+        if (terminado) {
+          stopTimer();
+          return;
+        }
+        const now = Date.now();
+        const delta = (now - lastFrame) / 1000;
+        lastFrame = now;
+        tiempoRestante = Math.max(0, tiempoRestante - delta);
+        syncTimer();
+        if (tiempoRestante <= 0) {
+          stopTimer();
+          terminado = true;
+          if (typeof onPerder === 'function') {
+            onPerder(`Llegaste a ${respuestas.length} de 10`);
+          }
+        }
+      }, 250);
+    }
+
+    function pausarTimer() {
+      if (!timerId || terminado) return;
+      stopTimer();
+    }
+
+    function reanudarTimer() {
+      if (!iniciado || terminado || timerId) return;
+      startTimer();
+    }
+
+    function handleVisualViewportResize() {
+      if (!window.visualViewport) return;
+      shell.classList.toggle('m10-compact', window.visualViewport.height < 500);
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pausarTimer();
+      } else {
+        reanudarTimer();
       }
     };
 
+    function renderSlots() {
+      slots.forEach((slot, index) => {
+        if (index < respuestas.length) {
+          slot.textContent = respuestas[index];
+          slot.classList.add('completado');
+        } else {
+          slot.textContent = '—';
+          slot.classList.remove('completado');
+        }
+      });
+    }
+
+    function resolverRespuesta(usuario) {
+      const entrada = normalizarM10(usuario);
+      if (!entrada) {
+        return { tipo: 'vacia' };
+      }
+
+      const aliasDirecto = alias[entrada] || alias[entrada.replace(/\s+/g, '')];
+      if (aliasDirecto) {
+        return { tipo: 'valid', valor: normalizarM10(aliasDirecto) };
+      }
+
+      if (mapaCanonico.has(entrada)) {
+        return { tipo: 'valid', valor: mapaCanonico.get(entrada) };
+      }
+
+      const candidata = Array.from(mapaCanonico.keys()).find((clave) => {
+        const exacta = clave.startsWith(entrada) && entrada.length >= 5 && clave.length > entrada.length;
+        return exacta;
+      });
+      if (candidata) {
+        return { tipo: 'valid', valor: mapaCanonico.get(candidata) };
+      }
+
+      return { tipo: 'invalid' };
+    }
+
+    function validarRespuesta() {
+      if (terminado) return;
+
+      const valor = input.value;
+      const entrada = normalizarM10(valor);
+      if (!entrada) {
+        if (status) status.textContent = 'Escribí una respuesta';
+        return;
+      }
+
+      if (!iniciado) {
+        iniciado = true;
+        startTimer();
+      }
+
+      if (yaDijo.has(entrada)) {
+        if (status) status.textContent = 'Ya la dijiste';
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      const resultado = resolverRespuesta(valor);
+      if (resultado.tipo === 'vacia') {
+        if (status) status.textContent = 'Escribí una respuesta';
+        return;
+      }
+
+      if (resultado.tipo === 'invalid') {
+        if (status) status.textContent = 'No cuenta';
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      const canonica = resultado.valor;
+      if (yaDijo.has(canonica)) {
+        if (status) status.textContent = 'Ya la dijiste';
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      const normalizadas = validas.map((item) => normalizarM10(item));
+      if (!normalizadas.includes(canonica)) {
+        if (status) status.textContent = 'No cuenta';
+        input.value = '';
+        input.focus();
+        return;
+      }
+
+      respuestas.push(canonica);
+      yaDijo.add(canonica);
+      yaDijo.add(entrada);
+      renderSlots();
+      syncCounter();
+      input.value = '';
+      input.focus();
+
+      if (status) status.textContent = `${canonica} · ${respuestas.length} / 10`;
+
+      if (respuestas.length >= 10) {
+        terminado = true;
+        stopTimer();
+        if (typeof onGanar === 'function') onGanar();
+      }
+    }
+
     input.addEventListener('input', () => {
       if (terminado) return;
-      inputValue = input.value.slice(0, 40);
-      syncInput();
+      const texto = String(input.value || '');
+      input.value = texto.toUpperCase().replace(/[^A-Z0-9 ]/g, '').replace(/\s+/g, ' ').slice(0, 42);
+      if (!iniciado && input.value.trim()) {
+        iniciado = true;
+        startTimer();
+      }
     });
 
     input.addEventListener('keydown', (event) => {
@@ -4910,124 +5025,26 @@
       }
     });
 
-    input.addEventListener('focus', () => {
-      setTimeout(() => {
-        input.scrollIntoView({ block: 'nearest' });
-      }, 300);
-    });
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'top5-check';
-    button.textContent = 'Enviar';
     button.addEventListener('click', () => validarRespuesta());
-
-    const inputRow = document.createElement('div');
-    inputRow.className = 'top5-input-row';
-    inputRow.appendChild(input);
-    inputRow.appendChild(button);
-
-    shell.appendChild(list);
-    shell.appendChild(inputRow);
-
-    const handleVisualViewportResize = () => {
-      if (!window.visualViewport) return;
-      shell.classList.toggle('top5-compact', window.visualViewport.height < 500);
-    };
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleVisualViewportResize);
       handleVisualViewportResize();
     }
 
-    function renderRanking() {
-      rankingCells.forEach(({ row, value }, index) => {
-        const valorActual = posicionadas[index];
-        const fueAdivinada = posicionesAdivinadas.has(index);
-        const mostrarComoEquivocada = terminado && !fueAdivinada && valorActual !== null;
-        const texto = valorActual || '—';
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        value.textContent = texto;
-        row.classList.toggle('correct', !terminado && fueAdivinada);
-        row.classList.toggle('wrong', mostrarComoEquivocada);
-        value.classList.toggle('correct', !terminado && fueAdivinada);
-        value.classList.toggle('wrong', mostrarComoEquivocada);
-      });
-    }
-
-    function revelarSolucion() {
-      posicionadas.forEach((_, index) => {
-        if (!posicionesAdivinadas.has(index)) {
-          posicionadas[index] = categoriaActual.respuestas[index];
-        }
-      });
-      renderRanking();
-      inputValue = '';
-      syncInput();
-      if (status) {
-        status.textContent = `Perdiste. La respuesta correcta era: ${categoriaActual.respuestas.join(', ')}`;
-      }
-    }
-
-    function validarRespuesta() {
-      if (terminado) return;
-
-      const valor = normalizarTexto(inputValue);
-      if (!valor) {
-        if (status) status.textContent = 'Completá la respuesta antes de validar';
-        return;
-      }
-
-      const posicion = respuestasCorrectas.indexOf(valor);
-      if (posicion === -1) {
-        vidas -= 1;
-        inputValue = '';
-        syncInput();
-        if (status) {
-          status.textContent = vidas > 0 ? `Te equivocaste, te quedan ${vidas} vidas` : 'Perdiste';
-        }
-        renderLives();
-
-        if (vidas <= 0) {
-          terminado = true;
-          revelarSolucion();
-          if (typeof onPerder === 'function') onPerder(`Perdiste. Las respuestas eran: ${categoriaActual.respuestas.join(', ')}`);
-        }
-        return;
-      }
-
-      if (posicionadas[posicion]) {
-        if (status) status.textContent = 'Esa respuesta ya está en el ranking';
-        inputValue = '';
-        syncInput();
-        return;
-      }
-
-      posicionadas[posicion] = categoriaActual.respuestas[posicion];
-      posicionesAdivinadas.add(posicion);
-      inputValue = '';
-      syncInput();
-      renderRanking();
-
-      if (status) status.textContent = 'Respuesta correcta';
-
-      const completo = posicionadas.every(Boolean);
-      if (completo) {
-        terminado = true;
-        if (status) status.textContent = '¡Ganaste!';
-        if (typeof onGanar === 'function') onGanar();
-      }
-    }
-
-    renderLives();
-    renderRanking();
-    syncInput();
+    syncCounter();
+    syncTimer();
+    renderSlots();
     contenedor.appendChild(shell);
 
     return function desmontar() {
+      stopTimer();
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleVisualViewportResize);
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       contenedor.innerHTML = '';
     };
   }
@@ -6193,23 +6210,26 @@
   function actualizarRefreshStatus() {
     const timer = document.getElementById('game-refresh-timer');
     const status = document.getElementById('game-refresh-status');
+    const menu = document.getElementById('game-menu');
+    const stage = document.getElementById('game-stage');
+    const modal = document.getElementById('game-modal');
     if (!timer) return;
 
-    if (juegosBloqueadosPorHoy()) {
-      const restante = FIN_BLOQUEO_MS - Date.now();
-      timer.textContent = formatearCuentaRegresiva(restante);
-      if (status) status.classList.remove('hidden');
-      return;
-    }
+    const disponibleEnMenu = !!(modal && modal.classList.contains('visible') && menu && !menu.classList.contains('hidden') && stage && stage.classList.contains('hidden'));
+    const restante = Math.max(0, FIN_BLOQUEO_MS - Date.now());
+    timer.textContent = formatearCuentaRegresiva(restante);
 
-    if (status) status.classList.add('hidden');
-    timer.textContent = '00:00:00';
+    if (status) {
+      status.classList.toggle('hidden', !disponibleEnMenu);
+      status.setAttribute('aria-hidden', String(!disponibleEnMenu));
+    }
   }
 
   function toggleRefreshStatusMenu(visible) {
     const status = document.getElementById('game-refresh-status');
     if (!status) return;
     status.classList.toggle('hidden', !visible);
+    status.setAttribute('aria-hidden', String(!visible));
   }
 
   function actualizarCartelBloqueo() {
@@ -6375,7 +6395,7 @@
       stage.classList.add('hidden');
       stage.innerHTML = '';
     }
-    if (title) title.textContent = 'Elegí tu juego';
+    if (title) title.textContent = 'Elegí un juego';
     if (kicker) kicker.textContent = 'juegos del día';
     if (status) status.textContent = `Seleccioná uno de los ${Object.keys(JUEGOS).length} juegos de hoy`;
 
@@ -6411,8 +6431,7 @@
   function pintarCielo(){
     const ahora = new Date();
     const h = ahora.getHours();
-    const [y, m, d] = diaLogico().split('-').map(Number);
-    const dia = new Date(y, m - 1, d).getDay();
+    const dia = ahora.getDay();
     const esCumple = ahora.getMonth() === 8 && ahora.getDate() === 7;
     const t = TEMAS.find(x => h < x.max) || TEMAS[TEMAS.length - 1];
     const r = document.documentElement.style;
@@ -6427,13 +6446,8 @@
 
     const modo = h < 5 ? 'noche' : h < 9 ? 'madrugada' : h < 12 ? 'dia' : h < 18 ? 'tarde' : h < 20 ? 'atardecer' : 'noche';
     if (astro) {
-      if (modo === 'noche') {
-        astro.classList.add('moon');
-        astro.innerHTML = renderMoonSVG(faseLunar(ahora));
-      } else {
-        astro.classList.remove('moon');
-        astro.innerHTML = '';
-      }
+      astro.classList.toggle('moon', modo === 'noche');
+      astro.innerHTML = '';
     }
     generarParticulas(modo);
     fechaHoy.textContent = formatearFecha(ahora);
@@ -6622,7 +6636,7 @@
   registrarIngresoDispositivo();
   escucharCambiosGlobales();
   activarPanelModerador();
-  actualizarBadgeMedallas();
+  actualizarBadgeMedallas();    
   renderPremios();
   pintarCielo();
   cargarClima();
