@@ -2182,7 +2182,7 @@
     pointer-events:none;
   }
 
-  .animacion.madrugada .particula,
+  .animacion.mañana .particula,
   .animacion.dia .particula,
   .animacion.tarde .particula,
   .animacion.atardecer .particula,
@@ -2193,7 +2193,7 @@
     border-radius:50%;
   }
 
-  .animacion.madrugada .particula {
+  .animacion.mañana .particula {
     width:12px;
     height:12px;
     background:rgba(255,255,255,.34);
@@ -2233,7 +2233,7 @@
     animation:star-twinkle 4s ease-in-out infinite;
   }
 
-  .animacion.madrugada .particula.mist,
+  .animacion.mañana .particula.mist,
   .animacion.dia .particula.dust,
   .animacion.tarde .particula.gold,
   .animacion.atardecer .particula.glow,
@@ -2241,12 +2241,12 @@
     will-change:transform, opacity;
   }
 
-  .animacion.madrugada .particula::before,
+  .animacion.mañana .particula::before,
   .animacion.dia .particula::before,
   .animacion.tarde .particula::before,
   .animacion.atardecer .particula::before,
   .animacion.noche .particula::before,
-  .animacion.madrugada .particula::after,
+  .animacion.mañana .particula::after,
   .animacion.dia .particula::after,
   .animacion.tarde .particula::after,
   .animacion.atardecer .particula::after,
@@ -2259,7 +2259,7 @@
     box-shadow:inherit;
   }
 
-  .animacion.madrugada .particula::before,
+  .animacion.mañana .particula::before,
   .animacion.dia .particula::before,
   .animacion.tarde .particula::before,
   .animacion.atardecer .particula::before,
@@ -2268,7 +2268,7 @@
     opacity:.35;
   }
 
-  .animacion.madrugada .particula::after,
+  .animacion.mañana .particula::after,
   .animacion.dia .particula::after,
   .animacion.tarde .particula::after,
   .animacion.atardecer .particula::after,
@@ -3375,8 +3375,8 @@
 
   const TEMAS = [
     { max:5,  id:'descanso',   saludo:'Que descanses', a:'#0A1029', b:'#1A1B4B', c:'#38295F', astro:'#D7E1FF', y:'36%', tinta:'#F2F5FF' },
-    { max:9,  id:'madrugada', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
-    { max:12, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
+    { max:10,  id:'mañana', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
+    { max:14, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
     { max:18, id:'tarde',     saludo:'Que tengas una excelente tarde', a:'#CFEAFF', b:'#BCE7FF', c:'#F8DDA0', astro:'#FFF9DB', y:'24%', tinta:'#1A3C5B' },
     { max:20, id:'atardecer', saludo:'Buenas tardes', a:'#4A1F63', b:'#E0565C', c:'#FFB05C', astro:'#FFD08A', y:'70%', tinta:'#FFF1E6' },
     { max:23, id:'noche',     saludo:'Buenas noches', a:'#0B1030', b:'#1E1B47', c:'#332A5C', astro:'#CFD8FF', y:'34%', tinta:'#EDF1FF' },
@@ -3453,7 +3453,7 @@
     const isMobile = window.innerWidth <= 480;
     const totals = {
       noche: isMobile ? 18 : 30,
-      madrugada: isMobile ? 10 : 18,
+      mañana: isMobile ? 10 : 18,
       tarde: isMobile ? 12 : 20,
       atardecer: isMobile ? 12 : 20,
       dia: isMobile ? 10 : 16
@@ -3464,15 +3464,15 @@
 
     for (let i = 0; i < total; i++) {
       const part = document.createElement('span');
-      const variante = modo === 'noche' ? ((i % 3) + 1) : (modo === 'madrugada' ? 'mist' : modo === 'dia' ? 'dust' : modo === 'tarde' ? 'gold' : 'glow');
+      const variante = modo === 'noche' ? ((i % 3) + 1) : (modo === 'mañana' ? 'mist' : modo === 'dia' ? 'dust' : modo === 'tarde' ? 'gold' : 'glow');
       part.className = 'particula ' + variante;
       part.style.left = (Math.random() * 100) + '%';
       part.style.top = (Math.random() * 100) + '%';
-      part.style.width = (modo === 'noche' ? 3 + Math.random() * 3 : modo === 'madrugada' ? 10 + Math.random() * 10 : modo === 'tarde' ? 7 + Math.random() * 6 : modo === 'atardecer' ? 8 + Math.random() * 6 : 5 + Math.random() * 4) + 'px';
+      part.style.width = (modo === 'noche' ? 3 + Math.random() * 3 : modo === 'mañana' ? 10 + Math.random() * 10 : modo === 'tarde' ? 7 + Math.random() * 6 : modo === 'atardecer' ? 8 + Math.random() * 6 : 5 + Math.random() * 4) + 'px';
       part.style.height = part.style.width;
       part.style.animationDuration = (
         modo === 'noche' ? 3 + Math.random() * 4 :
-        modo === 'madrugada' ? 60 + Math.random() * 30 :
+        modo === 'mañana' ? 60 + Math.random() * 30 :
         modo === 'tarde' ? 16 + Math.random() * 8 :
         modo === 'atardecer' ? 12 + Math.random() * 10 :
         9 + Math.random() * 7
@@ -6444,7 +6444,7 @@
     r.setProperty('--tinta-suave', t.tinta + '9E');
     const hora = String(h).padStart(2,'0') + ':' + String(ahora.getMinutes()).padStart(2,'0');
 
-    const modo = h < 5 ? 'noche' : h < 9 ? 'madrugada' : h < 12 ? 'dia' : h < 18 ? 'tarde' : h < 20 ? 'atardecer' : 'noche';
+    const modo = h < 5 ? 'noche' : h < 10 ? 'mañana' : h < 14 ? 'mediodía' : h < 18 ? 'tarde' : h < 20 ? 'atardecer' : 'noche';
     if (astro) {
       astro.classList.toggle('moon', modo === 'noche');
       astro.innerHTML = '';
