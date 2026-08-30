@@ -3031,22 +3031,47 @@
   // - alias es opcional y convierte variantes a la forma canónica.
   // - Si no hay entrada para un día, se usa un banco interno de categorías con semilla por fecha para no romper el juego.
   const CALENDARIO = {
-    '2026-08-28': {
-      wordle: 'GENIA',
-      ahorcado: { palabra: 'PATENTE', categoria: 'Autos' },
-      sopa: ['ALEX', 'FERNET', 'JOAQUI', 'BAILE', 'TASTY', ''],
+    '2026-08-30': {
+      wordle: 'DOMINGO',
+      ahorcado: { palabra: 'LUQUITAS', categoria: 'UADE' },
+      sopa: ['RUSTICA', 'ALPASO', 'LASEDE', 'WAT', 'CAFE', 'MATE'],
       memoria: [4, 12, 7, 20, 3, 16, 9, 22],
       cuentas: null,
       mencionar10: {
-        categoria: 'Restaurantes de Buenos Aires',
-        validas: [
-          'DON JULIO', 'MISHIGUENE', 'ELENA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
-          'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LA CABRERA', 'EL PREFERIDO',
-          'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'SANTA FE', 'ORQUIDEA', 'CABAÑA',
-          'PUNTA', 'BAR DOUGLAS', 'EL TANO', 'EL DORADO', 'CERVECERIA', 'MALBA', 'EL BARRIO', 'AESTA',
-          'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN', 'BICHO', 'PRIMERA', 'TAMARINDO'
+        categoria: 'Cantantes de reggaetón/trap latino',
+        validas: ['BAD BUNNY','ANUEL AA','OZUNA','MYKE TOWERS','BRYANT MYERS','ARCANGEL',
+    'DE LA GHETTO','FARRUKO','J BALVIN','MALUMA','NICKY JAM','DADDY YANKEE',
+    'DON OMAR','WISIN','YANDEL','RAUW ALEJANDRO','JHAY CORTEZ','SECH',
+    'LUNAY','DALEX','JUSTIN QUILES','LENNY TAVAREZ','BRYTIAGO','NORIEL',
+    'DARELL','CASPER MAGICO','NIO GARCIA','RESIDENTE','TEGO CALDERON',
+    'ELADIO CARRION','RAFA PABON','YOUNG MIKO','VILLANO ANTILLANO',
+    'KAROL G','BECKY G','NATTI NATASHA','IVY QUEEN','TOKISCHA','LA ROSALIA',
+    'DUKI','BIZARRAP','TRUENO','NICKI NICOLE','MARIA BECERRA','TINI',
+    'PAULO LONDRA','KHEA','CAZZU','LIT KILLAH','RUSHERKING','EMILIA',
+    'BHAVI','NEO PISTEA','YSY A','CA7RIEL','MILO J','LUCK RA','TIAGO PZK',
+    'SEVEN KAYNE','ECKO','ACRU','WOS','DILLOM','SAIKO','QUEVEDO',
+    'MORAD','BAD GYAL','FEID','BLESSD','RYAN CASTRO','KAROL','PESO PLUMA',
+    'NATANAEL CANO','JUNIOR H','FUERZA REGIDA','DE LA ROSE'
         ],
-        alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA', NINOGORDO: 'NIÑO GORDO' },
+        alias: {'BADBUNNY': 'BAD BUNNY',
+    'ANUEL': 'ANUEL AA',
+    'JBALVIN': 'J BALVIN',
+    'BZRP': 'BIZARRAP',
+    'BIZARRAP': 'BIZARRAP',
+    'NATTI': 'NATTI NATASHA',
+    'ROSALIA': 'LA ROSALIA',
+    'KAROLG': 'KAROL G',
+    'BECKYG': 'BECKY G',
+    'DADDYYANKEE': 'DADDY YANKEE',
+    'DONOMAR': 'DON OMAR',
+    'MYKETOWERS': 'MYKE TOWERS',
+    'BRYANTMYERS': 'BRYANT MYERS',
+    'RAUW': 'RAUW ALEJANDRO',
+    'MARIABECERRA': 'MARIA BECERRA',
+    'NICKINICOLE': 'NICKI NICOLE',
+    'PAULOLONDRA': 'PAULO LONDRA',
+    'TIAGO': 'TIAGO PZK',
+    'PESOPLUMA': 'PESO PLUMA' },
         segundos: 180
       }
     },
