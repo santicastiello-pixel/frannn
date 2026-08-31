@@ -2746,6 +2746,18 @@
     </div>
 
     <ul id="moderador-warnings" class="meta" hidden></ul>
+
+    <div class="control-global">
+      <div class="control-global-head">Regalo de medallas</div>
+      <div class="control-global-editor">
+        <input id="regalo-cantidad" type="number" min="1" max="100" step="1" placeholder="15" aria-label="Cantidad de medallas">
+        <input id="regalo-id" type="text" maxlength="20" placeholder="ago30" aria-label="ID del regalo">
+      </div>
+      <button id="regalo-generar" type="button">Armar link</button>
+      <input id="regalo-link" class="control-global-json" type="text" readonly placeholder="https://..." aria-label="Link del regalo">
+      <div id="regalo-lista" class="meta"></div>
+    </div>
+
     <div class="acciones">
       <button id="moderador-regenerar" type="button">Regenerar juegos de hoy</button>
       <button id="moderador-reset" class="danger" type="button">Reset total</button>
@@ -2988,6 +3000,9 @@
   // ?limpiar=1  → borra las marcas de juego de HOY en ese dispositivo.
   //               No toca medallas, canjes ni la racha. Para pasarle a alguien
   //               que quedó trabado sin darle el panel completo.
+  // ?regalo=15&id=ago30  → suma 15 medallas una sola vez en ese dispositivo.
+  //                        El id evita que se repita si recarga. Usar uno distinto
+  //                        cada vez.
   //
   // wordle:   palabra de 4 a 7 letras, sin acentos ni ñ
   // ahorcado: { palabra: 'XXX', categoria: 'Pista' }, hasta ~10 letras
@@ -3071,7 +3086,7 @@
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
       cuentas: null,
       mencionar10: {
-        categoria: 'Boliches de Buenos Aires',
+        categoria: 'Países de Europa',
         validas: [
           'ALEMANIA','FRANCIA','ITALIA','ESPAÑA','PORTUGAL','REINO UNIDO','IRLANDA',
     'PAISES BAJOS','BELGICA','LUXEMBURGO','SUIZA','AUSTRIA','DINAMARCA',
@@ -3314,6 +3329,7 @@
     historial: [],
     canjes: [],
     perdidos: [],
+    regalos: [],
     versionVista: 0
   };
   const PREMIOS = [
@@ -3742,6 +3758,11 @@
     const overrideEl = document.getElementById('moderador-override');
     const btnRegenerar = document.getElementById('moderador-regenerar');
     const btnReset = document.getElementById('moderador-reset');
+    const regaloCantidad = document.getElementById('regalo-cantidad');
+    const regaloId = document.getElementById('regalo-id');
+    const regaloGenerar = document.getElementById('regalo-generar');
+    const regaloLink = document.getElementById('regalo-link');
+    const regaloLista = document.getElementById('regalo-lista');
     const diaActual = diaLogico();
     const overrideActivo = diaLogicoOverrideActivo();
     const juegoHoy = obtenerJuegoDelDia();
@@ -3864,6 +3885,28 @@
       };
     }
 
+    if (regaloGenerar) {
+      regaloGenerar.onclick = () => {
+        const cantidad = Number.parseInt((regaloCantidad && regaloCantidad.value) || '', 10);
+        const id = ((regaloId && regaloId.value) || '').trim();
+        if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 100 || !/^[A-Za-z0-9]{1,20}$/.test(id)) {
+          if (regaloLink) regaloLink.value = 'Ingresá una cantidad entre 1 y 100 y un id válido';
+          return;
+        }
+        const url = new URL(window.location.href);
+        url.searchParams.set('regalo', String(cantidad));
+        url.searchParams.set('id', id);
+        if (regaloLink) regaloLink.value = url.toString();
+      };
+    }
+
+    if (regaloLista) {
+      const ids = Array.isArray(leerEstado().regalos) ? leerEstado().regalos : [];
+      regaloLista.innerHTML = ids.length
+        ? ids.map((id) => `<li>${id}</li>`).join('')
+        : '<li>Sin regalos aplicados en este dispositivo.</li>';
+    }
+
     const historial = JSON.parse(localStorage.getItem('visitasModerador') || '[]');
     const ahora = new Date();
     const nombreActual = (nombre && nombre.textContent ? nombre.textContent.trim() : '').replace(/\s+/g, ' ') || 'Persona desconocida';
@@ -3941,12 +3984,16 @@
   function normalizarEstado(estado) {
     const base = JSON.parse(JSON.stringify(DEFAULT_ESTADO));
     if (!estado || typeof estado !== 'object') return base;
+    const regalos = Array.isArray(estado.regalos)
+      ? estado.regalos.filter((id) => typeof id === 'string' && /^[A-Za-z0-9]{1,20}$/.test(id.trim())).map((id) => id.trim())
+      : [];
     return {
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
       historial: Array.isArray(estado.historial) ? estado.historial : [],
       canjes: Array.isArray(estado.canjes) ? estado.canjes : [],
       perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : [],
+      regalos: [...new Set(regalos)],
       versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
   }
@@ -4181,19 +4228,26 @@
           return Array.from(mapa.values());
         };
 
+        const regalos = [...new Set([
+          ...(Array.isArray(acumulado.regalos) ? acumulado.regalos : []),
+          ...(Array.isArray(actual.regalos) ? actual.regalos : [])
+        ].filter((id) => typeof id === 'string' && /^[A-Za-z0-9]{1,20}$/.test(id.trim())).map((id) => id.trim()))];
+
         return {
           medallas: Math.max(Number(acumulado.medallas) || 0, Number(actual.medallas) || 0),
           medallasTotales: Math.max(Number(acumulado.medallasTotales) || 0, Number(actual.medallasTotales) || 0),
           historial: unirItems('historial'),
           canjes: unirItems('canjes'),
-          perdidos: unirItems('perdidos')
+          perdidos: unirItems('perdidos'),
+          regalos
         };
       }, {
         medallas: 0,
         medallasTotales: 0,
         historial: [],
         canjes: [],
-        perdidos: []
+        perdidos: [],
+        regalos: []
       });
 
       const mejor = normalizarEstado(combinado);
@@ -4309,6 +4363,47 @@
     return Almacen.guardar(estado);
   }
 
+  async function aplicarRegalo(estadoActual = null) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const id = (params.get('id') || '').trim();
+      const cantidadRaw = params.get('regalo');
+      const diaParam = params.get('dia');
+
+      if (!id || !cantidadRaw) return false;
+      if (diaParam && /^\d{4}-\d{2}-\d{2}$/.test(diaParam)) return false;
+      if (!/^[A-Za-z0-9]{1,20}$/.test(id)) return false;
+
+      const cantidad = Number.parseInt(cantidadRaw, 10);
+      if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 100) return false;
+
+      const base = estadoActual && typeof estadoActual === 'object' ? normalizarEstado(estadoActual) : leerEstado();
+      const regalos = Array.isArray(base.regalos) ? base.regalos : [];
+      if (regalos.includes(id)) return false;
+
+      const nuevoEstado = {
+        ...base,
+        medallas: Number(base.medallas) + cantidad,
+        medallasTotales: Number(base.medallasTotales) + cantidad,
+        regalos: [...regalos, id]
+      };
+
+      await Almacen.guardar(nuevoEstado);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('regalo');
+      url.searchParams.delete('id');
+      window.history.replaceState({}, document.title, url.toString());
+
+      const totalActual = Number((nuevoEstado.medallas) || 0);
+      mostrarRegaloOverlay(cantidad, totalActual);
+      actualizarBadgeMedallas();
+      renderPremios();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   function formatearFechaCorta(fechaIso) {
     if (!fechaIso) return '—';
     const fecha = new Date(fechaIso + 'T00:00:00');
@@ -4327,10 +4422,29 @@
     const overlay = document.getElementById('medalla-overlay');
     const total = Number((leerEstado().medallas) || 0);
     const texto = document.getElementById('medalla-total');
+    const titulo = overlay ? overlay.querySelector('h2') : null;
     if (!overlay || !texto) return;
 
     cerrarJuegoDelDia();
+    if (titulo) titulo.textContent = '¡Ganaste una medalla!';
     texto.textContent = total === 1 ? 'Ya tenés 1 medalla' : `Ya tenés ${total} medallas`;
+    overlay.classList.add('visible');
+    overlay.setAttribute('aria-hidden', 'false');
+    if (overlay._timer) {
+      window.clearTimeout(overlay._timer);
+    }
+    overlay._timer = window.setTimeout(() => ocultarMedallaOverlay(), 4000);
+  }
+
+  function mostrarRegaloOverlay(cantidad, total) {
+    const overlay = document.getElementById('medalla-overlay');
+    const titulo = overlay ? overlay.querySelector('h2') : null;
+    const texto = document.getElementById('medalla-total');
+    if (!overlay || !texto) return;
+
+    cerrarJuegoDelDia();
+    if (titulo) titulo.textContent = `¡Santi te regaló ${cantidad} medallas!`;
+    texto.textContent = total === 1 ? 'Total: 1 medalla' : `Total: ${total} medallas`;
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
     if (overlay._timer) {
@@ -6798,7 +6912,9 @@
         } catch (error) {}
       }
 
-      const estadoNormalizado = normalizarEstado(estado);
+      const estadoConRegalo = await aplicarRegalo(estado);
+      const estadoFinal = estadoConRegalo ? await Almacen.leer() : estado;
+      const estadoNormalizado = normalizarEstado(estadoFinal);
       const saldo = Number(estadoNormalizado.medallas) || 0;
       const total = Number(estadoNormalizado.medallasTotales) || 0;
       const perdidos = Array.isArray(estadoNormalizado.perdidos) ? estadoNormalizado.perdidos : [];
