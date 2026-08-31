@@ -3002,7 +3002,9 @@
   //               que quedó trabado sin darle el panel completo.
   // ?regalo=15&id=ago30  → suma 15 medallas una sola vez en ese dispositivo.
   //                        El id evita que se repita si recarga. Usar uno distinto
-  //                        cada vez.
+  //                        cada vez. Si el navegador borra los datos del sitio,
+  //                        el link puede volver a ser válido; no hay forma de
+  //                        impedirlo sin un backend.
   //
   // wordle:   palabra de 4 a 7 letras, sin acentos ni ñ
   // ahorcado: { palabra: 'XXX', categoria: 'Pista' }, hasta ~10 letras
@@ -4123,11 +4125,13 @@
       }
     },
     _guardarCookie(estado) {
-      const payload = JSON.stringify(estado);
+      const base = normalizarEstado(estado);
+      const payload = JSON.stringify(base);
       const base64 = btoa(encodeURIComponent(payload));
       const compact = payload.length < 3500 ? base64 : btoa(encodeURIComponent(JSON.stringify({
-        medallas: Number(estado.medallas) || 0,
-        medallasTotales: Number(estado.medallasTotales) || 0
+        medallas: Number(base.medallas) || 0,
+        medallasTotales: Number(base.medallasTotales) || 0,
+        regalos: Array.isArray(base.regalos) ? base.regalos : []
       })));
       const expires = new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toUTCString();
       document.cookie = `estadoUsuario=${encodeURIComponent(compact)}; expires=${expires}; path=/; SameSite=Lax`;
@@ -4370,29 +4374,48 @@
       const cantidadRaw = params.get('regalo');
       const diaParam = params.get('dia');
 
-      if (!id || !cantidadRaw) return false;
-      if (diaParam && /^\d{4}-\d{2}-\d{2}$/.test(diaParam)) return false;
-      if (!/^[A-Za-z0-9]{1,20}$/.test(id)) return false;
+      const limpiarParametrosURL = () => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('regalo');
+        url.searchParams.delete('id');
+        window.history.replaceState({}, document.title, url.toString());
+      };
+
+      if (!id || !cantidadRaw) {
+        limpiarParametrosURL();
+        return false;
+      }
+      if (diaParam && /^\d{4}-\d{2}-\d{2}$/.test(diaParam)) {
+        limpiarParametrosURL();
+        return false;
+      }
+      if (!/^[A-Za-z0-9]{1,20}$/.test(id)) {
+        limpiarParametrosURL();
+        return false;
+      }
 
       const cantidad = Number.parseInt(cantidadRaw, 10);
-      if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 100) return false;
+      if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 100) {
+        limpiarParametrosURL();
+        return false;
+      }
 
-      const base = estadoActual && typeof estadoActual === 'object' ? normalizarEstado(estadoActual) : leerEstado();
+      const base = estadoActual && typeof estadoActual === 'object' ? normalizarEstado(estadoActual) : normalizarEstado(leerEstado());
       const regalos = Array.isArray(base.regalos) ? base.regalos : [];
-      if (regalos.includes(id)) return false;
+      if (regalos.includes(id)) {
+        limpiarParametrosURL();
+        return true;
+      }
 
       const nuevoEstado = {
         ...base,
         medallas: Number(base.medallas) + cantidad,
         medallasTotales: Number(base.medallasTotales) + cantidad,
-        regalos: [...regalos, id]
+        regalos: [...new Set([...regalos, id])]
       };
 
       await Almacen.guardar(nuevoEstado);
-      const url = new URL(window.location.href);
-      url.searchParams.delete('regalo');
-      url.searchParams.delete('id');
-      window.history.replaceState({}, document.title, url.toString());
+      limpiarParametrosURL();
 
       const totalActual = Number((nuevoEstado.medallas) || 0);
       mostrarRegaloOverlay(cantidad, totalActual);
@@ -4443,7 +4466,7 @@
     if (!overlay || !texto) return;
 
     cerrarJuegoDelDia();
-    if (titulo) titulo.textContent = `¡Santi te regaló ${cantidad} medallas!`;
+    if (titulo) titulo.textContent = `¡Santy te regaló ${cantidad} medallas!`;
     texto.textContent = total === 1 ? 'Total: 1 medalla' : `Total: ${total} medallas`;
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
