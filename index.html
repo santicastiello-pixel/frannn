@@ -2926,61 +2926,6 @@
   const cielo = document.querySelector('.cielo');
   const astro = document.querySelector('.astro');
 
-  let audioContext = null;
-
-  function obtenerAudioContext() {
-    if (!audioContext) {
-      const AudioCtor = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtor) return null;
-      audioContext = new AudioCtor();
-    }
-    return audioContext;
-  }
-
-  function reproducirBeep({ frequency = 440, duration = 0.07, volume = 0.028, type = 'sine', sweep = 0 } = {}) {
-    const context = obtenerAudioContext();
-    if (!context) return;
-
-    const now = context.currentTime;
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, now);
-    if (sweep) {
-      oscillator.frequency.exponentialRampToValueAtTime(Math.max(60, frequency + sweep), now + duration);
-    }
-
-    gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.exponentialRampToValueAtTime(volume, now + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    oscillator.start(now);
-    oscillator.stop(now + duration + 0.02);
-  }
-
-  function reproducirClickJuego() {
-    reproducirBeep({ frequency: 540, duration: 0.08, volume: 0.0185, type: 'triangle', sweep: 52 });
-  }
-
-  function reproducirMemoriaNaranja() {
-    reproducirBeep({ frequency: 620, duration: 0.11, volume: 0.03, type: 'sawtooth', sweep: 140 });
-  }
-
-  function reproducirVictoria() {
-    reproducirBeep({ frequency: 660, duration: 0.10, volume: 0.024, type: 'triangle', sweep: 80 });
-    setTimeout(() => reproducirBeep({ frequency: 880, duration: 0.12, volume: 0.022, type: 'triangle', sweep: 110 }), 90);
-  }
-
-  document.addEventListener('click', (event) => {
-    const button = event.target.closest('#game-modal button');
-    if (button) {
-      reproducirClickJuego();
-    }
-  });
-
   // ─────────────────────────────────────────────
   // CONTENIDO DE LOS JUEGOS, DÍA POR DÍA
   // Agregar entradas con la fecha en formato YYYY-MM-DD (hora local).
@@ -3030,7 +2975,7 @@
       wordle: 'DOMINGO',
       ahorcado: { palabra: 'LUQUITAS', categoria: 'UADE' },
       sopa: ['RUSTICA', 'ALPASO', 'LASEDE', 'WAT', 'CAFE', 'MATE'],
-      memoria: [4, 12, 7, 20, 3, 16, 9, 22],
+      memoria: [3, 17, 7, 12, 8, 24, 3, 19],
       cuentas: null,
       mencionar10: {
         categoria: 'Cantantes de reggaetón/trap latino',
@@ -3071,9 +3016,9 @@
       }
     },
     '2026-08-31': {
-      wordle: 'PASTAS',
-      ahorcado: { palabra: 'INSULINA', categoria: 'Medicina' },
-      sopa: ['SUSHI', 'PIZZA', 'ASADO', 'POLLO', 'CALABAZA', 'TOMATE'],
+      wordle: 'BOLICHE',
+      ahorcado: { palabra: 'SIXSEVEN', categoria: 'AURA' },
+      sopa: ['FUTBOL', 'RUGBY', 'HOCKEY', 'VOLLEY', 'BASQUET', 'TENIS'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
       cuentas: null,
       mencionar10: {
@@ -4625,7 +4570,6 @@
       }
     }
 
-    reproducirVictoria();
     mostrarMedallaOverlay();
   }
 
