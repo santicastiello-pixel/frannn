@@ -2747,17 +2747,6 @@
 
     <ul id="moderador-warnings" class="meta" hidden></ul>
 
-    <div class="control-global">
-      <div class="control-global-head">Regalo de medallas</div>
-      <div class="control-global-editor">
-        <input id="regalo-cantidad" type="number" min="1" max="100" step="1" placeholder="15" aria-label="Cantidad de medallas">
-        <input id="regalo-id" type="text" maxlength="20" placeholder="ago30" aria-label="ID del regalo">
-      </div>
-      <button id="regalo-generar" type="button">Armar link</button>
-      <input id="regalo-link" class="control-global-json" type="text" readonly placeholder="https://..." aria-label="Link del regalo">
-      <div id="regalo-lista" class="meta"></div>
-    </div>
-
     <div class="acciones">
       <button id="moderador-regenerar" type="button">Regenerar juegos de hoy</button>
       <button id="moderador-reset" class="danger" type="button">Reset total</button>
@@ -2899,7 +2888,7 @@
     <p class="dia-mensaje" id="dia-mensaje">Que tengas un gran día!</p>
     <p class="dia-semana" id="dia-semana">Feliz día</p>
 
-    <p class="firma">Santiago te manda un abrazo</p>
+    <p class="firma">Abrazo!</p>
 
     <div class="pie">
       <span class="ayuda" id="ayuda"></span>
@@ -3336,8 +3325,8 @@
   };
   const PREMIOS = [
     { id: 'cafe', nombre: 'Un café de Rústica', costo: 15, emoji: '☕' },
-    { id: 'peli', nombre: 'Capítulo de Friends', costo: 25, emoji: '🎬' },
-    { id: 'cena', nombre: 'Unas papas de Mc', costo: 40, emoji: '🍟' },
+    { id: 'peli', nombre: 'Un Capítulo de Friends', costo: 25, emoji: '🎬' },
+    { id: 'cena', nombre: 'Unas papas de Mac', costo: 40, emoji: '🍟' },
     { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 60, emoji: '⛍' }
   ];
   const JUEGOS = {
@@ -3420,7 +3409,7 @@
 
   const TEMAS = [
     { max:5,  id:'descanso',   saludo:'Que descanses', a:'#0A1029', b:'#1A1B4B', c:'#38295F', astro:'#D7E1FF', y:'36%', tinta:'#F2F5FF' },
-    { max:10,  id:'mañana', saludo:'Buenos días', a:'#080C22', b:'#1C1746', c:'#3A2C63', astro:'#D8E2FF', y:'74%', tinta:'#EDF1FF' },
+    { max:10,  id:'mañana', saludo:'Buenos días', a:'#101A2E', b:'#2C446C', c:'#E3A86A', astro:'#FFE2AE', y:'78%', tinta:'#F8F4EE' },
     { max:14, id:'mediodía',  saludo:'Que tengas un gran día!', a:'#1C5FA8', b:'#79BEE6', c:'#FFE9B8', astro:'#FFFDF2', y:'22%', tinta:'#0E2340' },
     { max:18, id:'tarde',     saludo:'Que tengas una excelente tarde', a:'#CFEAFF', b:'#BCE7FF', c:'#F8DDA0', astro:'#FFF9DB', y:'24%', tinta:'#1A3C5B' },
     { max:20, id:'atardecer', saludo:'Buenas tardes', a:'#4A1F63', b:'#E0565C', c:'#FFB05C', astro:'#FFD08A', y:'70%', tinta:'#FFF1E6' },
@@ -3429,7 +3418,7 @@
   ];
 
   const MENSAJES_POR_DIA = {
-    1: 'Feliz lunes, hoy tenés baile',
+    1: 'Feliz lunes, que empieces bien la semana!',
     2: 'Feliz martes',
     3: 'Feliz miércoles, hoy tenés baile',
     4: 'Feliz jueves',
@@ -3760,11 +3749,6 @@
     const overrideEl = document.getElementById('moderador-override');
     const btnRegenerar = document.getElementById('moderador-regenerar');
     const btnReset = document.getElementById('moderador-reset');
-    const regaloCantidad = document.getElementById('regalo-cantidad');
-    const regaloId = document.getElementById('regalo-id');
-    const regaloGenerar = document.getElementById('regalo-generar');
-    const regaloLink = document.getElementById('regalo-link');
-    const regaloLista = document.getElementById('regalo-lista');
     const diaActual = diaLogico();
     const overrideActivo = diaLogicoOverrideActivo();
     const juegoHoy = obtenerJuegoDelDia();
@@ -3885,28 +3869,6 @@
 
         window.location.reload();
       };
-    }
-
-    if (regaloGenerar) {
-      regaloGenerar.onclick = () => {
-        const cantidad = Number.parseInt((regaloCantidad && regaloCantidad.value) || '', 10);
-        const id = ((regaloId && regaloId.value) || '').trim();
-        if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > 100 || !/^[A-Za-z0-9]{1,20}$/.test(id)) {
-          if (regaloLink) regaloLink.value = 'Ingresá una cantidad entre 1 y 100 y un id válido';
-          return;
-        }
-        const url = new URL(window.location.href);
-        url.searchParams.set('regalo', String(cantidad));
-        url.searchParams.set('id', id);
-        if (regaloLink) regaloLink.value = url.toString();
-      };
-    }
-
-    if (regaloLista) {
-      const ids = Array.isArray(leerEstado().regalos) ? leerEstado().regalos : [];
-      regaloLista.innerHTML = ids.length
-        ? ids.map((id) => `<li>${id}</li>`).join('')
-        : '<li>Sin regalos aplicados en este dispositivo.</li>';
     }
 
     const historial = JSON.parse(localStorage.getItem('visitasModerador') || '[]');
