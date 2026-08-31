@@ -903,78 +903,44 @@
   }
 
   .ahorcado-dibujo {
-    position:relative;
-    width:min(28vw, 180px);
-    height:min(28vw, 180px);
-    max-width:180px;
-    max-height:180px;
+    width:min(160px, 40%);
+    aspect-ratio:120 / 140;
     margin:0 auto;
+    overflow:visible;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     border-radius:18px;
     background:rgba(255,255,255,0.02);
     border:1px solid rgba(255,255,255,0.12);
   }
 
-  .ahorcado-base,
-  .ahorcado-soporte,
-  .ahorcado-soga,
-  .ahorcado-cabeza,
-  .ahorcado-cuerpo,
-  .ahorcado-brazo-izq,
-  .ahorcado-brazo-der,
-  .ahorcado-pierna-izq,
-  .ahorcado-pierna-der {
-    position:absolute;
+  .ahorcado-dibujo svg {
+    width:100%;
+    height:100%;
     display:block;
+    overflow:visible;
+  }
+
+  .ahorcado-part {
     opacity:0;
+    fill:none;
+    stroke:var(--ahorcado-tinta, #f4ecff);
+    stroke-width:3;
+    stroke-linecap:round;
+    stroke-linejoin:round;
     transition:opacity .18s ease;
   }
 
-  .ahorcado-base.visible,
-  .ahorcado-soporte.visible,
-  .ahorcado-soga.visible,
-  .ahorcado-cabeza.visible,
-  .ahorcado-cuerpo.visible,
-  .ahorcado-brazo-izq.visible,
-  .ahorcado-brazo-der.visible,
-  .ahorcado-pierna-izq.visible,
-  .ahorcado-pierna-der.visible {
+  .ahorcado-part.visible {
     opacity:1;
   }
 
-  .ahorcado-base {
-    left:18px; right:18px; bottom:16px; height:6px; border-radius:999px; background:#f4ecff;
-  }
-
-  .ahorcado-soporte {
-    left:32px; bottom:22px; width:6px; height:120px; background:#f4ecff;
-  }
-
-  .ahorcado-soga {
-    left:116px; bottom:58px; width:46px; height:44px; border:4px solid #f4ecff; border-bottom:none; border-radius:12px 12px 0 0;
-  }
-
-  .ahorcado-cabeza {
-    left:134px; bottom:96px; width:26px; height:26px; border:4px solid #f4ecff; border-radius:50%;
-  }
-
-  .ahorcado-cuerpo {
-    left:146px; bottom:70px; width:4px; height:42px; background:#f4ecff;
-  }
-
-  .ahorcado-brazo-izq {
-    left:126px; bottom:82px; width:28px; height:4px; background:#f4ecff; transform:rotate(30deg); transform-origin:right center;
-  }
-
-  .ahorcado-brazo-der {
-    left:150px; bottom:82px; width:28px; height:4px; background:#f4ecff; transform:rotate(-30deg); transform-origin:left center;
-  }
-
-  .ahorcado-pierna-izq {
-    left:132px; bottom:42px; width:28px; height:4px; background:#f4ecff; transform:rotate(38deg); transform-origin:right center;
-  }
-
-  .ahorcado-pierna-der {
-    left:150px; bottom:42px; width:28px; height:4px; background:#f4ecff; transform:rotate(-38deg); transform-origin:left center;
+  @media (prefers-reduced-motion: reduce) {
+    .ahorcado-part {
+      opacity:1;
+      transition:none;
+    }
   }
 
   .ahorcado-word {
@@ -3099,19 +3065,33 @@
       }
     },
     '2026-08-31': {
-      wordle: 'GAVIOTA',
-      ahorcado: { palabra: 'QUEVEDO', categoria: 'Música' },
-      sopa: ['ALEXIA', 'POPA', 'MILI', 'CANDE', 'FRANSHU', 'JUANA'],
+      wordle: 'PASTAS',
+      ahorcado: { palabra: 'INSULINA', categoria: 'Medicina' },
+      sopa: ['SUSHI', 'PIZZA', 'ASADO', 'POLLO', 'CALABAZA', 'TOMATE'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
       cuentas: null,
       mencionar10: {
         categoria: 'Boliches de Buenos Aires',
         validas: [
-          'NONSTOP', 'NILO', 'JET', 'AFRIKA', 'CARAMELO', 'TEQUILA', 'MOSCU', 'MATA', 'ROCA BRUJA',
-          'CHINITO', 'CRUZA', 'KIKA', 'CROBAR', 'BANANA', 'CRETA', 'LA CABRERA', 'NICETO',
-          'BLACK', 'BRESH', 'BRUJAS', 'CAIX', 'THE BOW','MOROCCO', 'MINT', 'PIRATA', 'KAPITAL', 'LA FIESTA', 'EL QUINCHO', 'LA SIRENA', 'EL DORADO','TROPITANGO'
+          'ALEMANIA','FRANCIA','ITALIA','ESPAÑA','PORTUGAL','REINO UNIDO','IRLANDA',
+    'PAISES BAJOS','BELGICA','LUXEMBURGO','SUIZA','AUSTRIA','DINAMARCA',
+    'SUECIA','NORUEGA','FINLANDIA','ISLANDIA','POLONIA','REPUBLICA CHECA',
+    'ESLOVAQUIA','HUNGRIA','RUMANIA','BULGARIA','GRECIA','CROACIA','ESLOVENIA',
+    'SERBIA','BOSNIA','MONTENEGRO','MACEDONIA DEL NORTE','ALBANIA','KOSOVO',
+    'UCRANIA','BIELORRUSIA','RUSIA','ESTONIA','LETONIA','LITUANIA','MOLDAVIA',
+    'CHIPRE','MALTA','ANDORRA','MONACO','SAN MARINO','LIECHTENSTEIN',
+    'CIUDAD DEL VATICANO','TURQUIA'
         ],
-        alias: { 'NON STOP': 'NONSTOP', 'AFRIK': 'AFRIKA', NINOGORDO: 'NIÑO GORDO' },
+        alias: {  'HOLANDA': 'PAISES BAJOS',
+    'INGLATERRA': 'REINO UNIDO',
+    'GRAN BRETAÑA': 'REINO UNIDO',
+    'ESCOCIA': 'REINO UNIDO',
+    'GALES': 'REINO UNIDO',
+    'CHEQUIA': 'REPUBLICA CHECA',
+    'MACEDONIA': 'MACEDONIA DEL NORTE',
+    'VATICANO': 'CIUDAD DEL VATICANO',
+    'BOSNIA Y HERZEGOVINA': 'BOSNIA',
+    'BIELORUSIA': 'BIELORRUSIA' },
         segundos: 180
       }
     }
@@ -3334,7 +3314,6 @@
     historial: [],
     canjes: [],
     perdidos: [],
-    rachas: {},
     versionVista: 0
   };
   const PREMIOS = [
@@ -3962,21 +3941,86 @@
   function normalizarEstado(estado) {
     const base = JSON.parse(JSON.stringify(DEFAULT_ESTADO));
     if (!estado || typeof estado !== 'object') return base;
-    const rachas = estado.rachas && typeof estado.rachas === 'object' && !Array.isArray(estado.rachas)
-      ? Object.fromEntries(Object.entries(estado.rachas).filter(([key, value]) => key && value && typeof value === 'object').map(([key, value]) => {
-          const dias = Number(value.dias) || 0;
-          return [key, { dias, ultimaFecha: typeof value.ultimaFecha === 'string' ? value.ultimaFecha : null }];
-        }))
-      : {};
     return {
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
       historial: Array.isArray(estado.historial) ? estado.historial : [],
       canjes: Array.isArray(estado.canjes) ? estado.canjes : [],
       perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : [],
-      rachas,
       versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
+  }
+
+  function normalizarClaveJuego(valor) {
+    return String(valor || '').trim().toLowerCase().replace(/\s+/g, '');
+  }
+
+  function juegoCoincideConId(item, juegoId) {
+    if (!item || typeof item !== 'object') return false;
+    const claveJuego = normalizarClaveJuego(item.juego);
+    const claveJuegoId = normalizarClaveJuego(item.juegoId);
+    const claveObjetivo = normalizarClaveJuego(juegoId);
+    const claveNombre = normalizarClaveJuego((JUEGOS[juegoId] && JUEGOS[juegoId].nombre) || '');
+
+    return (
+      claveJuego === claveObjetivo ||
+      claveJuegoId === claveObjetivo ||
+      claveJuego === claveNombre ||
+      claveJuegoId === claveNombre ||
+      (juegoId === 'mencionar10' && (claveJuego === 'top5' || claveJuegoId === 'top5'))
+    );
+  }
+
+  function restarUnDia(fechaStr) {
+    const [y, m, d] = String(fechaStr || '').split('-').map(Number);
+    if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return fechaStr;
+    const tiempo = Date.UTC(y, m - 1, d) - 86400000;
+    const fecha = new Date(tiempo);
+    return `${fecha.getUTCFullYear()}-${String(fecha.getUTCMonth() + 1).padStart(2, '0')}-${String(fecha.getUTCDate()).padStart(2, '0')}`;
+  }
+
+  function calcularRachaJuego(juegoId, estadoActual = leerEstado()) {
+    const estado = normalizarEstado(estadoActual);
+    const hoy = diaLogico();
+    const perdidos = Array.isArray(estado.perdidos) ? estado.perdidos : [];
+    const historial = Array.isArray(estado.historial) ? estado.historial : [];
+
+    const perdioHoy = perdidos.some((item) => {
+      if (!item || typeof item !== 'object') return false;
+      return item.fecha === hoy && (item.juego === juegoId || item.juegoId === juegoId);
+    });
+    if (perdioHoy) return 0;
+
+    const ganadas = [...new Set(
+      historial
+        .filter((item) => {
+          if (!item || typeof item !== 'object') return false;
+          return item.fecha && (item.juego === juegoId || item.juegoId === juegoId);
+        })
+        .map((item) => String(item.fecha))
+        .filter(Boolean)
+    )].sort().reverse();
+
+    if (!ganadas.length) return 0;
+
+    const ayer = restarUnDia(hoy);
+    if (ganadas[0] !== hoy && ganadas[0] !== ayer) return 0;
+
+    const perdidas = new Set(
+      perdidos
+        .filter((item) => item && typeof item === 'object' && (item.juego === juegoId || item.juegoId === juegoId))
+        .map((item) => String(item.fecha || ''))
+        .filter(Boolean)
+    );
+
+    let racha = 1;
+    for (let i = 1; i < ganadas.length; i++) {
+      const esperada = restarUnDia(ganadas[i - 1]);
+      if (ganadas[i] !== esperada) break;
+      if (perdidas.has(ganadas[i])) break;
+      racha += 1;
+    }
+    return racha;
   }
 
   function obtenerMensajeDelDiaSegunHora() {
@@ -3991,39 +4035,15 @@
   }
 
   function obtenerRachaJuego(juegoId) {
-    const estado = leerEstado();
-    const racha = estado.rachas && estado.rachas[juegoId];
-    return Number(racha && Number(racha.dias) > 0 ? Number(racha.dias) : 0) || 0;
+    return calcularRachaJuego(juegoId, leerEstado());
   }
 
   function limpiarRachaJuego(juegoId, estadoActual = leerEstado()) {
-    const estado = normalizarEstado(estadoActual);
-    const rachas = { ...(estado.rachas || {}) };
-    delete rachas[juegoId];
-    return { ...estado, rachas };
+    return normalizarEstado(estadoActual);
   }
 
   function actualizarRachaVictoria(juegoId, estadoActual = leerEstado()) {
-    const estado = normalizarEstado(estadoActual);
-    const fechaActual = diaLogico();
-    const rachas = { ...(estado.rachas || {}) };
-    const actual = rachas[juegoId] || { dias: 0, ultimaFecha: null };
-    const ultimaFecha = typeof actual.ultimaFecha === 'string' ? actual.ultimaFecha : null;
-
-    let nuevoTotal = 1;
-    if (ultimaFecha) {
-      const ultima = new Date(`${ultimaFecha}T00:00:00`);
-      const hoy = new Date(`${fechaActual}T00:00:00`);
-      const diferenciaDias = Math.round((hoy.getTime() - ultima.getTime()) / 86400000);
-      if (diferenciaDias === 1) {
-        nuevoTotal = Number(actual.dias || 0) + 1;
-      } else if (diferenciaDias === 0) {
-        nuevoTotal = Number(actual.dias || 0) || 1;
-      }
-    }
-
-    rachas[juegoId] = { dias: nuevoTotal, ultimaFecha: fechaActual };
-    return { ...estado, rachas };
+    return normalizarEstado(estadoActual);
   }
 
   const Almacen = {
@@ -4451,7 +4471,7 @@
       perdidos: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.perdidos) ? estado.perdidos : [])]
     };
 
-    guardarEstado(limpiarRachaJuego(juegoId, nuevoEstado));
+    guardarEstado(nuevoEstado);
     renderMenuJuegos();
   }
 
@@ -4488,8 +4508,7 @@
       historial: [{ fecha, juego: juegoActual.id, juegoId: juegoActual.id, nombre: juegoActual.nombre }, ...(Array.isArray(estado.historial) ? estado.historial : [])]
     };
 
-    const conRacha = actualizarRachaVictoria(juegoId, nuevoEstado);
-    guardarEstado(conRacha);
+    guardarEstado(nuevoEstado);
     actualizarBadgeMedallas();
     renderPremios();
     renderMenuJuegos();
@@ -5656,6 +5675,7 @@
     let terminado = false;
     const status = document.getElementById('game-status');
     const yaGanado = yaGanoMedallaHoy('ahorcado');
+    const NS = 'http://www.w3.org/2000/svg';
 
     const shell = document.createElement('div');
     shell.className = 'ahorcado-shell';
@@ -5663,15 +5683,34 @@
     const dibujo = document.createElement('div');
     dibujo.className = 'ahorcado-dibujo';
 
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 120 140');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.setAttribute('aria-label', 'Dibujo del ahorcado');
+    svg.setAttribute('role', 'img');
+
     const partes = [
-      'base', 'soporte', 'soga', 'cabeza', 'cuerpo', 'brazo-izq', 'brazo-der', 'pierna-izq', 'pierna-der'
+      { key: 'base', tag: 'line', attrs: { x1: 10, y1: 130, x2: 70, y2: 130 } },
+      { key: 'soporte', tag: 'line', attrs: { x1: 30, y1: 130, x2: 30, y2: 15 } },
+      { key: 'travesaño', tag: 'line', attrs: { x1: 30, y1: 15, x2: 80, y2: 15 } },
+      { key: 'soga', tag: 'line', attrs: { x1: 80, y1: 15, x2: 80, y2: 30 } },
+      { key: 'cabeza', tag: 'circle', attrs: { cx: 80, cy: 40, r: 10 } },
+      { key: 'cuerpo', tag: 'line', attrs: { x1: 80, y1: 50, x2: 80, y2: 80 } },
+      { key: 'brazo-izq', tag: 'line', attrs: { x1: 80, y1: 58, x2: 65, y2: 72 } },
+      { key: 'brazo-der', tag: 'line', attrs: { x1: 80, y1: 58, x2: 95, y2: 72 } },
+      { key: 'pierna-izq', tag: 'line', attrs: { x1: 80, y1: 80, x2: 66, y2: 100 } },
+      { key: 'pierna-der', tag: 'line', attrs: { x1: 80, y1: 80, x2: 94, y2: 100 } }
     ];
 
-    partes.forEach((parte) => {
-      const el = document.createElement('span');
-      el.className = `ahorcado-${parte}`;
-      dibujo.appendChild(el);
+    const elementosPartes = partes.map(({ key, tag, attrs }) => {
+      const el = document.createElementNS(NS, tag);
+      el.setAttribute('class', `ahorcado-part ahorcado-${key}`);
+      Object.entries(attrs).forEach(([name, value]) => el.setAttribute(name, String(value)));
+      svg.appendChild(el);
+      return el;
     });
+
+    dibujo.appendChild(svg);
 
     const wordWrap = document.createElement('div');
     wordWrap.className = 'ahorcado-word';
@@ -5690,9 +5729,9 @@
     };
 
     const renderDibujo = () => {
-      const items = [...dibujo.children];
-      items.forEach((item, index) => {
-        item.classList.toggle('visible', index < errores);
+      const visibles = 4 + errores;
+      elementosPartes.forEach((item, index) => {
+        item.classList.toggle('visible', index < visibles && index < elementosPartes.length);
       });
     };
 
@@ -5750,7 +5789,9 @@
       const letrasPalabra = [...new Set(palabra)];
       letrasPalabra.forEach((letra) => letrasUsadas.add(letra));
       renderWord();
-      renderDibujo();
+      elementosPartes.forEach((item, index) => {
+        item.classList.toggle('visible', index < 4 || index <= 4 + letrasPalabra.length);
+      });
       renderTeclado();
       shell.appendChild(dibujo);
       shell.appendChild(wordWrap);
