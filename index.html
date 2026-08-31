@@ -1471,8 +1471,25 @@
     font-size:10px;
     letter-spacing:.12em;
     text-transform:uppercase;
-    pointer-events:none;
+    pointer-events:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
     transition:opacity .2s ease, transform .2s ease;
+  }
+
+  .premio-whatsapp-link {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.24);
+    color:#fff;
+    text-decoration:none;
+    font-weight:700;
+    letter-spacing:.08em;
   }
 
   .game-toast.visible,
@@ -3002,6 +3019,9 @@
   // Agregar entradas con la fecha en formato YYYY-MM-DD (hora local).
   // Cada día se activa solo a las 10:00 de Buenos Aires.
   // Si falta una fecha, ese día el contenido se genera automáticamente.
+  // ?limpiar=1  → borra las marcas de juego de HOY en ese dispositivo.
+  //               No toca medallas, canjes ni la racha. Para pasarle a alguien
+  //               que quedó trabado sin darle el panel completo.
   //
   // wordle:   palabra de 4 a 7 letras, sin acentos ni ñ
   // ahorcado: { palabra: 'XXX', categoria: 'Pista' }, hasta ~10 letras
@@ -3015,6 +3035,9 @@
   const HORA_CORTE = 10;
   const OFFSET_ARG = -3;
   const VERSION_JUEGOS = 1;
+  // Número de WhatsApp de destino para avisar cuando se canjea un premio.
+  // Formato internacional sin + ni espacios.
+  const WHATSAPP_DESTINO = '5491169034363';
   const URL_REPO_CONTROL = 'https://github.com/tuusuario/tu-repo/blob/main/control.json';
   // control.json es el origen de verdad compartido para todos los dispositivos.
   // El panel solo ayuda a redactar el texto; no escribe el archivo.
@@ -3075,7 +3098,7 @@
         segundos: 180
       }
     },
-    '2026-08-29': {
+    '2026-08-31': {
       wordle: 'GAVIOTA',
       ahorcado: { palabra: 'QUEVEDO', categoria: 'Música' },
       sopa: ['ALEXIA', 'POPA', 'MILI', 'CANDE', 'FRANSHU', 'JUANA'],
@@ -3811,18 +3834,12 @@
     }
 
     if (btnRegenerar) {
-      btnRegenerar.onclick = () => {
+      btnRegenerar.onclick = async () => {
         const confirmar = window.confirm('¿Querés regenerar los juegos de hoy? Se limpiarán los registros de historial y perdidos del día lógico actual.');
         if (!confirmar) return;
 
         try {
-          const estado = leerEstado();
-          const nuevoEstado = {
-            ...estado,
-            historial: Array.isArray(estado.historial) ? estado.historial.filter(item => item && item.fecha !== diaActual) : [],
-            perdidos: Array.isArray(estado.perdidos) ? estado.perdidos.filter(item => item && item.fecha !== diaActual) : []
-          };
-          guardarEstado(nuevoEstado);
+          await limpiarMarcasDelDia();
         } catch (error) {}
 
         dispararRegeneracionGlobal();
@@ -4239,6 +4256,35 @@
     return normalizarEstado(JSON.parse(JSON.stringify(DEFAULT_ESTADO)));
   }
 
+  async function limpiarMarcasDelDia(estadoActual = null) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('dia') && /^\d{4}-\d{2}-\d{2}$/.test(params.get('dia'))) {
+        return false;
+      }
+
+      const base = estadoActual && typeof estadoActual === 'object' ? normalizarEstado(estadoActual) : leerEstado();
+      const fechaActual = diaLogico();
+      const historial = Array.isArray(base.historial)
+        ? base.historial.filter(item => !(item && item.fecha === fechaActual))
+        : [];
+      const perdidos = Array.isArray(base.perdidos)
+        ? base.perdidos.filter(item => !(item && item.fecha === fechaActual))
+        : [];
+
+      const cambio = JSON.stringify(base.historial) !== JSON.stringify(historial) || JSON.stringify(base.perdidos) !== JSON.stringify(perdidos);
+      if (!cambio) {
+        return false;
+      }
+
+      const limpio = { ...base, historial, perdidos };
+      await Almacen.guardar(limpio);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   function guardarEstado(estado) {
     return Almacen.guardar(estado);
   }
@@ -4313,15 +4359,35 @@
     }
   }
 
-  function mostrarToastPremios(mensaje) {
+  function construirUrlWhatsapp(texto) {
+    return `https://wa.me/${WHATSAPP_DESTINO}?text=${encodeURIComponent(texto)}`;
+  }
+
+  function mostrarToastPremios(mensaje, opciones = {}) {
     const toast = document.getElementById('premios-toast');
     if (!toast) return;
-    toast.textContent = mensaje;
+    const { whatsappUrl = '', whatsappLabel = 'Avisarle a Santi' } = opciones;
+    toast.innerHTML = '';
+
+    const textNode = document.createElement('span');
+    textNode.textContent = typeof mensaje === 'string' ? mensaje : '';
+    toast.appendChild(textNode);
+
+    if (whatsappUrl) {
+      const link = document.createElement('a');
+      link.href = whatsappUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'premio-whatsapp-link';
+      link.textContent = whatsappLabel;
+      toast.appendChild(link);
+    }
+
     toast.classList.remove('visible');
     void toast.offsetWidth;
     toast.classList.add('visible');
     window.clearTimeout(toast._timer);
-    toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 1800);
+    toast._timer = window.setTimeout(() => toast.classList.remove('visible'), 3200);
   }
 
   function actualizarBadgeMedallas() {
@@ -4499,7 +4565,13 @@
           guardarEstado(nuevoEstado);
           actualizarBadgeMedallas();
           renderPremios();
-          mostrarToastPremios('Canje realizado');
+
+          const texto = `Me debés un ${premio.nombre} :) . Me quedan ${nuevoEstado.medallas} medallas.`;
+          const whatsappUrl = construirUrlWhatsapp(texto);
+          mostrarToastPremios('Canje realizado', {
+            whatsappUrl,
+            whatsappLabel: 'Avisarle a Santi'
+          });
         });
       });
     }
@@ -4512,7 +4584,11 @@
         historial.innerHTML = `
           <h3>Ya canjeaste</h3>
           <ul>
-            ${canjes.map(item => `<li>${item.nombre} · ${formatearFechaCorta(item.fecha)}</li>`).join('')}
+            ${canjes.map((item) => {
+              const texto = `Me debés un ${item.nombre} :) . Me quedan ${Math.max(0, (Number(estado.medallas) || 0))} medallas.`;
+              const whatsappUrl = construirUrlWhatsapp(texto);
+              return `<li>${item.nombre} · ${formatearFechaCorta(item.fecha)} <a class="premio-whatsapp-link" href="${whatsappUrl}" target="_blank" rel="noopener">Avisar</a></li>`;
+            }).join('')}
           </ul>
         `;
       }
@@ -6181,12 +6257,21 @@
   const FIN_BLOQUEO_MS = Date.UTC(2026, 7, 29, 13, 0, 0);  // 10:00 AR = 13:00 UTC
   let bloqueoIntervalId = null;
   let bloqueoTimeoutId = null;
+  let contadorMenuIntervalId = null;
 
   function juegosBloqueadosPorHoy() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('bloqueo') === '1') return true;
-    if (diaLogicoOverrideActivo()) return false;
-    return Date.now() < FIN_BLOQUEO_MS;
+    return false;
+  }
+
+  function proximoCorteMs() {
+    const ahora = Date.now();
+    const horaUTC = ((HORA_CORTE - OFFSET_ARG) % 24 + 24) % 24;
+    const d = new Date(ahora);
+    let corte = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), horaUTC, 0, 0);
+    if (ahora >= corte) corte += 24 * 60 * 60 * 1000;
+    return corte;
   }
 
   function formatearCuentaRegresiva(ms) {
@@ -6205,6 +6290,13 @@
     if (bloqueoTimeoutId !== null) {
       window.clearTimeout(bloqueoTimeoutId);
       bloqueoTimeoutId = null;
+    }
+  }
+
+  function limpiarRefreshStatusMenu() {
+    if (contadorMenuIntervalId !== null) {
+      window.clearInterval(contadorMenuIntervalId);
+      contadorMenuIntervalId = null;
     }
   }
 
@@ -6232,6 +6324,24 @@
     }, 1000);
   }
 
+  function arranqueRefreshStatusMenu() {
+    limpiarRefreshStatusMenu();
+    contadorMenuIntervalId = window.setInterval(() => {
+      const timer = document.getElementById('game-refresh-timer');
+      if (!timer) return;
+
+      const restante = proximoCorteMs() - Date.now();
+      timer.textContent = formatearCuentaRegresiva(restante);
+
+      if (restante <= 1000) {
+        comprobarCambioDeDia();
+      }
+
+      actualizarRefreshStatus();
+    }, 1000);
+    actualizarRefreshStatus();
+  }
+
   function actualizarRefreshStatus() {
     const timer = document.getElementById('game-refresh-timer');
     const status = document.getElementById('game-refresh-status');
@@ -6241,7 +6351,7 @@
     if (!timer) return;
 
     const disponibleEnMenu = !!(modal && modal.classList.contains('visible') && menu && !menu.classList.contains('hidden') && stage && stage.classList.contains('hidden'));
-    const restante = Math.max(0, FIN_BLOQUEO_MS - Date.now());
+    const restante = Math.max(0, proximoCorteMs() - Date.now());
     timer.textContent = formatearCuentaRegresiva(restante);
 
     if (status) {
@@ -6441,6 +6551,7 @@
       juegoActivoDesmontar = null;
     }
     limpiarBloqueoCountdown();
+    limpiarRefreshStatusMenu();
     toggleRefreshStatusMenu(true);
     if (stage) {
       stage.innerHTML = '';
@@ -6450,6 +6561,11 @@
       modal.classList.remove('visible');
       modal.setAttribute('aria-hidden', 'true');
     }
+    if (menu) {
+      menu.classList.remove('hidden');
+    }
+    actualizarRefreshStatus();
+    arranqueRefreshStatusMenu();
     toggleBodyModalLock(false);
   }
 
@@ -6624,6 +6740,23 @@
     try {
       const estado = await Almacen.leer();
       if (!estado || typeof estado !== 'object') return;
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('limpiar') === '1' && !(params.get('dia') && /^\d{4}-\d{2}-\d{2}$/.test(params.get('dia')))) {
+        try {
+          const huboCambio = await limpiarMarcasDelDia(estado);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('limpiar');
+          window.history.replaceState({}, document.title, url.toString());
+          if (huboCambio || true) {
+            mostrarToastPremios('Listo, los juegos de hoy están disponibles de nuevo');
+            actualizarBadgeMedallas();
+            renderMenuJuegos();
+            renderPremios();
+          }
+        } catch (error) {}
+      }
+
       const estadoNormalizado = normalizarEstado(estado);
       const saldo = Number(estadoNormalizado.medallas) || 0;
       const total = Number(estadoNormalizado.medallasTotales) || 0;
@@ -6667,7 +6800,7 @@
   cargarClima();
   setInterval(pintarCielo, 60000);
   setInterval(comprobarCambioDeDia, 60000);
-  setInterval(actualizarRefreshStatus, 1000);
+  arranqueRefreshStatusMenu();
   setInterval(cargarClima, 600000);
   actualizarRefreshStatus();
   programarProximoCambio();
