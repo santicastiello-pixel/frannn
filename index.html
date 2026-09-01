@@ -3994,7 +3994,7 @@
       id: 'vasos',
       nombre: 'Vasos',
       desc: 'Seguí la bolita con la mirada',
-      icono: { emoji: '🔎;', fondo: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+      icono: { emoji: '🔎', fondo: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarVasos(contenedor, rand, onGanar, onPerder);
       }
@@ -6556,6 +6556,12 @@
       return id;
     };
     const reducido = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    // Diagnóstico temporal para el bug reportado de la bolita en ronda 3. Se activa con
+    // ?debugvasos=1 y no afecta el juego normal. Sacar cuando esté confirmado y resuelto.
+    const DEBUG_VASOS = new URLSearchParams(window.location.search).get('debugvasos') === '1';
+    const logVasos = (...args) => {
+      if (DEBUG_VASOS) console.log('[vasos]', ...args);
+    };
     let cancelado = false;
     let terminado = false;
     let rondaActual = 0;
@@ -6850,6 +6856,8 @@
       const totalIntercambios = config.intercambios;
       let ultimoPar = null;
 
+      logVasos(`ronda ${rondaActual + 1} · inicio mezcla · bolaCupId=${bolaCupId} · posiciones=${JSON.stringify(posiciones)}`);
+
       for (let i = 0; i < totalIntercambios; i++) {
         if (cancelado) return;
         // Un porcentaje de los pasos mueve DOS pares disjuntos a la vez (par2 excluye
@@ -6862,6 +6870,11 @@
           const par2 = elegirPar(rand, VASOS_TOTAL, par1, null);
           ultimoPar = par1;
 
+          if (DEBUG_VASOS && (par1.includes(par2[0]) || par1.includes(par2[1]))) {
+            console.error('[vasos] BUG CONFIRMADO: pares no disjuntos', par1, par2);
+          }
+
+          const antes = JSON.stringify(posiciones);
           if (reducido) {
             message.textContent = `El vaso ${par1[0] + 1} y el ${par1[1] + 1} cambian de lugar, y a la vez el ${par2[0] + 1} con el ${par2[1] + 1} también`;
             [posiciones[par1[0]], posiciones[par1[1]]] = [posiciones[par1[1]], posiciones[par1[0]]];
@@ -6876,10 +6889,12 @@
             ]);
             await esperar(randRange(rand, config.pausaMin, config.pausaMax));
           }
+          logVasos(`  paso ${i} DOBLE par1=[${par1}] par2=[${par2}] · antes=${antes} · despues=${JSON.stringify(posiciones)}`);
         } else {
           const [a, b] = elegirPar(rand, VASOS_TOTAL, null, ultimoPar);
           ultimoPar = [a, b];
 
+          const antes = JSON.stringify(posiciones);
           if (reducido) {
             message.textContent = `El vaso ${a + 1} y el ${b + 1} cambian de lugar`;
             const temp = posiciones[a];
@@ -6891,6 +6906,7 @@
             await animarIntercambio(a, b, duracion);
             await esperar(randRange(rand, config.pausaMin, config.pausaMax));
           }
+          logVasos(`  paso ${i} simple par=[${a},${b}] · antes=${antes} · despues=${JSON.stringify(posiciones)}`);
         }
         if (cancelado) return;
       }
@@ -6898,6 +6914,30 @@
       // orden de creación: sin esto, el estado interno queda bien pero el DOM
       // vuelve a mostrar todo ordenado justo antes de habilitar el toque.
       posicionarVasos(posiciones);
+
+      if (DEBUG_VASOS) {
+        const slotEsperado = posiciones.indexOf(bolaCupId);
+        const cupBolita = cupNodes.find((cup) => cup.id === bolaCupId);
+        const { slots } = obtenerDisposicion();
+        const leftEsperado = slotEsperado >= 0 ? slots[slotEsperado] : null;
+        const leftReal = cupBolita ? parseFloat(cupBolita.mover.style.left) : null;
+        const coincide = leftEsperado !== null && leftReal !== null && Math.abs(leftEsperado - leftReal) < 0.5;
+        logVasos(`fin mezcla · bolaCupId=${bolaCupId} · slot esperado=${slotEsperado} (left=${leftEsperado}) · left real del vaso=${leftReal} · ${coincide ? 'OK coincide' : 'DESAJUSTE'}`);
+        if (!coincide) {
+          console.error('[vasos] BUG CONFIRMADO: el DOM no coincide con el array de posiciones al final de la mezcla', {
+            bolaCupId, posiciones, slotEsperado, leftEsperado, leftReal
+          });
+        }
+
+        // Prueba visual: levanta todos los vasos un instante para confirmar a ojo si la
+        // bolita quedó donde dice el estado interno, antes de habilitar el toque.
+        mostrarBolita(true);
+        mostrarVasosLevantados(true);
+        await esperar(900);
+        if (cancelado || terminado) return;
+        mostrarVasosLevantados(false);
+        mostrarBolita(false);
+      }
     }
 
     function iniciarRonda(index) {
