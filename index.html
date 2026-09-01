@@ -3994,7 +3994,7 @@
       id: 'vasos',
       nombre: 'Vasos',
       desc: 'Seguí la bolita con la mirada',
-      icono: { emoji: '🥛', fondo: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+      icono: { emoji: '🔎;', fondo: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
       montar(contenedor, rand, onGanar, onPerder) {
         return montarVasos(contenedor, rand, onGanar, onPerder);
       }
@@ -5270,6 +5270,7 @@
       }
     }
 
+    reproducirVictoria();
     mostrarMedallaOverlay();
   }
 
@@ -5601,24 +5602,83 @@
       .trim();
   }
 
-  function reproducirMemoriaNaranja() {
-    const audioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!audioCtx) return;
+  // ═══ SONIDO ═══
+  // Un solo AudioContext compartido por todos los sonidos. Los navegadores lo arrancan
+  // en 'suspended' hasta el primer gesto del usuario: sin resume() ahí, ningún sonido
+  // posterior suena aunque el resto del código esté bien.
+  let audioCtxCompartido = null;
+
+  function obtenerAudioContext() {
     try {
-      const context = new audioCtx();
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.value = 780;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      if (!audioCtxCompartido) {
+        audioCtxCompartido = new Ctx();
+      }
+      if (audioCtxCompartido.state === 'suspended') {
+        audioCtxCompartido.resume().catch(() => {});
+      }
+      return audioCtxCompartido;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function reanudarAudioContext() {
+    try {
+      const ctx = obtenerAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+    } catch (error) {}
+  }
+
+  function reproducirTono({ frecuencia = 440, duracion = 0.12, tipo = 'sine', volumen = 0.05, retraso = 0 } = {}) {
+    try {
+      const ctx = obtenerAudioContext();
+      if (!ctx) return;
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      oscillator.type = tipo;
+      oscillator.frequency.value = frecuencia;
       gain.gain.value = 0.0001;
       oscillator.connect(gain);
-      gain.connect(context.destination);
-      const now = context.currentTime;
-      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-      oscillator.start(now);
-      oscillator.stop(now + 0.15);
+      gain.connect(ctx.destination);
+      const inicio = ctx.currentTime + retraso;
+      gain.gain.exponentialRampToValueAtTime(volumen, inicio + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+      oscillator.start(inicio);
+      oscillator.stop(inicio + duracion + 0.02);
     } catch (error) {}
+  }
+
+  function reproducirClick() {
+    reproducirTono({ frecuencia: 720, duracion: 0.045, tipo: 'sine', volumen: 0.035 });
+  }
+
+  function reproducirAcierto() {
+    reproducirTono({ frecuencia: 660, duracion: 0.13, tipo: 'sine', volumen: 0.055 });
+  }
+
+  function reproducirError() {
+    reproducirTono({ frecuencia: 220, duracion: 0.18, tipo: 'square', volumen: 0.05 });
+  }
+
+  function reproducirVictoria() {
+    const notas = [523.25, 659.25, 783.99, 1046.5];
+    notas.forEach((frecuencia, index) => {
+      reproducirTono({ frecuencia, duracion: 0.18, tipo: 'sine', volumen: 0.06, retraso: index * 0.12 });
+    });
+  }
+
+  document.addEventListener('pointerdown', reanudarAudioContext, { once: true });
+  document.addEventListener('keydown', reanudarAudioContext, { once: true });
+  document.addEventListener('click', () => {
+    reproducirClick();
+  });
+
+  function reproducirMemoriaNaranja() {
+    reproducirTono({ frecuencia: 780, duracion: 0.14, tipo: 'sine', volumen: 0.04 });
   }
 
   function montarMencionar10(contenedor, rand, onGanar, onPerder) {
@@ -6484,9 +6544,9 @@
 
     const VASOS_TOTAL = 5;
     const rondaDef = [
-      { intercambios: 7, duracion: 420, pausa: 120 },
-      { intercambios: 9, duracion: 400, pausa: 110 },
-      { intercambios: 12, duracion: 380, pausa: 100 }
+      { intercambios: 12, duracionMin: 400, duracionMax: 500, dobleProb: 0, pausaMin: 60, pausaMax: 90 },
+      { intercambios: 16, duracionMin: 340, duracionMax: 460, dobleProb: 0.3, pausaMin: 60, pausaMax: 90 },
+      { intercambios: 22, duracionMin: 280, duracionMax: 420, dobleProb: 0.5, pausaMin: 60, pausaMax: 90 }
     ];
 
     const timers = [];
@@ -6705,23 +6765,32 @@
       }, 1500);
     }
 
-    function elegirParDistinto(randFn, total, ultimoPar) {
+    function elegirPar(randFn, total, excluidos, evitarPar) {
+      const disponibles = [];
+      for (let i = 0; i < total; i++) {
+        if (!excluidos || !excluidos.includes(i)) disponibles.push(i);
+      }
       let a;
       let b;
       let intentos = 0;
       do {
-        a = Math.floor(randFn() * total);
-        b = Math.floor(randFn() * total);
+        a = disponibles[Math.floor(randFn() * disponibles.length)];
+        b = disponibles[Math.floor(randFn() * disponibles.length)];
         if (a === b) {
-          b = (b + 1) % total;
+          const idx = disponibles.indexOf(a);
+          b = disponibles[(idx + 1) % disponibles.length];
         }
         intentos += 1;
       } while (
-        ultimoPar &&
-        ((a === ultimoPar[0] && b === ultimoPar[1]) || (a === ultimoPar[1] && b === ultimoPar[0])) &&
+        evitarPar &&
+        ((a === evitarPar[0] && b === evitarPar[1]) || (a === evitarPar[1] && b === evitarPar[0])) &&
         intentos < 30
       );
       return [a, b];
+    }
+
+    function randRange(randFn, min, max) {
+      return Math.round(min + randFn() * (max - min));
     }
 
     async function animarIntercambio(a, b, duracion) {
@@ -6779,23 +6848,49 @@
 
     async function mezclarRonda(config) {
       const totalIntercambios = config.intercambios;
-      const duracion = config.duracion;
-      const pausa = config.pausa;
       let ultimoPar = null;
 
       for (let i = 0; i < totalIntercambios; i++) {
         if (cancelado) return;
-        const [a, b] = elegirParDistinto(rand, VASOS_TOTAL, ultimoPar);
-        ultimoPar = [a, b];
-        if (reducido) {
-          message.textContent = `El vaso ${a + 1} y el ${b + 1} cambian de lugar`;
-          const temp = posiciones[a];
-          posiciones[a] = posiciones[b];
-          posiciones[b] = temp;
-          await esperar(1200);
+        // Un porcentaje de los pasos mueve DOS pares disjuntos a la vez (par2 excluye
+        // los índices de par1): exige seguir el propio vaso mientras pasa otra cosa
+        // en paralelo, sin acelerar el movimiento en sí.
+        const esDoble = config.dobleProb > 0 && rand() < config.dobleProb;
+
+        if (esDoble) {
+          const par1 = elegirPar(rand, VASOS_TOTAL, null, ultimoPar);
+          const par2 = elegirPar(rand, VASOS_TOTAL, par1, null);
+          ultimoPar = par1;
+
+          if (reducido) {
+            message.textContent = `El vaso ${par1[0] + 1} y el ${par1[1] + 1} cambian de lugar, y a la vez el ${par2[0] + 1} con el ${par2[1] + 1} también`;
+            [posiciones[par1[0]], posiciones[par1[1]]] = [posiciones[par1[1]], posiciones[par1[0]]];
+            [posiciones[par2[0]], posiciones[par2[1]]] = [posiciones[par2[1]], posiciones[par2[0]]];
+            await esperar(1400);
+          } else {
+            const dur1 = randRange(rand, config.duracionMin, config.duracionMax);
+            const dur2 = randRange(rand, config.duracionMin, config.duracionMax);
+            await Promise.all([
+              animarIntercambio(par1[0], par1[1], dur1),
+              animarIntercambio(par2[0], par2[1], dur2)
+            ]);
+            await esperar(randRange(rand, config.pausaMin, config.pausaMax));
+          }
         } else {
-          await animarIntercambio(a, b, duracion);
-          await esperar(pausa);
+          const [a, b] = elegirPar(rand, VASOS_TOTAL, null, ultimoPar);
+          ultimoPar = [a, b];
+
+          if (reducido) {
+            message.textContent = `El vaso ${a + 1} y el ${b + 1} cambian de lugar`;
+            const temp = posiciones[a];
+            posiciones[a] = posiciones[b];
+            posiciones[b] = temp;
+            await esperar(1200);
+          } else {
+            const duracion = randRange(rand, config.duracionMin, config.duracionMax);
+            await animarIntercambio(a, b, duracion);
+            await esperar(randRange(rand, config.pausaMin, config.pausaMax));
+          }
         }
         if (cancelado) return;
       }
@@ -8049,6 +8144,7 @@
         ganarMedalla(juego.id);
       }
     }, (mensaje) => {
+      reproducirError();
       marcarPerdida(juego.id);
       const detalle = typeof mensaje === 'string' ? mensaje : '';
       const overlay = document.getElementById('derrota-overlay');
