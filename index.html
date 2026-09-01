@@ -1671,6 +1671,245 @@
     }
   }
 
+  .vasos-shell {
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    width:min(440px, 100%);
+    margin:0 auto;
+    flex:1 1 auto;
+    min-height:0;
+    justify-content:center;
+    position:relative;
+  }
+
+  .vasos-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:30px;
+  }
+
+  .vasos-progress {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    min-height:22px;
+    font-family:"DM Mono",ui-monospace,monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.8);
+  }
+
+  .vasos-progress-bar {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+  }
+
+  .vasos-punto {
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.2);
+    transition:all .2s ease;
+  }
+
+  .vasos-punto.activo {
+    background:#ffd98a;
+    border-color:rgba(255,217,138,0.75);
+    box-shadow:0 0 12px rgba(255,217,138,0.45);
+    transform:scale(1.08);
+  }
+
+  .vasos-mensaje {
+    min-height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:clamp(16px, 2.5vw, 22px);
+    font-weight:700;
+    letter-spacing:-.04em;
+    color:#f7f3ff;
+    text-transform:none;
+  }
+
+  .vasos-mesa {
+    position:relative;
+    height:220px;
+    width:100%;
+    border-radius:22px;
+    background:linear-gradient(180deg, rgba(250,224,176,0.08), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.08);
+    overflow:hidden;
+    box-shadow:inset 0 12px 18px rgba(0,0,0,0.08);
+  }
+
+  .vasos-mesa::before {
+    content:"";
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:14px;
+    height:22px;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(28,30,44,0.72), rgba(28,30,44,0.12) 70%, rgba(28,30,44,0.02) 100%);
+    box-shadow:0 16px 20px rgba(7, 12, 22, 0.25);
+  }
+
+  .vaso-mover {
+    position:absolute;
+    bottom:40px;
+    left:0;
+    width:84px;
+    height:140px;
+    /* .vaso-mover es un <button>: sin este reset, Chrome/Safari pintan su fondo y
+       borde nativos (buttonface) detrás del SVG, que no cubre todo el rectángulo. */
+    appearance:none;
+    -webkit-appearance:none;
+    background:none;
+    border:none;
+    padding:0;
+    margin:0;
+    font:inherit;
+    color:inherit;
+    cursor:pointer;
+    transform:translate3d(0, 0, 0);
+    transition:transform 900ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms ease, filter 260ms ease;
+    z-index:4;
+    will-change:transform, left;
+  }
+
+  .vaso-mover.vaso-oculto {
+    opacity:0;
+  }
+
+  .vaso-cuerpo {
+    position:relative;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    transform:translateY(0);
+    transition:transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .vaso-vidrio {
+    position:relative;
+    width:100%;
+    height:100%;
+    display:block;
+    overflow:visible;
+  }
+
+  .vaso-sombra {
+    position:absolute;
+    left:50%;
+    bottom:-4px;
+    width:72%;
+    height:18px;
+    transform:translateX(-50%);
+    border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(23,18,30,0.52), rgba(23,18,30,0.08) 70%, rgba(23,18,30,0) 100%);
+    transition:transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 260ms ease;
+    opacity:1;
+  }
+
+  .vaso-mover.vaso-levantado .vaso-sombra {
+    width:56%;
+    opacity:.72;
+    transform:translateX(-50%) scale(0.9);
+  }
+
+  .vaso-mover.vaso-levantado .vaso-cuerpo {
+    transform:translateY(-18px);
+  }
+
+  /* Bolita independiente de la mesa: no vive dentro de ningún vaso, así nunca se
+     mueve con ellos durante la mezcla. Su visibilidad la controla solo esta clase. */
+  .vasos-bolita {
+    position:absolute;
+    left:0;
+    bottom:40px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    transform:translateX(-50%);
+    background:radial-gradient(circle at 30% 28%, #fffdef 0%, #f6d7a0 18%, #d69b2e 48%, #b26d13 100%);
+    box-shadow:0 0 10px rgba(255, 215, 145, 0.55);
+    opacity:0;
+    z-index:1;
+    pointer-events:none;
+    transition:opacity 220ms ease;
+  }
+
+  .vasos-bolita.vasos-bolita--visible {
+    opacity:1;
+  }
+
+  .vaso-vidrio svg {
+    display:block;
+    width:100%;
+    height:100%;
+    overflow:visible;
+  }
+
+  .vaso-vidrio .trazo {
+    fill:url(#vasoFill);
+  }
+
+  .vaso-vidrio .brillo {
+    fill:rgba(255,255,255,0.22);
+  }
+
+  .vaso-vidrio .base {
+    fill:#8fb8ea;
+  }
+
+  .vaso-vidrio .hueco {
+    fill:rgba(8, 16, 32, 0.55);
+    opacity:0;
+    transition:opacity 260ms ease;
+  }
+
+  .vaso-mover.vaso-levantado .vaso-vidrio .hueco {
+    opacity:1;
+  }
+
+  .vasos-reduced {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    width:min(100%, 340px);
+    margin:0 auto;
+    font-size:14px;
+    color:#f7f3ff;
+  }
+
+  .vasos-reduced-item {
+    padding:8px 10px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vaso-mover,
+    .vaso-cuerpo,
+    .vaso-sombra,
+    .vasos-bolita {
+      transition:none !important;
+      animation:none !important;
+    }
+  }
+
   .cuentas-shell {
     width:min(100%, 420px);
     margin:0 auto;
@@ -3299,9 +3538,12 @@
   const HORA_CORTE = 10;
   const OFFSET_ARG = -3;
   const VERSION_JUEGOS = 1;
-  // Badge "NUEVO" en el menú de Mayor o Menor: desde este momento y solo si
-  // nunca se abrió ese juego. Desaparece apenas se abre una vez (no hace falta ganar).
-  const INICIO_NUEVO_MM = Date.UTC(2026, 8, 1, 13, 0, 0); // 1/9/2026 10:00 AR = 13:00 UTC
+  // Badge "NUEVO" en el menú: por cada juego listado acá, se muestra desde su fecha
+  // y solo si nunca se abrió. Desaparece apenas se abre una vez (no hace falta ganar).
+  const NUEVOS = {
+    mayormenor: Date.UTC(2026, 8, 1, 13, 0, 0), // 1/9/2026 10:00 AR = 13:00 UTC
+    vasos: Date.UTC(2026, 8, 1, 13, 0, 0) // 1/9/2026 10:00 AR = 13:00 UTC
+  };
   // Número de WhatsApp de destino para avisar cuando se canjea un premio.
   // Formato internacional sin + ni espacios.
   const WHATSAPP_DESTINO = '5491169034363';
@@ -3352,13 +3594,21 @@
       }
     },
     '2026-09-02': {
-      wordle: 'BOLICHE',
-      ahorcado: { palabra: 'TOBLERONE', categoria: 'COMIDA' },
-      sopa: ['FUTBOL', 'RUGBY', 'HOCKEY', 'VOLLEY', 'BASQUET', 'TENIS'],
+      wordle: 'COLEGIO',
+      ahorcado: { palabra: 'SIXEVEN', categoria: 'AURA' },
+      sopa: ['HONDA', 'AUDI', 'MERCEDES', 'FERRARI', 'BMW', 'TOYOTA'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
+      mayormenor: [
+        { v: 4, p: 'P' },
+        { v: 7, p: 'C' },
+        { v: 2, p: 'D' },
+        { v: 11, p: 'T' },
+        { v: 8, p: 'P' },
+        { v: 6, p: 'C' }
+      ],
       cuentas: null,
       mencionar10: {
-        categoria: 'Países de Europa',
+        categoria: 'Universidades de Argentina',
         validas: [
           'UBA','UTN','UNLP','UNC','UNR','UNCUYO','UNL','UNT','UNS','UNSAM',
     'UNQUI','UNGS','UNLA','UNLAM','UNSL','UNRC','UNNE','UNJU','UNSA',
@@ -3597,8 +3847,8 @@
       if (!categoria) {
         warnings.push(`[${fecha}] mencionar10 inválido: falta categoria.`);
       }
-      if (validas.length < 30) {
-        warnings.push(`[${fecha}] mencionar10 inválido: debe haber al menos 30 respuestas válidas.`);
+      if (validas.length < 20) {
+        warnings.push(`[${fecha}] mencionar10 inválido: debe haber al menos 20 respuestas válidas.`);
       }
 
       validas.forEach((valor, index) => {
@@ -3671,10 +3921,10 @@
     versionVista: 0
   };
   const PREMIOS = [
-    { id: 'cafe', nombre: 'Un café de Rústica', costo: 15, emoji: '☕' },
-    { id: 'peli', nombre: 'Un Capítulo de Friends', costo: 25, emoji: '🎬' },
-    { id: 'cena', nombre: 'Unas papas de Mac', costo: 40, emoji: '🍟' },
-    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 60, emoji: '⛍' }
+    { id: 'cafe', nombre: 'Un café de Rústica', costo: 20, emoji: '☕' },
+    { id: 'peli', nombre: 'Un Capítulo de Friends', costo: 30, emoji: '🎬' },
+    { id: 'cena', nombre: 'Unas papas de Mac', costo: 50, emoji: '🍟' },
+    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 70, emoji: '⛍' }
   ];
   const JUEGOS = {
     wordle: {
@@ -3739,6 +3989,15 @@
       montar(contenedor, rand, onGanar, onPerder) {
         return montarMayorMenor(contenedor, rand, onGanar, onPerder);
       }
+    },
+    vasos: {
+      id: 'vasos',
+      nombre: 'Vasos',
+      desc: 'Seguí la bolita con la mirada',
+      icono: { emoji: '🥛', fondo: 'linear-gradient(135deg, #fbbf24, #f59e0b)' },
+      montar(contenedor, rand, onGanar, onPerder) {
+        return montarVasos(contenedor, rand, onGanar, onPerder);
+      }
     }
   };
 
@@ -3760,7 +4019,7 @@
     4: 'ahorcado',
     5: 'memoria',
     6: 'mayormenor',
-    0: 'wordle'
+    0: 'vasos'
   };
 
   const TEMAS = [
@@ -4796,7 +5055,7 @@
     if (!overlay || !texto) return;
 
     cerrarJuegoDelDia();
-    if (titulo) titulo.textContent = `¡Santy te regaló ${cantidad} medallas por ser muy linda!`;
+    if (titulo) titulo.textContent = `¡Santy te regaló ${cantidad} medallas!`;
     texto.textContent = total === 1 ? 'Total: 1 medalla' : `Total: ${total} medallas`;
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
@@ -4853,7 +5112,7 @@
   function mostrarToastPremios(mensaje, opciones = {}) {
     const toast = document.getElementById('premios-toast');
     if (!toast) return;
-    const { whatsappUrl = '', whatsappLabel = 'Avisarle a Santi' } = opciones;
+    const { whatsappUrl = '', whatsappLabel = 'Avisarle a Santy' } = opciones;
     toast.innerHTML = '';
 
     const textNode = document.createElement('span');
@@ -4952,7 +5211,9 @@
   }
 
   function mostrarBadgeNuevo(juegoId) {
-    if (Date.now() < INICIO_NUEVO_MM) return false;
+    const desde = NUEVOS[juegoId];
+    if (!desde) return false;
+    if (Date.now() < desde) return false;
     const estado = leerEstado();
     const vistos = Array.isArray(estado.juegosVistos) ? estado.juegosVistos : [];
     return !vistos.includes(juegoId);
@@ -5378,23 +5639,25 @@
 
     const categoria = base.categoria || 'Restaurantes de Buenos Aires';
     const alias = base.alias && typeof base.alias === 'object' ? base.alias : {};
-    const validas = Array.isArray(base.validas) && base.validas.length >= 30
+    const validas = Array.isArray(base.validas) && base.validas.length > 0
       ? base.validas
       : MENCIONAR10_FALLBACKS[Math.floor(rand() * MENCIONAR10_FALLBACKS.length)].validas;
     const segundosTotales = Number.isFinite(Number(base.segundos)) ? Number(base.segundos) : 180;
     const tiempoMaximo = Math.min(600, Math.max(60, segundosTotales));
 
-    const mapaCanonico = new Map();
+    const validasSet = new Set();
     validas.forEach((valor) => {
       const canonico = normalizarM10(valor);
       if (!canonico) return;
-      mapaCanonico.set(canonico, canonico);
+      validasSet.add(canonico);
     });
+
+    const aliasMap = {};
     Object.entries(alias).forEach(([clave, valor]) => {
       const claveNormalizada = normalizarM10(clave);
       const valorNormalizado = normalizarM10(valor);
       if (claveNormalizada && valorNormalizado) {
-        mapaCanonico.set(claveNormalizada, valorNormalizado);
+        aliasMap[claveNormalizada] = valorNormalizado;
       }
     });
 
@@ -5549,21 +5812,28 @@
         return { tipo: 'vacia' };
       }
 
-      const aliasDirecto = alias[entrada] || alias[entrada.replace(/\s+/g, '')];
-      if (aliasDirecto) {
-        return { tipo: 'valid', valor: normalizarM10(aliasDirecto) };
+      const aliasCanonico = aliasMap[entrada];
+      if (aliasCanonico) {
+        return { tipo: 'valid', valor: aliasCanonico };
       }
 
-      if (mapaCanonico.has(entrada)) {
-        return { tipo: 'valid', valor: mapaCanonico.get(entrada) };
+      const sinEspacios = entrada.replace(/ /g, '');
+      const validasNormalizadas = [...validasSet];
+      const exacta = validasNormalizadas.includes(entrada);
+      if (exacta) {
+        return { tipo: 'valid', valor: entrada };
       }
 
-      const candidata = Array.from(mapaCanonico.keys()).find((clave) => {
-        const exacta = clave.startsWith(entrada) && entrada.length >= 5 && clave.length > entrada.length;
-        return exacta;
+      const conEspaciosNegados = validasNormalizadas.find((valor) => valor.replace(/ /g, '') === sinEspacios);
+      if (conEspaciosNegados) {
+        return { tipo: 'valid', valor: conEspaciosNegados };
+      }
+
+      const aliasEntero = Object.entries(aliasMap).find(([clave, valor]) => {
+        return clave === entrada || clave.replace(/ /g, '') === sinEspacios || valor === entrada || valor.replace(/ /g, '') === sinEspacios;
       });
-      if (candidata) {
-        return { tipo: 'valid', valor: mapaCanonico.get(candidata) };
+      if (aliasEntero) {
+        return { tipo: 'valid', valor: aliasEntero[1] };
       }
 
       return { tipo: 'invalid' };
@@ -5612,8 +5882,7 @@
         return;
       }
 
-      const normalizadas = validas.map((item) => normalizarM10(item));
-      if (!normalizadas.includes(canonica)) {
+      if (!validasSet.has(canonica) && ![...validasSet].some((valor) => valor.replace(/ /g, '') === canonica.replace(/ /g, ''))) {
         if (status) status.textContent = 'No cuenta';
         input.value = '';
         input.focus();
@@ -6163,6 +6432,407 @@
     return function desmontar() {
       limpiarTimers();
       document.removeEventListener('visibilitychange', onVisibility);
+      contenedor.innerHTML = '';
+    };
+  }
+
+  // ═══ LOS 3 VASOS ═══
+  function montarVasos(contenedor, rand, onGanar, onPerder) {
+    marcarJuegoVisto('vasos');
+    const status = document.getElementById('game-status');
+    const yaGanado = yaGanoMedallaHoy('vasos');
+    const shell = document.createElement('div');
+    shell.className = 'vasos-shell';
+
+    const top = document.createElement('div');
+    top.className = 'vasos-top';
+
+    const progressWrap = document.createElement('div');
+    progressWrap.className = 'vasos-progress';
+
+    const puntos = Array.from({ length: 3 }, () => {
+      const punto = document.createElement('span');
+      punto.className = 'vasos-punto';
+      return punto;
+    });
+
+    const label = document.createElement('span');
+    label.className = 'vasos-progress-bar';
+    puntos.forEach((punto) => label.appendChild(punto));
+
+    const counter = document.createElement('span');
+    counter.textContent = '1 / 3';
+    progressWrap.appendChild(label);
+    progressWrap.appendChild(counter);
+    top.appendChild(progressWrap);
+
+    const message = document.createElement('div');
+    message.className = 'vasos-mensaje';
+    message.textContent = 'Mirá bien';
+
+    const mesa = document.createElement('div');
+    mesa.className = 'vasos-mesa';
+
+    const bolita = document.createElement('div');
+    bolita.className = 'vasos-bolita';
+    mesa.appendChild(bolita);
+
+    shell.appendChild(top);
+    shell.appendChild(message);
+    shell.appendChild(mesa);
+    contenedor.appendChild(shell);
+
+    const VASOS_TOTAL = 5;
+    const rondaDef = [
+      { intercambios: 7, duracion: 420, pausa: 120 },
+      { intercambios: 9, duracion: 400, pausa: 110 },
+      { intercambios: 12, duracion: 380, pausa: 100 }
+    ];
+
+    const timers = [];
+    const later = (fn, ms) => {
+      const id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    };
+    const reducido = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    let cancelado = false;
+    let terminado = false;
+    let rondaActual = 0;
+    let aciertos = 0;
+    let inputHabilitado = false;
+    let bolaCupId = 0;
+    let posiciones = [];
+    let cupNodes = [];
+
+    function limpiarTimers() {
+      timers.forEach((id) => clearTimeout(id));
+      timers.length = 0;
+    }
+
+    function esperar(ms) {
+      return new Promise((resolve) => {
+        if (cancelado) {
+          resolve();
+          return;
+        }
+        const id = setTimeout(() => {
+          if (!cancelado) resolve();
+        }, ms);
+        timers.push(id);
+      });
+    }
+
+    function desplazarCuerpo(cantidad) {
+      const anchoDisponible = Math.max(240, mesa.clientWidth - 18);
+      const anchoVaso = Math.min(96, Math.max(56, (anchoDisponible - (cantidad - 1) * 8) / cantidad));
+      const offset = (mesa.clientWidth - (cantidad * anchoVaso + (cantidad - 1) * 8)) / 2;
+      // slots[i] es el borde IZQUIERDO del slot i (así se usa en .style.left más abajo).
+      const slots = Array.from({ length: cantidad }, (_, index) => offset + index * (anchoVaso + 8));
+      return { anchoVaso, slots };
+    }
+
+    // Con las 3 rondas siempre en VASOS_TOTAL, el ancho/las posiciones se calculan
+    // una sola vez (la primera vez que hace falta) y se reusan en todas las rondas.
+    let disposicionVasos = null;
+    function obtenerDisposicion() {
+      if (!disposicionVasos) {
+        disposicionVasos = desplazarCuerpo(VASOS_TOTAL);
+      }
+      return disposicionVasos;
+    }
+
+    function posicionarBolita() {
+      const { slots, anchoVaso } = obtenerDisposicion();
+      const slot = posiciones.indexOf(bolaCupId);
+      if (slot < 0) return;
+      bolita.style.left = `${slots[slot] + anchoVaso / 2}px`;
+    }
+
+    function mostrarBolita(visible) {
+      bolita.classList.toggle('vasos-bolita--visible', visible);
+    }
+
+    function cupSvg() {
+      return `
+        <svg viewBox="0 0 118 142" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="vasoFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6b9fe0" />
+              <stop offset="55%" stop-color="#3d6fb5" />
+              <stop offset="100%" stop-color="#2a4d85" />
+            </linearGradient>
+          </defs>
+          <path class="trazo" d="M40 10 L10 122 Q59 136 108 122 L78 10 Q59 2 40 10 Z" />
+          <path class="brillo" d="M32 24 L18 106 Q25 110 33 106 L45 22 Q38 19 32 24 Z" />
+          <ellipse class="hueco" cx="59" cy="118" rx="44" ry="11" />
+          <ellipse class="base" cx="59" cy="10" rx="19" ry="6" />
+        </svg>
+      `;
+    }
+
+    function crearVaso(id) {
+      const mover = document.createElement('button');
+      mover.type = 'button';
+      mover.className = 'vaso-mover';
+      mover.setAttribute('aria-label', `Vaso ${id + 1}`);
+      const anchoVaso = obtenerDisposicion().anchoVaso;
+      mover.style.width = `${anchoVaso}px`;
+      mover.style.height = `${anchoVaso * 1.25}px`;
+
+      const cuerpo = document.createElement('div');
+      cuerpo.className = 'vaso-cuerpo';
+
+      const vaso = document.createElement('div');
+      vaso.className = 'vaso-vidrio';
+      vaso.innerHTML = cupSvg();
+
+      const sombra = document.createElement('div');
+      sombra.className = 'vaso-sombra';
+
+      cuerpo.appendChild(vaso);
+      mover.appendChild(sombra);
+      mover.appendChild(cuerpo);
+      mesa.appendChild(mover);
+
+      mover.addEventListener('click', () => {
+        if (!inputHabilitado || terminado || cancelado) return;
+        if (id === bolaCupId) {
+          aciertos += 1;
+          inputHabilitado = false;
+          levantarSeleccion([id]);
+          posicionarBolita();
+          mostrarBolita(true);
+          actualizarPuntos();
+          message.textContent = '¡Bien!';
+          const esFinal = aciertos >= 3;
+          if (esFinal) terminado = true;
+          later(() => {
+            if (cancelado) return;
+            if (esFinal) {
+              if (status) status.textContent = '¡Perfecto!';
+              if (typeof onGanar === 'function') onGanar();
+              return;
+            }
+            iniciarRonda(rondaActual + 1);
+          }, 1500);
+        } else {
+          inputHabilitado = false;
+          terminado = true;
+          levantarSeleccion([id, bolaCupId]);
+          posicionarBolita();
+          mostrarBolita(true);
+          message.textContent = 'No era ahí';
+          const mensaje = `Acertaste ${aciertos} de 3`;
+          later(() => {
+            if (cancelado) return;
+            if (status) status.textContent = mensaje;
+            if (typeof onPerder === 'function') onPerder(mensaje);
+          }, 1500);
+        }
+      });
+
+      return { id, mover, cuerpo, sombra };
+    }
+
+    function actualizarPuntos() {
+      const total = 3;
+      puntos.forEach((punto, index) => {
+        punto.classList.toggle('activo', index < total && index < aciertos + 1);
+      });
+      counter.textContent = `${Math.min(3, aciertos + 1)} / 3`;
+    }
+
+    function posicionarVasos(siguientePosiciones = null) {
+      const { slots } = obtenerDisposicion();
+      const orden = siguientePosiciones || Array.from({ length: VASOS_TOTAL }, (_, index) => index);
+      cupNodes.forEach((cup, index) => {
+        const slotActual = orden.indexOf(cup.id);
+        const target = slotActual >= 0 ? slots[slotActual] : slots[index];
+        cup.mover.style.left = `${target}px`;
+        cup.mover.style.transform = 'translate3d(0, 0, 0)';
+        cup.mover.style.zIndex = String(10 + slotActual);
+      });
+      if (siguientePosiciones) {
+        posiciones = [...siguientePosiciones];
+      }
+    }
+
+    function mostrarVasosLevantados(levantados) {
+      cupNodes.forEach((cup) => {
+        cup.mover.classList.toggle('vaso-levantado', levantados);
+      });
+    }
+
+    function levantarSeleccion(ids) {
+      cupNodes.forEach((cup) => {
+        cup.mover.classList.toggle('vaso-levantado', ids.includes(cup.id));
+      });
+    }
+
+    function prepararRonda(rondaIndex) {
+      if (cancelado || terminado) return;
+      const config = rondaDef[rondaIndex] || rondaDef[rondaDef.length - 1];
+
+      if (cupNodes.length) {
+        cupNodes.forEach((cup) => cup.mover.remove());
+      }
+      cupNodes = Array.from({ length: VASOS_TOTAL }, (_, index) => crearVaso(index));
+      posiciones = Array.from({ length: VASOS_TOTAL }, (_, index) => index);
+      bolaCupId = Math.floor(rand() * VASOS_TOTAL);
+      inputHabilitado = false;
+      message.textContent = 'Mirá bien';
+      counter.textContent = `${rondaIndex + 1} / 3`;
+      puntos.forEach((punto, index) => {
+        punto.classList.toggle('activo', index < Math.min(3, rondaIndex + 1));
+      });
+      posicionarVasos();
+      posicionarBolita();
+      mostrarBolita(true);
+      mostrarVasosLevantados(true);
+      later(() => {
+        if (cancelado || terminado) return;
+        mostrarVasosLevantados(false);
+        mostrarBolita(false);
+        message.textContent = 'Seguí la bolita';
+        later(async () => {
+          if (cancelado || terminado) return;
+          await mezclarRonda(config);
+          if (cancelado || terminado) return;
+          inputHabilitado = true;
+          message.textContent = '¿Dónde está?';
+        }, 700);
+      }, 1500);
+    }
+
+    function elegirParDistinto(randFn, total, ultimoPar) {
+      let a;
+      let b;
+      let intentos = 0;
+      do {
+        a = Math.floor(randFn() * total);
+        b = Math.floor(randFn() * total);
+        if (a === b) {
+          b = (b + 1) % total;
+        }
+        intentos += 1;
+      } while (
+        ultimoPar &&
+        ((a === ultimoPar[0] && b === ultimoPar[1]) || (a === ultimoPar[1] && b === ultimoPar[0])) &&
+        intentos < 30
+      );
+      return [a, b];
+    }
+
+    async function animarIntercambio(a, b, duracion) {
+      if (cancelado) return;
+      const leftA = positionsForSlot(a);
+      const leftB = positionsForSlot(b);
+      const cupA = cupNodes[posiciones[a]];
+      const cupB = cupNodes[posiciones[b]];
+      if (!cupA || !cupB) return;
+
+      const deltaA = leftB - leftA;
+      const deltaB = leftA - leftB;
+      const PROFUNDIDAD_PX = 7;
+      const transition = `transform ${duracion}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+
+      cupA.mover.style.transition = transition;
+      cupB.mover.style.transition = transition;
+      cupA.mover.style.zIndex = '12';
+      cupB.mover.style.zIndex = '8';
+      // Movimiento puramente horizontal. A pasa por delante (z-index alto) con un
+      // offset vertical mínimo para leer la profundidad; B, por detrás, sin offset.
+      cupA.mover.style.transform = `translate3d(${deltaA}px, ${PROFUNDIDAD_PX}px, 0)`;
+      cupB.mover.style.transform = `translate3d(${deltaB}px, 0px, 0)`;
+
+      await Promise.race([
+        new Promise((resolve) => {
+          const onEnd = () => {
+            cupA.mover.removeEventListener('transitionend', onEnd);
+            resolve();
+          };
+          cupA.mover.addEventListener('transitionend', onEnd, { once: true });
+        }),
+        esperar(Math.max(duracion + 120, 600))
+      ]);
+
+      const temp = posiciones[a];
+      posiciones[a] = posiciones[b];
+      posiciones[b] = temp;
+      // bolaCupId es la identidad fija del vaso que tiene la bolita: no cambia al
+      // intercambiar posiciones, viaja pegada al vaso que ya la tenía.
+      cupA.mover.style.transition = 'none';
+      cupB.mover.style.transition = 'none';
+      cupA.mover.style.transform = 'translate3d(0, 0, 0)';
+      cupB.mover.style.transform = 'translate3d(0, 0, 0)';
+
+      const { slots } = obtenerDisposicion();
+      cupA.mover.style.left = `${slots[posiciones.indexOf(cupA.id)]}px`;
+      cupB.mover.style.left = `${slots[posiciones.indexOf(cupB.id)]}px`;
+    }
+
+    function positionsForSlot(slotIndex) {
+      const { slots } = obtenerDisposicion();
+      return slots[slotIndex] || slots[0];
+    }
+
+    async function mezclarRonda(config) {
+      const totalIntercambios = config.intercambios;
+      const duracion = config.duracion;
+      const pausa = config.pausa;
+      let ultimoPar = null;
+
+      for (let i = 0; i < totalIntercambios; i++) {
+        if (cancelado) return;
+        const [a, b] = elegirParDistinto(rand, VASOS_TOTAL, ultimoPar);
+        ultimoPar = [a, b];
+        if (reducido) {
+          message.textContent = `El vaso ${a + 1} y el ${b + 1} cambian de lugar`;
+          const temp = posiciones[a];
+          posiciones[a] = posiciones[b];
+          posiciones[b] = temp;
+          await esperar(1200);
+        } else {
+          await animarIntercambio(a, b, duracion);
+          await esperar(pausa);
+        }
+        if (cancelado) return;
+      }
+      // Asienta los vasos en el orden REAL tras la mezcla (posiciones), no en el
+      // orden de creación: sin esto, el estado interno queda bien pero el DOM
+      // vuelve a mostrar todo ordenado justo antes de habilitar el toque.
+      posicionarVasos(posiciones);
+    }
+
+    function iniciarRonda(index) {
+      if (cancelado || terminado) return;
+      rondaActual = index;
+      prepararRonda(rondaActual);
+    }
+
+    if (yaGanado) {
+      message.textContent = 'Ya ganaste la medalla de hoy';
+      if (status) status.textContent = 'Ya ganaste la medalla de hoy';
+      return function desmontar() {
+        cancelado = true;
+        limpiarTimers();
+        contenedor.innerHTML = '';
+      };
+    }
+
+    // El modal (y por lo tanto .vasos-mesa) todavía está display:none en este punto:
+    // montar() corre ANTES de que abrirJuegoPorId le agregue la clase "visible" al
+    // modal. Medir mesa.clientWidth ahora daría 0 y descolocaría vasos y bolita.
+    // Diferimos un tick para que el modal ya esté renderizado.
+    later(() => {
+      if (cancelado) return;
+      iniciarRonda(0);
+    }, 0);
+
+    return function desmontar() {
+      cancelado = true;
+      limpiarTimers();
       contenedor.innerHTML = '';
     };
   }
@@ -7313,7 +7983,7 @@
       const perdido = yaPerdioHoy(juego.id) && !ganado;
       const disabled = perdido || ganado;
       const racha = obtenerRachaJuego(juego.id);
-      const esNuevo = juego.id === 'mayormenor' && mostrarBadgeNuevo(juego.id);
+      const esNuevo = mostrarBadgeNuevo(juego.id);
       const thumbStyle = juego.icono && juego.icono.fondo ? `style="background:${juego.icono.fondo};"` : '';
       return `
         <button type="button" class="game-option ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
