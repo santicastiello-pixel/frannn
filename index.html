@@ -5289,25 +5289,33 @@
     {
       categoria: 'Restaurantes de Buenos Aires',
       validas: [
-        'DON JULIO', 'MISHIGUENE', 'ELENA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
-        'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LA CABRERA', 'EL PREFERIDO',
-        'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'ORQUIDEA', 'CABAÑA', 'PUNTA', 'MALBA',
-        'EL DORADO', 'CERVECERIA', 'AESTA', 'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN',
-        'BICHO', 'TAMARINDO', 'NUEVO', 'MIRAMAR', 'DOMINIC', 'ALBEA', 'LA PIEDRA', 'PABLO'
+       'BUENOS AIRES','CATAMARCA','CHACO','CHUBUT','CORDOBA','CORRIENTES',
+    'ENTRE RIOS','FORMOSA','JUJUY','LA PAMPA','LA RIOJA','MENDOZA',
+    'MISIONES','NEUQUEN','RIO NEGRO','SALTA','SAN JUAN','SAN LUIS',
+    'SANTA CRUZ','SANTA FE','SANTIAGO DEL ESTERO','TIERRA DEL FUEGO',
+    'TUCUMAN','CABA'
       ],
-      alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA', NINOGORDO: 'NIÑO GORDO' },
+      alias: {  'CAPITAL FEDERAL': 'CABA',
+    'CIUDAD DE BUENOS AIRES': 'CABA',
+    'CIUDAD AUTONOMA DE BUENOS AIRES': 'CABA',
+    'SANTIAGO': 'SANTIAGO DEL ESTERO',
+    'TIERRA DEL FUEGO ANTARTIDA E ISLAS DEL ATLANTICO SUR': 'TIERRA DEL FUEGO' },
       segundos: 180
     },
     {
       categoria: 'Lugares para comer en Buenos Aires',
       validas: [
-        'DON JULIO', 'MISHIGUENE', 'LA CABRERA', 'TEGUI', 'CHILA', 'ANAFE', 'NIÑO GORDO', 'JULIA', 'TRESCHA',
-        'GRAN DABBANG', 'SACRO', 'CRIZIA', 'ARAMBURU', 'OSAKA', 'FERVOR', 'LO DE CORA', 'EL PREFERIDO',
-        'PROPER', 'MENGANO', 'NARDA COMEDOR', 'LA BRASITA', 'BISTRO', 'ORQUIDEA', 'CABAÑA', 'PUNTA', 'MALBA',
-        'EL DORADO', 'CERVECERIA', 'AESTA', 'LA PERGOLA', 'PIZZERIA', 'MONO', 'KARU', 'NARA', 'JARDIN',
-        'BICHO', 'TAMARINDO', 'MIRAMAR', 'DOMINIC', 'ALBEA', 'LA PIEDRA', 'PABLO'
+        'BUENOS AIRES','CATAMARCA','CHACO','CHUBUT','CORDOBA','CORRIENTES',
+    'ENTRE RIOS','FORMOSA','JUJUY','LA PAMPA','LA RIOJA','MENDOZA',
+    'MISIONES','NEUQUEN','RIO NEGRO','SALTA','SAN JUAN','SAN LUIS',
+    'SANTA CRUZ','SANTA FE','SANTIAGO DEL ESTERO','TIERRA DEL FUEGO',
+    'TUCUMAN','CABA'
       ],
-      alias: { DONJULIO: 'DON JULIO', LACABRERA: 'LA CABRERA' },
+      alias: { 'CAPITAL FEDERAL': 'CABA',
+    'CIUDAD DE BUENOS AIRES': 'CABA',
+    'CIUDAD AUTONOMA DE BUENOS AIRES': 'CABA',
+    'SANTIAGO': 'SANTIAGO DEL ESTERO',
+    'TIERRA DEL FUEGO ANTARTIDA E ISLAS DEL ATLANTICO SUR': 'TIERRA DEL FUEGO' },
       segundos: 180
     }
   ];
@@ -5330,6 +5338,26 @@
       .replace(/[^A-Z0-9 ]/g, '')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  function reproducirMemoriaNaranja() {
+    const audioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!audioCtx) return;
+    try {
+      const context = new audioCtx();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 780;
+      gain.gain.value = 0.0001;
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      const now = context.currentTime;
+      gain.gain.exponentialRampToValueAtTime(0.04, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      oscillator.start(now);
+      oscillator.stop(now + 0.15);
+    } catch (error) {}
   }
 
   function montarMencionar10(contenedor, rand, onGanar, onPerder) {
