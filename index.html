@@ -3603,6 +3603,9 @@
   const GLOBAL_SYNC_KEY = 'granDiaGlobalSync';
   const GLOBAL_SYNC_CHANNEL = 'gran-dia-sync';
   const MODERADOR_KEY = '15995123';
+  // Topic privado de ntfy.sh para avisar al moderador cuando Fran entra a la web.
+  // Cualquiera que conozca este nombre puede suscribirse, por eso es un slug largo y al azar.
+  const NTFY_TOPIC = 'buenosdias-fran-k7x9mq2p';
   const weatherBadge = document.getElementById('weather-badge');
   const weatherTexto = document.getElementById('weather-texto');
   const weatherClouds = document.getElementById('weather-clouds');
@@ -4335,6 +4338,36 @@
     }
   }
 
+  function esVisitaDeModerador() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paramModerador = params.get('moderador') === '1' || params.get('admin') === '1' || params.get('clave') === MODERADOR_KEY;
+      if (paramModerador) return true;
+      return window.sessionStorage.getItem('granDiaModeradorAutorizado') === MODERADOR_KEY;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function notificarIngresoModerador() {
+    if (esVisitaDeModerador()) return;
+
+    try {
+      const ahora = new Date();
+      const hora = ahora.toLocaleString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+        method: 'POST',
+        body: `Fran entró a la web · ${hora}`,
+        headers: { 'Title': 'Buenos día', 'Tags': 'coffee' }
+      }).catch(() => {});
+    } catch (error) {}
+  }
+
   function renderListaDispositivos() {
     const dispositivos = leerDispositivosRegistrados();
     if (!listaModerador) return;
@@ -4484,7 +4517,7 @@
     const proximoCambio = tiempoHastaProximoCambio();
 
     if (meta) {
-      meta.innerHTML = `Día lógico: <strong>${diaActual}</strong><br>Entrada del calendario: <strong>${fechaHoy ? 'Sí' : 'No'}</strong><br>Versión: <strong>v${VERSION_JUEGOS}</strong> · Corte: <strong>${HORA_CORTE}:00 (hora AR)</strong><br>Próximo cambio en <strong>${proximoCambio.texto}</strong><br>Juego del día: <strong>${juegoHoy.nombre}</strong><br>Contenido cargado hasta el <strong>${ultimoCargado}</strong>, faltan <strong>${faltan}</strong> días. ${alertaFaltan}<br><a href="${linkMañana}" target="_blank" rel="noreferrer noopener">Previsualizar mañana</a>`;
+      meta.innerHTML = `Día lógico: <strong>${diaActual}</strong><br>Entrada del calendario: <strong>${fechaHoy ? 'Sí' : 'No'}</strong><br>Versión: <strong>v${VERSION_JUEGOS}</strong> · Corte: <strong>${HORA_CORTE}:00 (hora AR)</strong><br>Próximo cambio en <strong>${proximoCambio.texto}</strong><br>Juego del día: <strong>${juegoHoy.nombre}</strong><br>Contenido cargado hasta el <strong>${ultimoCargado}</strong>, faltan <strong>${faltan}</strong> días. ${alertaFaltan}<br><a href="${linkMañana}" target="_blank" rel="noreferrer noopener">Previsualizar mañana</a><br><a href="https://ntfy.sh/${NTFY_TOPIC}" target="_blank" rel="noreferrer noopener">Avisos de ingreso de Fran (ntfy.sh)</a>`;
     }
 
     if (controlGlobalEstado) {
@@ -8857,6 +8890,7 @@
 
   cargarControl();
   registrarIngresoDispositivo();
+  notificarIngresoModerador();
   escucharCambiosGlobales();
   activarPanelModerador();
   actualizarBadgeMedallas();    
