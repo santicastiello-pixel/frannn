@@ -3541,8 +3541,7 @@
   // Badge "NUEVO" en el menú: por cada juego listado acá, se muestra desde su fecha
   // y solo si nunca se abrió. Desaparece apenas se abre una vez (no hace falta ganar).
   const NUEVOS = {
-    mayormenor: Date.UTC(2026, 8, 1, 13, 0, 0), // 1/9/2026 10:00 AR = 13:00 UTC
-    vasos: Date.UTC(2026, 8, 1, 13, 0, 0) // 1/9/2026 10:00 AR = 13:00 UTC
+    mayormenor: Date.UTC(2026, 8, 1, 13, 0, 0) // 1/9/2026 10:00 AR = 13:00 UTC
   };
   // Número de WhatsApp de destino para avisar cuando se canjea un premio.
   // Formato internacional sin + ni espacios.
@@ -3594,8 +3593,8 @@
       }
     },
     '2026-09-02': {
-      wordle: 'COLEGIO',
-      ahorcado: { palabra: 'SIXEVEN', categoria: 'AURA' },
+      wordle: 'TANQUE',
+      ahorcado: { palabra: 'SIXSEVEN', categoria: 'AURA' },
       sopa: ['HONDA', 'AUDI', 'MERCEDES', 'FERRARI', 'BMW', 'TOYOTA'],
       memoria: [0, 24, 12, 6, 18, 2, 20, 14],
       mayormenor: [
@@ -3918,13 +3917,17 @@
     perdidos: [],
     regalos: [],
     juegosVistos: [],
+    // Progreso del juego en curso (día actual únicamente). Estructura:
+    // { dia: 'YYYY-MM-DD', wordle: {...}, ahorcado: {...}, ... }. Se descarta
+    // entero si progreso.dia no coincide con diaLogico() al leerlo.
+    progreso: null,
     versionVista: 0
   };
   const PREMIOS = [
     { id: 'cafe', nombre: 'Un café de Rústica', costo: 20, emoji: '☕' },
     { id: 'peli', nombre: 'Un Capítulo de Friends', costo: 30, emoji: '🎬' },
-    { id: 'cena', nombre: 'Unas papas de Mac', costo: 50, emoji: '🍟' },
-    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 70, emoji: '⛍' }
+    { id: 'cena', nombre: 'Santy te cocina lo que quieras', costo: 50, emoji: '👨‍🍳' },
+    { id: 'finde', nombre: 'Dos semanas sin pagar estacionamiento', costo: 80, emoji: '⛍' }
   ];
   const JUEGOS = {
     wordle: {
@@ -4035,7 +4038,7 @@
   const MENSAJES_POR_DIA = {
     1: 'Feliz lunes, que empieces bien la semana!',
     2: 'Feliz martes, gracias por el Toblerone❤',
-    3: 'Feliz miércoles, hoy tenés baile',
+    3: 'Feliz miércoles!',
     4: 'Feliz jueves',
     5: 'Feliz viernes, buen finde!',
     6: 'Feliz sábado!',
@@ -4569,6 +4572,12 @@
     const juegosVistos = Array.isArray(estado.juegosVistos)
       ? estado.juegosVistos.filter((id) => typeof id === 'string' && /^[a-z0-9]{1,24}$/.test(id))
       : [];
+    const progresoValido = estado.progreso
+      && typeof estado.progreso === 'object'
+      && typeof estado.progreso.dia === 'string'
+      && /^\d{4}-\d{2}-\d{2}$/.test(estado.progreso.dia)
+      ? estado.progreso
+      : null;
     return {
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
@@ -4577,6 +4586,7 @@
       perdidos: Array.isArray(estado.perdidos) ? estado.perdidos : [],
       regalos: [...new Set(regalos)],
       juegosVistos: [...new Set(juegosVistos)],
+      progreso: progresoValido,
       versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
   }
@@ -4824,6 +4834,18 @@
           ...(Array.isArray(actual.juegosVistos) ? actual.juegosVistos : [])
         ])];
 
+        // El progreso es estado efímero del día en curso, no un historial acumulable.
+        // Si ambas fuentes son del mismo día se combinan por juego (actual gana en
+        // choques); si son de días distintos no tiene sentido mezclarlos, así que
+        // se queda con el más reciente y el otro se descarta más adelante al leerlo
+        // (progreso.dia !== diaLogico()).
+        let progreso = acumulado.progreso || null;
+        if (actual.progreso) {
+          progreso = progreso && progreso.dia === actual.progreso.dia
+            ? { ...progreso, ...actual.progreso }
+            : actual.progreso;
+        }
+
         return {
           medallas: Math.max(Number(acumulado.medallas) || 0, Number(actual.medallas) || 0),
           medallasTotales: Math.max(Number(acumulado.medallasTotales) || 0, Number(actual.medallasTotales) || 0),
@@ -4831,7 +4853,8 @@
           canjes: unirItems('canjes'),
           perdidos: unirItems('perdidos'),
           regalos,
-          juegosVistos
+          juegosVistos,
+          progreso
         };
       }, {
         medallas: 0,
@@ -4840,7 +4863,8 @@
         canjes: [],
         perdidos: [],
         regalos: [],
-        juegosVistos: []
+        juegosVistos: [],
+        progreso: null
       });
 
       const mejor = normalizarEstado(combinado);
@@ -5038,7 +5062,7 @@
     if (!overlay || !texto) return;
 
     cerrarJuegoDelDia();
-    if (titulo) titulo.textContent = '¡Ganaste una medalla!';
+    if (titulo) titulo.textContent = '¡Bien Fran! ¡Ganaste una medalla!';
     texto.textContent = total === 1 ? 'Ya tenés 1 medalla' : `Ya tenés ${total} medallas`;
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
@@ -5217,6 +5241,33 @@
     const estado = leerEstado();
     const vistos = Array.isArray(estado.juegosVistos) ? estado.juegosVistos : [];
     return !vistos.includes(juegoId);
+  }
+
+  // ═══ PROGRESO EN CURSO ═══
+  // Guarda el mínimo necesario para reconstruir un juego a mitad de partida (el
+  // contenido del juego en sí no se guarda: se regenera con la semilla del día,
+  // que es determinística). Se descarta entero si es de un día distinto al actual.
+  function leerProgresoJuego(juegoId) {
+    const estado = leerEstado();
+    if (!estado.progreso || estado.progreso.dia !== diaLogico()) return null;
+    return estado.progreso[juegoId] || null;
+  }
+
+  function guardarProgresoJuego(juegoId, datos) {
+    const estado = leerEstado();
+    const diaActual = diaLogico();
+    const progresoBase = estado.progreso && estado.progreso.dia === diaActual ? estado.progreso : { dia: diaActual };
+    const nuevoProgreso = { ...progresoBase, dia: diaActual, [juegoId]: datos };
+    guardarEstado({ ...estado, progreso: nuevoProgreso });
+  }
+
+  function borrarProgresoJuego(juegoId) {
+    const estado = leerEstado();
+    if (!estado.progreso || estado.progreso.dia !== diaLogico()) return;
+    if (!Object.prototype.hasOwnProperty.call(estado.progreso, juegoId)) return;
+    const nuevoProgreso = { ...estado.progreso };
+    delete nuevoProgreso[juegoId];
+    guardarEstado({ ...estado, progreso: nuevoProgreso });
   }
 
   function ganarMedalla(juegoId = obtenerJuegoDelDia().id) {
@@ -7501,6 +7552,7 @@
     let currentGuess = '';
     let activeRow = 0;
     let finished = false;
+    const intentosEnviados = [];
 
     const shell = document.createElement('div');
     shell.className = 'wordle-shell';
@@ -7637,6 +7689,11 @@
       }
     }
 
+    function guardarProgresoActual() {
+      if (finished) return;
+      guardarProgresoJuego('wordle', { intentos: intentosEnviados.slice() });
+    }
+
     function intentarSolucion() {
       if (finished) return;
       if (currentGuess.length !== largo) {
@@ -7662,10 +7719,12 @@
       const resultado = evaluarWordle(guess, solution);
       boardStates[activeRow] = resultado;
       actualizarTecladoDesdeResultado(guess, resultado);
+      intentosEnviados.push(guess);
       renderBoard();
 
       if (guess === solution) {
         finished = true;
+        borrarProgresoJuego('wordle');
         if (status) status.textContent = '¡Adivinaste!';
         if (typeof onGanar === 'function') onGanar();
         return;
@@ -7675,10 +7734,13 @@
       currentGuess = '';
       if (activeRow >= 6) {
         finished = true;
+        borrarProgresoJuego('wordle');
         if (status) status.textContent = `La palabra era ${solution}`;
         if (typeof onPerder === 'function') onPerder(`La palabra era ${solution}`);
         return;
       }
+
+      guardarProgresoActual();
 
       if (status) status.textContent = `Intento ${activeRow} de 6`;
       renderBoard();
@@ -7708,6 +7770,7 @@
 
     if (yaGanoMedallaHoy('wordle')) {
       finished = true;
+      borrarProgresoJuego('wordle');
       const mensaje = document.getElementById('game-status');
       if (mensaje) mensaje.textContent = 'Ya ganaste la medalla de hoy';
       for (let i = 0; i < largo; i++) {
@@ -7723,8 +7786,40 @@
       };
     }
 
+    // Restaurar progreso guardado (cierre con la X, cambio de app, etc.). El
+    // contenido (solution) ya salió de la semilla del día, así que solo hace falta
+    // replay de los intentos ya enviados para reconstruir tablero y teclado.
+    const progresoGuardado = leerProgresoJuego('wordle');
+    if (progresoGuardado && Array.isArray(progresoGuardado.intentos)) {
+      for (const palabraGuardada of progresoGuardado.intentos) {
+        if (activeRow >= 6 || finished) break;
+        const guess = String(palabraGuardada || '').toUpperCase();
+        if (guess.length !== largo || !/^[A-Z]+$/.test(guess)) continue;
+        const base = Array(largo).fill('');
+        for (let i = 0; i < largo; i++) base[i] = guess[i];
+        boardState[activeRow] = base;
+        const resultado = evaluarWordle(guess, solution);
+        boardStates[activeRow] = resultado;
+        actualizarTecladoDesdeResultado(guess, resultado);
+        intentosEnviados.push(guess);
+        activeRow += 1;
+        if (guess === solution) {
+          // No debería poder pasar (se borra el progreso al ganar), pero por las
+          // dudas no dejamos el juego restaurado en un estado inconsistente.
+          finished = true;
+        }
+      }
+      if (status && !finished && intentosEnviados.length) {
+        status.textContent = `Intento ${activeRow} de 6`;
+      }
+    }
+
+    guardarProgresoActivo = guardarProgresoActual;
+
     renderBoard();
     return () => {
+      guardarProgresoActual();
+      guardarProgresoActivo = null;
       document.removeEventListener('keydown', onKeyDown);
       contenedor.innerHTML = '';
     };
@@ -7954,6 +8049,10 @@
   }
 
   let juegoActivoDesmontar = null;
+  // El juego montado deja acá su propia función "guardar progreso ahora"; la usa el
+  // listener global de visibilitychange para persistir sin que cada juego tenga que
+  // agregar su propio listener. null cuando no hay ningún juego abierto.
+  let guardarProgresoActivo = null;
 
   // Bloqueo único de lanzamiento: 29/08/2026 hasta las 10:00 AR.
   // Pasada esa hora la función devuelve false para siempre, salvo el override ?bloqueo=1.
@@ -7961,6 +8060,16 @@
   let bloqueoIntervalId = null;
   let bloqueoTimeoutId = null;
   let contadorMenuIntervalId = null;
+
+  // Cartel "Nuevos juegos en..." que tapa el menú hasta 02/09/2026 10:00 AR.
+  // Pasada esa hora, esperandoNuevosJuegos() devuelve false para siempre.
+  const FIN_ESPERA_NUEVOS_JUEGOS_MS = Date.UTC(2026, 8, 2, 13, 0, 0); // 10:00 AR = 13:00 UTC
+  let nuevosJuegosIntervalId = null;
+  let nuevosJuegosTimeoutId = null;
+
+  function esperandoNuevosJuegos() {
+    return Date.now() < FIN_ESPERA_NUEVOS_JUEGOS_MS;
+  }
 
   function juegosBloqueadosPorHoy() {
     const params = new URLSearchParams(window.location.search);
@@ -7994,6 +8103,56 @@
       window.clearTimeout(bloqueoTimeoutId);
       bloqueoTimeoutId = null;
     }
+  }
+
+  function limpiarNuevosJuegosCountdown() {
+    if (nuevosJuegosIntervalId !== null) {
+      window.clearInterval(nuevosJuegosIntervalId);
+      nuevosJuegosIntervalId = null;
+    }
+    if (nuevosJuegosTimeoutId !== null) {
+      window.clearTimeout(nuevosJuegosTimeoutId);
+      nuevosJuegosTimeoutId = null;
+    }
+  }
+
+  function arranqueNuevosJuegosCountdown() {
+    limpiarNuevosJuegosCountdown();
+
+    const restante = Math.max(0, FIN_ESPERA_NUEVOS_JUEGOS_MS - Date.now());
+    if (restante > 0) {
+      const timeoutMs = Math.min(restante, 2147483647);
+      nuevosJuegosTimeoutId = window.setTimeout(() => {
+        nuevosJuegosTimeoutId = null;
+        renderMenuJuegos();
+      }, timeoutMs);
+    }
+
+    nuevosJuegosIntervalId = window.setInterval(() => {
+      if (!esperandoNuevosJuegos()) {
+        limpiarNuevosJuegosCountdown();
+        renderMenuJuegos();
+        return;
+      }
+      actualizarCartelNuevosJuegos();
+    }, 1000);
+  }
+
+  function actualizarCartelNuevosJuegos() {
+    const menu = document.getElementById('game-menu');
+    if (!menu || !menu.dataset.esperandoNuevos) return;
+    const countdown = menu.querySelector('#nuevos-juegos-countdown');
+    if (!countdown) return;
+
+    const restante = FIN_ESPERA_NUEVOS_JUEGOS_MS - Date.now();
+    if (restante <= 0) {
+      countdown.textContent = '00:00:00';
+      limpiarNuevosJuegosCountdown();
+      renderMenuJuegos();
+      return;
+    }
+
+    countdown.textContent = formatearCuentaRegresiva(restante);
   }
 
   function limpiarRefreshStatusMenu() {
@@ -8093,6 +8252,24 @@
     const menu = document.getElementById('game-menu');
     if (!menu) return;
 
+    if (esperandoNuevosJuegos()) {
+      menu.dataset.esperandoNuevos = '1';
+      menu.innerHTML = `
+        <div class="game-lock-panel">
+          <p class="game-lock-title">Hola Fran, buen día. Nuevos juegos en</p>
+          <div id="nuevos-juegos-countdown" class="game-lock-countdown">00:00:00</div>
+        </div>
+      `;
+      actualizarCartelNuevosJuegos();
+      arranqueNuevosJuegosCountdown();
+      const status = document.getElementById('game-status');
+      if (status) status.textContent = 'Nuevos juegos muy pronto';
+      return;
+    }
+
+    limpiarNuevosJuegosCountdown();
+    delete menu.dataset.esperandoNuevos;
+
     if (juegosBloqueadosPorHoy()) {
       menu.dataset.bloqueado = '1';
       menu.innerHTML = `
@@ -8138,6 +8315,14 @@
   }
 
   function abrirJuegoPorId(juegoId) {
+    if (esperandoNuevosJuegos()) {
+      const menu = document.getElementById('game-menu');
+      if (menu) renderMenuJuegos();
+      const status = document.getElementById('game-status');
+      if (status) status.textContent = 'Nuevos juegos muy pronto';
+      return;
+    }
+
     if (juegosBloqueadosPorHoy()) {
       const menu = document.getElementById('game-menu');
       if (menu) renderMenuJuegos();
@@ -8379,6 +8564,9 @@
 
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
+      if (typeof guardarProgresoActivo === 'function') {
+        try { guardarProgresoActivo(); } catch (error) {}
+      }
       Almacen.guardar(leerEstado());
       return;
     }
@@ -8489,6 +8677,7 @@
         canjes: Array.isArray(estadoNormalizado.canjes) ? estadoNormalizado.canjes : [],
         perdidos,
         juegosVistos: Array.isArray(estadoNormalizado.juegosVistos) ? estadoNormalizado.juegosVistos : [],
+        progreso: estadoNormalizado.progreso || null,
         versionVista: VERSION_JUEGOS > versionVista ? VERSION_JUEGOS : versionVista
       }));
       await Almacen.guardar(estadoActual);
