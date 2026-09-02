@@ -3368,6 +3368,15 @@
     <div id="moderador-override" class="override" hidden></div>
 
     <div class="control-global">
+      <div class="control-global-head">Etiqueta de este dispositivo</div>
+      <div id="etiqueta-dispositivo-estado" class="meta"></div>
+      <div class="control-global-editor">
+        <input id="etiqueta-dispositivo-input" type="text" maxlength="30" placeholder="ej: Mi celular" aria-label="Etiqueta de este dispositivo">
+        <button id="etiqueta-dispositivo-guardar" type="button">Guardar</button>
+      </div>
+    </div>
+
+    <div class="control-global">
       <div class="control-global-head">Control global</div>
       <div id="control-global-estado" class="meta"></div>
       <div id="control-global-warning" class="override" hidden></div>
@@ -3599,6 +3608,9 @@
   const controlGlobalGenerar = document.getElementById('control-global-generar');
   const controlGlobalJson = document.getElementById('control-global-json');
   const controlGlobalLink = document.getElementById('control-global-link');
+  const etiquetaDispositivoEstado = document.getElementById('etiqueta-dispositivo-estado');
+  const etiquetaDispositivoInput = document.getElementById('etiqueta-dispositivo-input');
+  const etiquetaDispositivoGuardar = document.getElementById('etiqueta-dispositivo-guardar');
   const DISPOSITIVOS_KEY = 'granDiaDispositivos';
   const GLOBAL_SYNC_KEY = 'granDiaGlobalSync';
   const GLOBAL_SYNC_CHANNEL = 'gran-dia-sync';
@@ -4338,6 +4350,31 @@
     }
   }
 
+  const ETIQUETA_DISPOSITIVO_KEY = 'granDiaEtiquetaDispositivo';
+
+  function leerEtiquetaDispositivo() {
+    try {
+      const raw = window.localStorage.getItem(ETIQUETA_DISPOSITIVO_KEY);
+      return raw ? raw.trim() : '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function guardarEtiquetaDispositivo(texto) {
+    try {
+      const limpio = String(texto || '').trim().slice(0, 30);
+      if (limpio) {
+        window.localStorage.setItem(ETIQUETA_DISPOSITIVO_KEY, limpio);
+      } else {
+        window.localStorage.removeItem(ETIQUETA_DISPOSITIVO_KEY);
+      }
+      return limpio;
+    } catch (error) {
+      return '';
+    }
+  }
+
   function esVisitaDeModerador() {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -4353,6 +4390,8 @@
     if (esVisitaDeModerador()) return;
 
     try {
+      const etiqueta = leerEtiquetaDispositivo();
+      const quien = etiqueta || 'Fran';
       const ahora = new Date();
       const hora = ahora.toLocaleString('es-AR', {
         day: '2-digit',
@@ -4362,7 +4401,7 @@
       });
       fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
         method: 'POST',
-        body: `Fran entró a la web · ${hora}`,
+        body: `${quien} entró a la web · ${hora}`,
         headers: { 'Title': 'Buenos día', 'Tags': 'coffee' }
       }).catch(() => {});
     } catch (error) {}
@@ -4518,6 +4557,25 @@
 
     if (meta) {
       meta.innerHTML = `Día lógico: <strong>${diaActual}</strong><br>Entrada del calendario: <strong>${fechaHoy ? 'Sí' : 'No'}</strong><br>Versión: <strong>v${VERSION_JUEGOS}</strong> · Corte: <strong>${HORA_CORTE}:00 (hora AR)</strong><br>Próximo cambio en <strong>${proximoCambio.texto}</strong><br>Juego del día: <strong>${juegoHoy.nombre}</strong><br>Contenido cargado hasta el <strong>${ultimoCargado}</strong>, faltan <strong>${faltan}</strong> días. ${alertaFaltan}<br><a href="${linkMañana}" target="_blank" rel="noreferrer noopener">Previsualizar mañana</a><br><a href="https://ntfy.sh/${NTFY_TOPIC}" target="_blank" rel="noreferrer noopener">Avisos de ingreso de Fran (ntfy.sh)</a>`;
+    }
+
+    if (etiquetaDispositivoEstado && etiquetaDispositivoInput) {
+      const actualizarEstadoEtiqueta = () => {
+        const actual = leerEtiquetaDispositivo();
+        etiquetaDispositivoEstado.innerHTML = actual
+          ? `Este dispositivo avisa como: <strong>${actual}</strong>`
+          : `Sin etiquetar: los avisos van a decir <strong>"Fran"</strong>`;
+      };
+      actualizarEstadoEtiqueta();
+      etiquetaDispositivoInput.value = leerEtiquetaDispositivo();
+
+      if (etiquetaDispositivoGuardar) {
+        etiquetaDispositivoGuardar.onclick = () => {
+          const guardado = guardarEtiquetaDispositivo(etiquetaDispositivoInput.value);
+          etiquetaDispositivoInput.value = guardado;
+          actualizarEstadoEtiqueta();
+        };
+      }
     }
 
     if (controlGlobalEstado) {
