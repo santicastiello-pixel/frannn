@@ -37,6 +37,10 @@
       min-height: 100dvh;
     }
   }
+  html,body{
+    height:var(--app-vh, 100dvh);
+    min-height:var(--app-vh, 100dvh);
+  }
   body{
     margin:0;
     font-family:"Fraunces",Georgia,serif;
@@ -51,9 +55,10 @@
 
   /* Cielo */
   .cielo{
-    position:fixed; top:0; left:0; right:0; bottom:0; z-index:0;
+    position:fixed; top:0; left:0; right:0; z-index:0;
     height:100vh;
     height:100dvh;
+    height:var(--app-vh, 100dvh);
     background:
       radial-gradient(120% 80% at 50% var(--astro-y),
         color-mix(in srgb, var(--astro) 55%, transparent) 0%,
@@ -3602,6 +3607,21 @@
 
 <script>
 (function(){
+  // iOS a veces mide mal la altura real del viewport en el primer render de una app
+  // instalada (standalone), dejando una franja sin cubrir hasta que el usuario scrollea.
+  // dvh no alcanza a corregirlo solo, así que medimos con JS y lo aplicamos como variable.
+  function actualizarAlturaViewport() {
+    const alto = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--app-vh', `${alto}px`);
+  }
+  actualizarAlturaViewport();
+  window.addEventListener('resize', actualizarAlturaViewport);
+  window.addEventListener('orientationchange', actualizarAlturaViewport);
+  window.addEventListener('pageshow', actualizarAlturaViewport);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', actualizarAlturaViewport);
+  }
+
   const nombre = document.getElementById('nombre');
   const franja = document.getElementById('franja');
   const fechaHoy = document.getElementById('fecha-hoy');
