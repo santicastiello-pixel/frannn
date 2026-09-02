@@ -3393,6 +3393,15 @@
     </div>
 
     <div class="control-global">
+      <div class="control-global-head">Sumar medallas (testing)</div>
+      <div id="sumar-medallas-estado" class="meta"></div>
+      <div class="control-global-editor">
+        <input id="sumar-medallas-input" type="number" min="1" max="999" step="1" value="1" aria-label="Cantidad de medallas a sumar">
+        <button id="sumar-medallas-boton" type="button">Agregar</button>
+      </div>
+    </div>
+
+    <div class="control-global">
       <div class="control-global-head">Control global</div>
       <div id="control-global-estado" class="meta"></div>
       <div id="control-global-warning" class="override" hidden></div>
@@ -3660,6 +3669,9 @@
   const etiquetaDispositivoEstado = document.getElementById('etiqueta-dispositivo-estado');
   const etiquetaDispositivoInput = document.getElementById('etiqueta-dispositivo-input');
   const etiquetaDispositivoGuardar = document.getElementById('etiqueta-dispositivo-guardar');
+  const sumarMedallasEstado = document.getElementById('sumar-medallas-estado');
+  const sumarMedallasInput = document.getElementById('sumar-medallas-input');
+  const sumarMedallasBoton = document.getElementById('sumar-medallas-boton');
   const DISPOSITIVOS_KEY = 'granDiaDispositivos';
   const GLOBAL_SYNC_KEY = 'granDiaGlobalSync';
   const GLOBAL_SYNC_CHANNEL = 'gran-dia-sync';
@@ -4625,6 +4637,33 @@
           actualizarEstadoEtiqueta();
         };
       }
+    }
+
+    if (sumarMedallasEstado) {
+      const estadoActualMedallas = leerEstado();
+      const saldoActual = Number(estadoActualMedallas.medallas) || 0;
+      sumarMedallasEstado.innerHTML = `Saldo actual: <strong>${saldoActual}</strong>`;
+    }
+
+    if (sumarMedallasBoton && sumarMedallasInput) {
+      sumarMedallasBoton.onclick = async () => {
+        const cantidad = Math.floor(Number(sumarMedallasInput.value));
+        if (!Number.isFinite(cantidad) || cantidad < 1) return;
+
+        const estado = leerEstado();
+        const nuevoEstado = {
+          ...estado,
+          medallas: (Number(estado.medallas) || 0) + cantidad,
+          medallasTotales: (Number(estado.medallasTotales) || 0) + cantidad
+        };
+
+        await guardarEstado(nuevoEstado);
+        actualizarBadgeMedallas();
+        renderPremios();
+        if (sumarMedallasEstado) {
+          sumarMedallasEstado.innerHTML = `Saldo actual: <strong>${nuevoEstado.medallas}</strong>`;
+        }
+      };
     }
 
     if (controlGlobalEstado) {
