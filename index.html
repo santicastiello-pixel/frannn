@@ -3623,11 +3623,19 @@
   }
 
   // En apps instaladas en iOS, a veces el fondo fijo queda mal pintado hasta el primer
-  // scroll del usuario (bug de repintado de WebKit, no de la altura calculada). Forzamos
-  // un scroll mínimo apenas carga para que WebKit repinte sin que el usuario lo note.
+  // scroll del usuario (bug de repintado de WebKit, no de la altura calculada). Como
+  // html/body miden justo el alto de la pantalla, no hay overflow real para scrollear,
+  // así que lo generamos a propósito por un instante para forzar un scroll de verdad.
   function forzarRepintadoIOS() {
-    window.scrollTo(0, 1);
-    window.setTimeout(() => window.scrollTo(0, 0), 50);
+    const alturaPrevia = document.documentElement.style.minHeight;
+    document.documentElement.style.minHeight = 'calc(var(--app-vh, 100dvh) + 1px)';
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 1);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.style.minHeight = alturaPrevia;
+      });
+    });
   }
   window.addEventListener('load', () => window.setTimeout(forzarRepintadoIOS, 60));
   window.addEventListener('pageshow', () => window.setTimeout(forzarRepintadoIOS, 60));
