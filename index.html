@@ -8830,6 +8830,26 @@
     avion.addEventListener('click', () => descubrirSecreta('avion'));
   });
 
+  // Acceso al panel de moderador desde dentro de la app instalada (sin barra de
+  // direcciones para escribir ?moderador=1): 5 toques seguidos en "Abrazo!".
+  (function habilitarAccesoModeradorSecreto() {
+    const firmaEl = document.querySelector('.firma');
+    if (!firmaEl) return;
+    let toques = 0;
+    let temporizador = null;
+    firmaEl.addEventListener('click', () => {
+      toques += 1;
+      if (temporizador) window.clearTimeout(temporizador);
+      temporizador = window.setTimeout(() => { toques = 0; }, 3000);
+      if (toques >= 5) {
+        toques = 0;
+        const url = new URL(window.location.href);
+        url.searchParams.set('moderador', '1');
+        window.location.href = url.toString();
+      }
+    });
+  })();
+
   premiosClose.addEventListener('click', cerrarPremios);
   premiosModal.addEventListener('click', function(event) {
     if (event.target === premiosModal) {
