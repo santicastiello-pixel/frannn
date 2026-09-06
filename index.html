@@ -2218,6 +2218,52 @@
     margin-bottom:18px;
   }
 
+  .game-header,
+  .game-status,
+  .game-menu,
+  .game-stage {
+    position:relative;
+    z-index:1;
+  }
+
+  .game-confeti-capa {
+    position:absolute;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+
+  .game-banderines {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:32px;
+    z-index:0;
+    opacity:0;
+    pointer-events:none;
+    overflow:visible;
+    transform-origin:50% 0%;
+    transition:opacity .6s ease;
+  }
+
+  .game-banderines svg {
+    display:block;
+    width:100%;
+    height:100%;
+  }
+
+  .game-banderines.visible {
+    opacity:1;
+    animation:banderines-balanceo 6s ease-in-out infinite;
+  }
+
+  .game-option.cumple:not(.won):not(.lost):not(.featured) {
+    border-color:rgba(255, 209, 128, 0.55);
+    box-shadow:0 0 0 1px rgba(255, 209, 128, 0.18), 0 12px 26px rgba(255, 173, 94, 0.12);
+  }
+
   .game-kicker {
     font-family:"DM Mono",ui-monospace,monospace;
     font-size:10px;
@@ -2880,24 +2926,19 @@
     inset:0;
     pointer-events:none;
     overflow:hidden;
-    z-index:3;
-    opacity:0;
-    transition:opacity .8s ease;
-  }
-
-  .globos.visible {
-    opacity:1;
+    z-index:0;
   }
 
   .globo {
     position:absolute;
-    top:-12vh;
+    bottom:-14vh;
     width:26px;
     height:34px;
     border-radius:50% 50% 48% 48%;
-    background:linear-gradient(180deg, #ff7aa2, #ff4d6d);
     box-shadow:inset -8px -6px 0 rgba(255,255,255,.18), 0 0 18px rgba(255,255,255,.25);
-    animation: caer-viernes linear infinite;
+    opacity:0;
+    will-change:transform, opacity;
+    animation: globo-subir var(--duracion, 13s) ease-in forwards;
   }
 
   .globo::before {
@@ -2921,10 +2962,109 @@
     background:rgba(255,255,255,.25);
   }
 
-  .globo:nth-child(2n) { background:linear-gradient(180deg, #7bdff2, #35b7d7); }
-  .globo:nth-child(3n) { background:linear-gradient(180deg, #ffd166, #ff9f1c); }
-  .globo:nth-child(4n) { background:linear-gradient(180deg, #c77dff, #8a5cf6); }
-  .globo:nth-child(5n) { background:linear-gradient(180deg, #7ae582, #2ec27e); }
+  @keyframes globo-subir {
+    0% { transform:translate3d(0, 0, 0); opacity:0; }
+    10% { opacity:.95; }
+    50% { transform:translate3d(var(--deriva, 20px), -58vh, 0); }
+    90% { opacity:.95; }
+    100% { transform:translate3d(calc(var(--deriva, 20px) * -1), -120vh, 0); opacity:0; }
+  }
+
+  .banderines {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:46px;
+    z-index:0;
+    opacity:0;
+    pointer-events:none;
+    transform-origin:50% 0%;
+    transition:opacity .8s ease;
+  }
+
+  .banderines.visible {
+    opacity:1;
+    animation:banderines-balanceo 6s ease-in-out infinite;
+  }
+
+  @keyframes banderines-balanceo {
+    0%, 100% { transform:rotate(-1deg); }
+    50% { transform:rotate(1deg); }
+  }
+
+  .confeti-capa {
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+
+  .confeti-pieza {
+    --confeti-opacidad-pico:1;
+    position:absolute;
+    top:-18px;
+    border-radius:2px;
+    opacity:0;
+    will-change:transform, opacity;
+    animation:confeti-caida var(--duracion, 3.4s) linear var(--retraso, 0s) forwards;
+  }
+
+  .confeti-pieza.redonda {
+    border-radius:50%;
+  }
+
+  @keyframes confeti-caida {
+    0% { transform:translate3d(0, 0, 0) rotate(0deg); opacity:0; }
+    6% { opacity:var(--confeti-opacidad-pico, 1); }
+    88% { opacity:var(--confeti-opacidad-pico, 1); }
+    100% { transform:translate3d(var(--deriva, 0px), 108vh, 0) rotate(var(--rot, 360deg)); opacity:0; }
+  }
+
+  .cumple-mensaje {
+    position:fixed;
+    top:50%;
+    left:50%;
+    z-index:20;
+    max-width:90vw;
+    padding:22px 30px;
+    border-radius:24px;
+    background:rgba(20, 12, 30, 0.35);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    box-shadow:0 18px 50px rgba(0,0,0,0.25);
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(28px, 7vw, 52px);
+    line-height:1.1;
+    color:#fff;
+    text-align:center;
+    text-shadow:0 4px 18px rgba(0,0,0,0.35);
+    opacity:0;
+    pointer-events:none;
+    transform:translate(-50%, -50%) scale(.7);
+  }
+
+  .cumple-mensaje.mostrar {
+    animation:cumple-mensaje-anim 4.2s ease forwards;
+  }
+
+  @keyframes cumple-mensaje-anim {
+    0% { opacity:0; transform:translate(-50%, -50%) scale(.7); }
+    10% { opacity:1; transform:translate(-50%, -50%) scale(1.04); }
+    18% { transform:translate(-50%, -50%) scale(1); }
+    81% { opacity:1; transform:translate(-50%, -50%) scale(1); }
+    100% { opacity:0; transform:translate(-50%, -50%) scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cumple-mensaje.mostrar {
+      opacity:1;
+      transform:translate(-50%, -50%) scale(1);
+    }
+  }
 
   @keyframes twinkle {
     0%, 100% { transform:scale(.5); opacity:0; }
@@ -3348,9 +3488,6 @@
       bottom: 10px;
     }
 
-    .globos .globo {
-      transform: scale(.82);
-    }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -3488,19 +3625,27 @@
     <span class="avion izq" style="top:22%; animation-duration:70s; animation-delay:-28s;"></span>
     <span class="avion izq" style="top:26%; animation-duration:85s; animation-delay:-60s;"></span>
   </div>
-  <div class="globos" id="globos" aria-hidden="true">
-    <span class="globo" style="left:4%; --drift:22px; animation-duration:11s; animation-delay:0s;"></span>
-    <span class="globo" style="left:13%; --drift:-18px; animation-duration:15s; animation-delay:1s;"></span>
-    <span class="globo" style="left:22%; --drift:26px; animation-duration:12s; animation-delay:2s;"></span>
-    <span class="globo" style="left:31%; --drift:-14px; animation-duration:16s; animation-delay:0.5s;"></span>
-    <span class="globo" style="left:40%; --drift:22px; animation-duration:13s; animation-delay:3s;"></span>
-    <span class="globo" style="left:50%; --drift:-20px; animation-duration:12.5s; animation-delay:1.5s;"></span>
-    <span class="globo" style="left:59%; --drift:24px; animation-duration:14s; animation-delay:2.5s;"></span>
-    <span class="globo" style="left:68%; --drift:-16px; animation-duration:11.5s; animation-delay:3.5s;"></span>
-    <span class="globo" style="left:77%; --drift:18px; animation-duration:15.5s; animation-delay:1.8s;"></span>
-    <span class="globo" style="left:86%; --drift:-22px; animation-duration:13.5s; animation-delay:2.8s;"></span>
-    <span class="globo" style="left:94%; --drift:16px; animation-duration:12s; animation-delay:4s;"></span>
-  </div>
+  <div class="globos" id="globos" aria-hidden="true"></div>
+
+  <svg id="banderines" class="banderines" viewBox="0 0 400 46" preserveAspectRatio="none" aria-hidden="true">
+    <line x1="0" y1="10" x2="400" y2="10" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/>
+    <polygon points="9,10 25,10 17,32" fill="#ff6b6b"/>
+    <polygon points="42,10 58,10 50,32" fill="#ffd166"/>
+    <polygon points="75,10 91,10 83,32" fill="#4cc9f0"/>
+    <polygon points="109,10 125,10 117,32" fill="#c77dff"/>
+    <polygon points="142,10 158,10 150,32" fill="#7ae582"/>
+    <polygon points="175,10 191,10 183,32" fill="#ff6b6b"/>
+    <polygon points="209,10 225,10 217,32" fill="#ffd166"/>
+    <polygon points="242,10 258,10 250,32" fill="#4cc9f0"/>
+    <polygon points="275,10 291,10 283,32" fill="#c77dff"/>
+    <polygon points="309,10 325,10 317,32" fill="#7ae582"/>
+    <polygon points="342,10 358,10 350,32" fill="#ff6b6b"/>
+    <polygon points="375,10 391,10 383,32" fill="#ffd166"/>
+  </svg>
+
+  <div id="confeti-capa" class="confeti-capa" aria-hidden="true"></div>
+
+  <div id="cumple-mensaje" class="cumple-mensaje" aria-hidden="true"><span>¡Feliz cumple, Fran!</span></div>
 
   <div class="top-actions" aria-label="Acciones rápidas">
     <button id="medal-badge" class="medal-badge" type="button" aria-label="Medallas">
@@ -3512,6 +3657,8 @@
 
   <div id="game-modal" class="game-modal" aria-hidden="true">
     <div class="game-panel" role="dialog" aria-modal="true" aria-labelledby="game-title">
+      <div id="game-confeti-capa" class="game-confeti-capa" aria-hidden="true"></div>
+      <div id="game-banderines" class="game-banderines" aria-hidden="true"></div>
       <div class="game-header">
         <div>
           <div id="game-kicker" class="game-kicker">juegos del día</div>
@@ -3657,6 +3804,9 @@
   const diaMensaje = document.getElementById('dia-mensaje');
   const diaSemana = document.getElementById('dia-semana');
   const globos = document.getElementById('globos');
+  const banderines = document.getElementById('banderines');
+  const confettiCapa = document.getElementById('confeti-capa');
+  const cumpleMensajeEl = document.getElementById('cumple-mensaje');
   const animacionDia = document.getElementById('animacion-dia');
   const panelModerador = document.getElementById('moderador-panel');
   const listaModerador = document.getElementById('moderador-lista');
@@ -3739,11 +3889,11 @@
   // - alias es opcional y convierte variantes a la forma canónica.
   // - Si no hay entrada para un día, se usa un banco interno de categorías con semilla por fecha para no romper el juego.
   const CALENDARIO = {
-    '2026-09-05': {
-      wordle: 'TRABAJO',
-      ahorcado: { palabra: 'MARANELLO', categoria: 'COMIDA' },
-      sopa: ['DARIO', 'DOLORES', 'CAROLINA', 'FRAN', 'JUANA', 'TUTE'],
-      memoria: [3, 16, 9, 12, 13, 24, 22, 17],
+    '2026-09-07': {
+      wordle: '',
+      ahorcado: { palabra: 'CUMPLEAÑOS', categoria: 'FRAN' },
+      sopa: ['UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS'],
+      memoria: [22, 14, 11, 1, 10, 23, 22, 19],
       mayormenor: [
         { v: 1, p: 'P' },
         { v: 6, p: 'C' },
@@ -3754,34 +3904,30 @@
       ],
       cuentas: null,
       mencionar10: {
-        categoria: 'Instrumentos musicales',
-        validas: [  'GUITARRA','PIANO','BAJO','BATERIA','VIOLIN','VIOLA','CELLO',
-    'CONTRABAJO','ARPA','FLAUTA','FLAUTA TRAVERSERA','CLARINETE',
-    'SAXOFON','OBOE','FAGOT','TROMPETA','TROMBON','TUBA','CORNO',
-    'ACORDEON','BANDONEON','ARMONICA','ORGANO','SINTETIZADOR',
-    'TECLADO','UKELELE','BANJO','MANDOLINA','CHARANGO','LAUD',
-    'SITAR','PANDERETA','TAMBOR','BOMBO','TIMBAL','PLATILLOS',
-    'XILOFON','MARIMBA','VIBRAFONO','TRIANGULO','CAJON','CONGA',
-    'BONGO','MARACAS','CASTAÑUELAS','GONG','CAMPANA','CENCERRO',
-    'DIDGERIDOO','GAITA','QUENA','SIKU','ZAMPOÑA','OCARINA',
-    'CLAVICORDIO','CLAVECIN','THEREMIN','TIMBALES'
+        categoria: 'Animales que vuelan',
+        validas: [  'AGUILA','HALCON','BUHO','LECHUZA','GORRION','PALOMA','CUERVO',
+    'AVESTRUZ','PINGUINO','FLAMENCO','COLIBRI','TUCAN',
+    'LORO','COTORRA','PERIQUITO','CANARIO','JILGUERO','CARDENAL','PETIRROJO',
+    'GOLONDRINA','ALBATROS','PELICANO','CISNE','GAVIOTA',
+    'FAISAN','PAVO','PAVO REAL','GALLO','GALLINA','PATOS',
+    'GANSO','CUACUAC','PATO SILVESTRE','PATO MANDARIN','PATO REAL',
+    'AVOCETA','AVEFRIA','CHORLO','CORRECAMINOS','AVOCETA COMUN',
+    'CIGUEÑA','FLAMENCO ROSA','FLAMENCO COMUN','GARZA','GARZA REAL',
+    'GARZA IMPERIAL','GARZA TIGRE','GARZA MORITA','GARZA BLANCA','GARZA NEGRA',
+    'GARZA AZUL','GARZA ROJA','GARZA VERDE','GARZA AMARILLA','GARZA NARANJA'
         ],
-        alias: {   'GUITARRA ELECTRICA': 'GUITARRA',
-    'GUITARRA CRIOLLA': 'GUITARRA',
-    'GUITARRA ACUSTICA': 'GUITARRA',
-    'VIOLONCHELO': 'CELLO',
-    'VIOLONCELO': 'CELLO',
-    'SAXO': 'SAXOFON',
-    'TRAVERSERA': 'FLAUTA TRAVERSERA',
-    'FLAUTA DULCE': 'FLAUTA',
-    'BAJO ELECTRICO': 'BAJO',
-    'CORNO FRANCES': 'CORNO',
-    'TROMPA': 'CORNO',
-    'PIANO DE COLA': 'PIANO',
-    'SINTE': 'SINTETIZADOR',
-    'ZAMPONA': 'ZAMPOÑA',
-    'BOMBO LEGUERO': 'BOMBO',
-    'CLAVE': 'CLAVECIN'},
+        alias: {   'AGUILA CALVA': 'AGUILA',
+    'BUO': 'BUHO',
+    'PICO FLOR': 'PICAFLOR',
+    'COLIBRÍ': 'COLIBRI',
+    'CIGUENA': 'CIGUEÑA',
+    'MARIPOSAS': 'MARIPOSA',
+    'ABEJAS': 'ABEJA',
+    'VAQUITA': 'VAQUITA DE SAN ANTONIO',
+    'CATARINA': 'MARIQUITA',
+    'MARTIN PESCADOR': 'MARTIN PESCADOR',
+    'PAJARO CARPINTERO': 'CARPINTERO'
+        },
         segundos: 120
       }
     },
@@ -3939,6 +4085,33 @@
     const override = params.get('dia');
     if (override && /^\d{4}-\d{2}-\d{2}$/.test(override)) return true;
     return Boolean(DIA_FORZADO && /^\d{4}-\d{2}-\d{2}$/.test(DIA_FORZADO));
+  }
+
+  // ═══ CUMPLEAÑOS (7/9) ═══
+  function cumpleForzado() {
+    try {
+      return new URLSearchParams(window.location.search).get('cumple') === '1';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Hora real del dispositivo, comparando solo mes y día (sin año) para que
+  // funcione todos los años. No usa diaLogico(): el cumpleaños arranca a la
+  // medianoche real, no a la hora de corte de los juegos.
+  function esCumpleHoy(ahora = new Date()) {
+    return cumpleForzado() || (ahora.getMonth() === 8 && ahora.getDate() === 7);
+  }
+
+  function fechaClaveLocal(ahora = new Date()) {
+    const y = ahora.getFullYear();
+    const m = String(ahora.getMonth() + 1).padStart(2, '0');
+    const d = String(ahora.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function prefiereMovimientoReducido() {
+    return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
   function fechaExisteEnCalendario(fecha) {
@@ -4099,6 +4272,9 @@
     progreso: null,
     // Medallas secretas ya descubiertas, para siempre (no por día). ids: 'avion', 'taza'.
     secretas: [],
+    // Fecha real (YYYY-MM-DD, hora local del dispositivo) en la que ya se mostró la
+    // secuencia de entrada de cumpleaños. Evita repetirla en cada recarga del 7/9.
+    cumpleVisto: null,
     versionVista: 0
   };
   const PREMIOS = [
@@ -4862,6 +5038,9 @@
       && /^\d{4}-\d{2}-\d{2}$/.test(estado.progreso.dia)
       ? estado.progreso
       : null;
+    const cumpleVistoValido = typeof estado.cumpleVisto === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(estado.cumpleVisto)
+      ? estado.cumpleVisto
+      : null;
     return {
       medallas: Number.isFinite(Number(estado.medallas)) ? Number(estado.medallas) : 0,
       medallasTotales: Number.isFinite(Number(estado.medallasTotales)) ? Number(estado.medallasTotales) : 0,
@@ -4872,6 +5051,7 @@
       juegosVistos: [...new Set(juegosVistos)],
       progreso: progresoValido,
       secretas: [...new Set(secretas)],
+      cumpleVisto: cumpleVistoValido,
       versionVista: Number.isFinite(Number(estado.versionVista)) ? Number(estado.versionVista) : 0
     };
   }
@@ -5639,6 +5819,10 @@
 
     reproducirVictoria();
     mostrarMedallaOverlay();
+
+    if (esCumpleHoy() && !prefiereMovimientoReducido()) {
+      lanzarConfetti(15);
+    }
   }
 
   function renderPremios() {
@@ -8614,7 +8798,7 @@
       const esNuevo = mostrarBadgeNuevo(juego.id);
       const thumbStyle = juego.icono && juego.icono.fondo ? `style="background:${juego.icono.fondo};"` : '';
       return `
-        <button type="button" class="game-option ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
+        <button type="button" class="game-option ${ganado ? 'won' : ''} ${perdido ? 'lost' : ''} ${esCumpleHoy() ? 'cumple' : ''}" data-juego-id="${juego.id}" ${disabled ? 'disabled' : ''}>
           <div class="game-option-top">
             <span class="game-option-thumb" ${thumbStyle} aria-hidden="true">${juego.icono ? juego.icono.emoji : '🎮'}</span>
             ${racha > 0 ? `<span class="game-option-streak" aria-label="Racha de victorias">🔥 ${racha}</span>` : ''}
@@ -8666,6 +8850,8 @@
       juegoActivoDesmontar();
       juegoActivoDesmontar = null;
     }
+
+    desactivarFestejoMenu();
 
     if (menu) menu.classList.add('hidden');
     toggleRefreshStatusMenu(false);
@@ -8741,6 +8927,12 @@
     if (kicker) kicker.textContent = 'juegos del día';
     if (status) status.textContent = `Seleccioná uno de los ${Object.keys(JUEGOS).length} juegos de hoy`;
 
+    if (esCumpleHoy()) {
+      activarFestejoMenu();
+    } else {
+      desactivarFestejoMenu();
+    }
+
     if (modal) {
       modal.classList.add('visible');
       modal.setAttribute('aria-hidden', 'false');
@@ -8757,6 +8949,7 @@
       juegoActivoDesmontar();
       juegoActivoDesmontar = null;
     }
+    desactivarFestejoMenu();
     limpiarBloqueoCountdown();
     limpiarRefreshStatusMenu();
     toggleRefreshStatusMenu(true);
@@ -8776,11 +8969,198 @@
     toggleBodyModalLock(false);
   }
 
+  let modoCumpleActivo = false;
+  let globoSpawnTimer = null;
+  let entradaCumpleEjecutada = false;
+
+  function lanzarConfetti(cantidad, contenedor = confettiCapa, opacidadPico = 1, timersOut = null) {
+    if (!contenedor) return;
+    const colores = ['#ff6b6b', '#ffd166', '#4cc9f0', '#c77dff', '#7ae582', '#f72585', '#ffb703'];
+    for (let i = 0; i < cantidad; i++) {
+      const pieza = document.createElement('span');
+      pieza.className = 'confeti-pieza' + (Math.random() < 0.5 ? ' redonda' : '');
+      const izquierda = Math.random() * 100;
+      const duracion = 2.8 + Math.random() * 1.8;
+      const retraso = Math.random() * 0.5;
+      const deriva = Math.round(Math.random() * 140 - 70);
+      const rotacion = Math.round(Math.random() * 720 - 360);
+      const ancho = 6 + Math.random() * 6;
+      const alto = ancho * (0.5 + Math.random() * 0.7);
+      pieza.style.left = `${izquierda}%`;
+      pieza.style.background = colores[Math.floor(Math.random() * colores.length)];
+      pieza.style.width = `${ancho}px`;
+      pieza.style.height = `${alto}px`;
+      pieza.style.setProperty('--duracion', `${duracion}s`);
+      pieza.style.setProperty('--retraso', `${retraso}s`);
+      pieza.style.setProperty('--deriva', `${deriva}px`);
+      pieza.style.setProperty('--rot', `${rotacion}deg`);
+      pieza.style.setProperty('--confeti-opacidad-pico', String(opacidadPico));
+      contenedor.appendChild(pieza);
+      const timerId = window.setTimeout(() => pieza.remove(), (duracion + retraso) * 1000 + 250);
+      if (Array.isArray(timersOut)) timersOut.push(timerId);
+    }
+  }
+
+  // Guirnalda de banderines reutilizable: genera un <svg> nuevo cada vez que se
+  // llama, para poder usarla tanto en la pantalla principal como dentro de
+  // cualquier panel (ej. el modal de juegos) sin duplicar las coordenadas.
+  function crearGuirnaldaSVG(cantidadFlags = 12, ancho = 400, alto = 46) {
+    const colores = ['#ff6b6b', '#ffd166', '#4cc9f0', '#c77dff', '#7ae582'];
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${ancho} ${alto}`);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+
+    const cuerdaY = alto * 0.22;
+    const puntaY = alto * 0.7;
+    const paso = ancho / cantidadFlags;
+    const anchoFlag = Math.max(8, paso * 0.6);
+
+    const cuerda = document.createElementNS(svgNS, 'line');
+    cuerda.setAttribute('x1', '0');
+    cuerda.setAttribute('y1', String(cuerdaY));
+    cuerda.setAttribute('x2', String(ancho));
+    cuerda.setAttribute('y2', String(cuerdaY));
+    cuerda.setAttribute('stroke', 'rgba(255,255,255,0.55)');
+    cuerda.setAttribute('stroke-width', '1.5');
+    svg.appendChild(cuerda);
+
+    for (let i = 0; i < cantidadFlags; i++) {
+      const cx = paso * (i + 0.5);
+      const flag = document.createElementNS(svgNS, 'polygon');
+      flag.setAttribute('points', `${cx - anchoFlag / 2},${cuerdaY} ${cx + anchoFlag / 2},${cuerdaY} ${cx},${puntaY}`);
+      flag.setAttribute('fill', colores[i % colores.length]);
+      svg.appendChild(flag);
+    }
+
+    return svg;
+  }
+
+  let menuConfettiTimers = [];
+
+  function activarFestejoMenu() {
+    const gameConfettiCapa = document.getElementById('game-confeti-capa');
+    const gameBanderinesEl = document.getElementById('game-banderines');
+    const kicker = document.getElementById('game-kicker');
+    const title = document.getElementById('game-title');
+
+    if (kicker) kicker.textContent = 'feliz cumple';
+    if (title) title.textContent = 'Los juegos de hoy son especiales 🎉';
+
+    if (gameBanderinesEl) {
+      if (!gameBanderinesEl.dataset.armado) {
+        gameBanderinesEl.appendChild(crearGuirnaldaSVG(14, 400, 32));
+        gameBanderinesEl.dataset.armado = '1';
+      }
+      gameBanderinesEl.classList.add('visible');
+    }
+
+    if (gameConfettiCapa && !prefiereMovimientoReducido()) {
+      const cantidad = window.innerWidth < 600 ? 15 : 25;
+      lanzarConfetti(cantidad, gameConfettiCapa, 0.6, menuConfettiTimers);
+    }
+  }
+
+  function desactivarFestejoMenu() {
+    menuConfettiTimers.forEach((id) => window.clearTimeout(id));
+    menuConfettiTimers = [];
+    const gameConfettiCapa = document.getElementById('game-confeti-capa');
+    if (gameConfettiCapa) gameConfettiCapa.innerHTML = '';
+    const gameBanderinesEl = document.getElementById('game-banderines');
+    if (gameBanderinesEl) gameBanderinesEl.classList.remove('visible');
+  }
+
+  function spawnGlobo() {
+    if (!globos) return;
+    const colores = [
+      'linear-gradient(180deg, #ff7aa2, #ff4d6d)',
+      'linear-gradient(180deg, #7bdff2, #35b7d7)',
+      'linear-gradient(180deg, #ffd166, #ff9f1c)',
+      'linear-gradient(180deg, #c77dff, #8a5cf6)',
+      'linear-gradient(180deg, #7ae582, #2ec27e)'
+    ];
+    const globo = document.createElement('span');
+    globo.className = 'globo';
+    const izquierda = 6 + Math.random() * 88;
+    const duracion = 11 + Math.random() * 6;
+    const deriva = Math.round(16 + Math.random() * 24);
+    globo.style.left = `${izquierda}%`;
+    globo.style.background = colores[Math.floor(Math.random() * colores.length)];
+    globo.style.setProperty('--duracion', `${duracion}s`);
+    globo.style.setProperty('--deriva', `${deriva}px`);
+    globos.appendChild(globo);
+    window.setTimeout(() => globo.remove(), duracion * 1000 + 300);
+  }
+
+  function programarGlobo() {
+    if (globoSpawnTimer || prefiereMovimientoReducido()) return;
+    const disparar = () => {
+      if (!modoCumpleActivo || prefiereMovimientoReducido()) {
+        globoSpawnTimer = null;
+        return;
+      }
+      spawnGlobo();
+      globoSpawnTimer = window.setTimeout(disparar, 8000 + Math.random() * 7000);
+    };
+    globoSpawnTimer = window.setTimeout(disparar, 1200);
+  }
+
+  function detenerGlobos() {
+    if (globoSpawnTimer) {
+      window.clearTimeout(globoSpawnTimer);
+      globoSpawnTimer = null;
+    }
+    if (globos) globos.innerHTML = '';
+  }
+
+  function reproducirSecuenciaEntradaCumple() {
+    const reducido = prefiereMovimientoReducido();
+    if (!reducido) {
+      const cantidad = window.innerWidth < 600 ? 35 : 60;
+      lanzarConfetti(cantidad);
+    }
+    if (cumpleMensajeEl) {
+      cumpleMensajeEl.classList.add('mostrar');
+      window.setTimeout(() => cumpleMensajeEl.classList.remove('mostrar'), 4300);
+    }
+  }
+
+  function evaluarEntradaCumple(ahora) {
+    if (entradaCumpleEjecutada) return;
+    entradaCumpleEjecutada = true;
+
+    const forzado = cumpleForzado();
+    const claveHoy = fechaClaveLocal(ahora);
+    if (!forzado) {
+      const estado = leerEstado();
+      if (estado.cumpleVisto === claveHoy) return;
+      guardarEstado({ ...estado, cumpleVisto: claveHoy });
+    }
+    reproducirSecuenciaEntradaCumple();
+  }
+
+  function activarAmbienteCumple(ahora) {
+    if (!modoCumpleActivo) {
+      modoCumpleActivo = true;
+      if (banderines) banderines.classList.add('visible');
+      programarGlobo();
+    }
+    evaluarEntradaCumple(ahora);
+  }
+
+  function desactivarAmbienteCumple() {
+    if (!modoCumpleActivo) return;
+    modoCumpleActivo = false;
+    if (banderines) banderines.classList.remove('visible');
+    detenerGlobos();
+  }
+
   function pintarCielo(){
     const ahora = new Date();
     const h = ahora.getHours();
     const dia = ahora.getDay();
-    const esCumple = ahora.getMonth() === 8 && ahora.getDate() === 7;
+    const esCumple = esCumpleHoy(ahora);
     const t = TEMAS.find(x => h < x.max) || TEMAS[TEMAS.length - 1];
     const r = document.documentElement.style;
     r.setProperty('--cielo-a', t.a);
@@ -8802,19 +9182,19 @@
     franja.textContent = hora + ' · ' + t.id;
 
     if (esCumple) {
-      saludoTexto.textContent = 'Hola';
-      nombre.textContent = 'Fran';
-      diaMensaje.textContent = 'Que tengas un gran día!';
+      saludoTexto.textContent = 'Feliz';
+      nombre.textContent = 'cumple, Fran';
+      diaMensaje.textContent = '¡Que la pases increíble hoy!';
       if (diaSemana) diaSemana.textContent = 'Feliz cumpleaños';
-      globos.classList.add('visible');
+      activarAmbienteCumple(ahora);
       return;
     }
 
+    desactivarAmbienteCumple();
     saludoTexto.textContent = 'Hola';
     nombre.textContent = 'Fran';
     diaMensaje.textContent = obtenerMensajeDelDiaSegunHora();
     if (diaSemana) diaSemana.textContent = MENSAJES_POR_DIA[dia] || 'Feliz día';
-    globos.classList.remove('visible');
   }
 
   const gameBadge = document.getElementById('game-badge');
@@ -9043,6 +9423,7 @@
         juegosVistos: Array.isArray(estadoNormalizado.juegosVistos) ? estadoNormalizado.juegosVistos : [],
         progreso: estadoNormalizado.progreso || null,
         secretas: Array.isArray(estadoNormalizado.secretas) ? estadoNormalizado.secretas : [],
+        cumpleVisto: typeof estadoNormalizado.cumpleVisto === 'string' ? estadoNormalizado.cumpleVisto : null,
         versionVista: VERSION_JUEGOS > versionVista ? VERSION_JUEGOS : versionVista
       }));
       await Almacen.guardar(estadoActual);
